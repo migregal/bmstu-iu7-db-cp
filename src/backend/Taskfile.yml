@@ -1,0 +1,29 @@
+version: "3"
+# https://taskfile.dev/#/installation
+
+env:
+  COVDIR: './tmp/cov'
+
+tasks:
+  generate:
+    desc: Generates mocks for ports interfaces
+    cmds:
+      - go generate ./...
+
+  test:lint:
+    desc: Runs linters for golang code
+    cmds:
+      - golangci-lint run
+
+  test:unit:
+    desc: Runs unit test with coverage output
+    cmds:
+      - mkdir -p {{.COVDIR}}
+      - go test -coverpkg=./... -coverprofile $COVDIR/cov.out ./... > /dev/null
+      - task: test:coverage
+
+  test:coverage:
+    desc: Build coverage report from tests result
+    cmds:
+      - go tool cover -html=$COVDIR/cov.out -o $COVDIR/cover.html
+      - go tool cover -func=$COVDIR/cov.out
