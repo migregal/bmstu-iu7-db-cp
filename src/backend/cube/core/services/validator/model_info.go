@@ -1,0 +1,134 @@
+package validator
+
+import (
+	"fmt"
+	"neural_storage/cube/core/entities/model"
+	"neural_storage/cube/core/entities/structure"
+)
+
+func (v *Validator) ValidateModelInfo(info *model.Info) error {
+	if info == nil {
+		return nil
+	}
+
+	return v.validateModelStructure(info.Structure())
+}
+
+func (v *Validator) validateModelStructure(info *structure.Info) error {
+	if info == nil {
+		return nil
+	}
+
+	if err := v.validateLayers(info); err != nil {
+		return err
+	}
+
+	neuronIds, err := v.validateNeurons(info)
+	if err != nil {
+		return err
+	}
+
+	if err = v.validateNeuronOffsets(info, neuronIds); err != nil {
+		return err
+	}
+
+	if err = v.validateNeuronLinks(info, neuronIds); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (v *Validator) validateLayers(info *structure.Info) error {
+	if len(info.Layers()) > 0 && len(info.Neurons()) == 0 {
+		return fmt.Errorf("missing neuron info")
+	}
+
+	layerIds := make(map[string]struct{})
+	for _, v := range info.Layers() {
+		if _, found := layerIds[v.Id()]; found {
+			return fmt.Errorf("duplicate layer info")
+		}
+
+		layerIds[v.Id()] = struct{}{}
+	}
+
+	for _, v := range info.Neurons() {
+		if _, found := layerIds[v.LayerID()]; !found {
+			return fmt.Errorf("missing layer info")
+		}
+	}
+
+	return nil
+}
+
+func (v *Validator) validateNeurons(info *structure.Info) (map[string]struct{}, error) {
+	neuronIds := make(map[string]struct{})
+	for _, v := range info.Neurons() {
+		if _, found := neuronIds[v.Id()]; found {
+			return nil, fmt.Errorf("duplicate neuron info")
+		}
+
+		neuronIds[v.Id()] = struct{}{}
+	}
+
+	return neuronIds, nil
+}
+
+func (v *Validator) validateNeuronOffsets(info *structure.Info, neurons map[string]struct{}) (err error) {
+	if neurons == nil {
+		if neurons, err = v.validateNeurons(info); err != nil {
+			return
+		}
+	}
+
+	for _, w := range info.Weights() {
+		for _, v := range w.Offsets() {
+			if _, found := neurons[v.Id()]; !found {
+				return fmt.Errorf("missing neuron info")
+			}
+			if err = validateFloatValue(v.Offset()); err != nil {
+				return fmt.Errorf("neuron offset: %w", err)
+			}
+		}
+	}
+
+	return
+}
+
+func (v *Validator) validateNeuronLinks(info *structure.Info, neurons map[string]struct{}) (err error) {
+	if neurons == nil {
+		if neurons, err = v.validateNeurons(info); err != nil {
+			return
+		}
+	}
+
+	linksIds := make(map[string]struct{})
+	for _, v := range info.Links() {
+		if _, found := linksIds[v.Id()]; found {
+			return fmt.Errorf("duplicate link info")
+		}
+
+		linksIds[v.Id()] = struct{}{}
+
+		if _, found := neurons[v.From()]; !found {
+			return fmt.Errorf("missing neuron info")
+		}
+		if _, found := neurons[v.To()]; !found {
+			return fmt.Errorf("missing neuron info")
+		}
+	}
+
+	for _, w := range info.Weights() {
+		for _, v := range w.Weights() {
+			if _, found := linksIds[v.Id()]; !found {
+				return fmt.Errorf("missing neuron info")
+			}
+			if err = validateFloatValue(v.Weight()); err != nil {
+				return fmt.Errorf("neuron link weight: %w", err)
+			}
+		}
+	}
+
+	return nil
+}
