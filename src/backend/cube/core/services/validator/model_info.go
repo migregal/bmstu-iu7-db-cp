@@ -46,11 +46,11 @@ func (v *Validator) validateLayers(info *structure.Info) error {
 
 	layerIds := make(map[string]struct{})
 	for _, v := range info.Layers() {
-		if _, found := layerIds[v.Id()]; found {
+		if _, found := layerIds[v.ID()]; found {
 			return fmt.Errorf("duplicate layer info")
 		}
 
-		layerIds[v.Id()] = struct{}{}
+		layerIds[v.ID()] = struct{}{}
 	}
 
 	for _, v := range info.Neurons() {
@@ -84,7 +84,7 @@ func (v *Validator) validateNeuronOffsets(info *structure.Info, neurons map[stri
 
 	for _, w := range info.Weights() {
 		for _, v := range w.Offsets() {
-			if _, found := neurons[v.Id()]; !found {
+			if _, found := neurons[v.ID()]; !found {
 				return fmt.Errorf("missing neuron info")
 			}
 			if err = validateFloatValue(v.Offset()); err != nil {
@@ -121,7 +121,7 @@ func (v *Validator) validateNeuronLinks(info *structure.Info, neurons map[string
 
 	for _, w := range info.Weights() {
 		for _, v := range w.Weights() {
-			if _, found := linksIds[v.Id()]; !found {
+			if _, found := linksIds[v.ID()]; !found {
 				return fmt.Errorf("missing neuron info")
 			}
 			if err = validateFloatValue(v.Weight()); err != nil {

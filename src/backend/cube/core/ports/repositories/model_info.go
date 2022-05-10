@@ -16,6 +16,7 @@ type ModelInfoRepository interface {
 }
 
 type ModelInfoFilter struct {
-	Ids []string
-	Limit int
+	OwnerID string
+	Ids     []string
+	Limit   int
 }

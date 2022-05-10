@@ -16,17 +16,24 @@ type UserInfoRepository struct {
 }
 
 // Add provides a mock function with given fields: _a0
-func (_m *UserInfoRepository) Add(_a0 user.Info) error {
+func (_m *UserInfoRepository) Add(_a0 user.Info) (string, error) {
 	ret := _m.Called(_a0)
 
-	var r0 error
-	if rf, ok := ret.Get(0).(func(user.Info) error); ok {
+	var r0 string
+	if rf, ok := ret.Get(0).(func(user.Info) string); ok {
 		r0 = rf(_a0)
 	} else {
-		r0 = ret.Error(0)
+		r0 = ret.Get(0).(string)
 	}
 
-	return r0
+	var r1 error
+	if rf, ok := ret.Get(1).(func(user.Info) error); ok {
+		r1 = rf(_a0)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // Delete provides a mock function with given fields: _a0
@@ -44,15 +51,15 @@ func (_m *UserInfoRepository) Delete(_a0 user.Info) error {
 }
 
 // Find provides a mock function with given fields: filter
-func (_m *UserInfoRepository) Find(filter repositories.UserInfoFilter) ([]*user.Info, error) {
+func (_m *UserInfoRepository) Find(filter repositories.UserInfoFilter) ([]user.Info, error) {
 	ret := _m.Called(filter)
 
-	var r0 []*user.Info
-	if rf, ok := ret.Get(0).(func(repositories.UserInfoFilter) []*user.Info); ok {
+	var r0 []user.Info
+	if rf, ok := ret.Get(0).(func(repositories.UserInfoFilter) []user.Info); ok {
 		r0 = rf(filter)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*user.Info)
+			r0 = ret.Get(0).([]user.Info)
 		}
 	}
 
@@ -67,18 +74,18 @@ func (_m *UserInfoRepository) Find(filter repositories.UserInfoFilter) ([]*user.
 }
 
 // Get provides a mock function with given fields: _a0
-func (_m *UserInfoRepository) Get(_a0 user.Info) (user.Info, error) {
+func (_m *UserInfoRepository) Get(_a0 string) (user.Info, error) {
 	ret := _m.Called(_a0)
 
 	var r0 user.Info
-	if rf, ok := ret.Get(0).(func(user.Info) user.Info); ok {
+	if rf, ok := ret.Get(0).(func(string) user.Info); ok {
 		r0 = rf(_a0)
 	} else {
 		r0 = ret.Get(0).(user.Info)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(user.Info) error); ok {
+	if rf, ok := ret.Get(1).(func(string) error); ok {
 		r1 = rf(_a0)
 	} else {
 		r1 = ret.Error(1)

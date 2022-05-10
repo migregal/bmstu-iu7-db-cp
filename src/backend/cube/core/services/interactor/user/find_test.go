@@ -23,8 +23,8 @@ func (s *FindSuite) TearDownTest() {
 
 func (s *FindSuite) TestFind() {
 	filter := Filter{}
-	expected := []*user.Info{
-		user.NewInfo(nil, nil, nil, nil, nil),
+	expected := []user.Info{
+		*user.NewInfo(nil, nil, nil, nil, nil, nil),
 	}
 
 	s.mockedRepo.On("Find", mock.Anything).Return(expected, nil)

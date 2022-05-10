@@ -8,6 +8,7 @@ import (
 )
 
 type Info struct {
+	id      string
 	name    string
 	neurons []*neuron.Info
 	layers  []*layer.Info

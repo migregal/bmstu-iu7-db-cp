@@ -24,12 +24,13 @@ func (s *RegisterSuite) TearDownTest() {
 func (s *RegisterSuite) TestRegister() {
 	s.mockedValidator.On("ValidateUserInfo", mock.Anything).Return(true)
 
-	expected := user.NewInfo(nil, nil, nil, nil, nil)
-	s.mockedRepo.On("Add", mock.Anything).Return(nil)
+	expected := user.NewInfo(nil, nil, nil, nil, nil, nil)
+	s.mockedRepo.On("Add", mock.Anything).Return("hehe", nil)
 
-	err := s.interactor.Register(*expected)
+	id, err := s.interactor.Register(*expected)
 
 	require.NoError(s.T(), err)
+	require.Equal(s.T(), "hehe", id)
 
 	require.True(s.T(), s.mockedRepo.AssertExpectations(s.T()))
 }

@@ -7,7 +7,6 @@ import (
 	"neural_storage/cube/core/services/validator"
 )
 
-
 func NewValidator(conf config.ValidatorConfig) ports.Validator {
 	if conf.IsMocked() {
 		return &mock.Validator{}

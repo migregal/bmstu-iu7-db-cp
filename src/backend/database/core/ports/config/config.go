@@ -4,8 +4,12 @@
 
 package config
 
+import "neural_storage/database/core/services/interactor/database"
+
 type UserInfoRepositoryConfig interface {
 	IsMocked() bool
+	Adapter() string
+	ConnParams() database.Params
 }
 
 type ModelInfoRepositoryConfig interface {
