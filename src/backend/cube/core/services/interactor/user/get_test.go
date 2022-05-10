@@ -24,10 +24,11 @@ func (s *GetSuite) TearDownTest() {
 func (s *GetSuite) TestGet() {
 	s.mockedValidator.On("ValidateUserInfo", mock.Anything).Return(true)
 
-	expected := user.NewInfo(nil, nil, nil, nil, nil)
+	id := ""
+	expected := user.NewInfo(&id, nil, nil, nil, nil, nil)
 	s.mockedRepo.On("Get", mock.Anything).Return(*expected, nil)
 
-	info, err := s.interactor.Get(*expected)
+	info, err := s.interactor.Get(*expected.Id())
 
 	require.NoError(s.T(), err)
 	require.Equal(s.T(), info, *expected)

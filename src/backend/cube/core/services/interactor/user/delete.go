@@ -6,7 +6,7 @@ import (
 )
 
 func (i *Interactor) Delete(userId string) error {
-	info := user.NewInfo(&userId, nil, nil, nil, nil)
+	info := user.NewInfo(&userId, nil, nil, nil, nil, nil)
 	valid := i.validator.ValidateUserInfo(info)
 	if !valid {
 		return fmt.Errorf("invalid user info")

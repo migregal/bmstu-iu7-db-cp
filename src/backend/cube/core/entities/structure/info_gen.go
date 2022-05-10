@@ -7,6 +7,10 @@ import (
 	"neural_storage/cube/core/entities/structure/weights"
 )
 
+func (i *Info) ID() string {
+	return i.id
+}
+
 func (i *Info) Name() string {
 	return i.name
 }

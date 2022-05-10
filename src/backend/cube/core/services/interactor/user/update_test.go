@@ -24,7 +24,7 @@ func (s *UpdateSuite) TearDownTest() {
 func (s *UpdateSuite) TestUpdate() {
 	s.mockedValidator.On("ValidateUserInfo", mock.Anything).Return(true)
 
-	expected := user.NewInfo(nil, nil, nil, nil, nil)
+	expected := user.NewInfo(nil, nil, nil, nil, nil, nil)
 	s.mockedRepo.On("Update", mock.Anything).Return(nil)
 
 	err := s.interactor.Update(*expected)

@@ -1,7 +1,11 @@
 package weight
 
-func (i *Info) Id() string {
+func (i *Info) ID() string {
 	return i.id
+}
+
+func (i *Info) LinkID() string {
+	return i.linkID
 }
 
 func (i *Info) Weight() float64 {

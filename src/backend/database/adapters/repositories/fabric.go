@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"neural_storage/cube/core/ports/repositories"
+	"neural_storage/database/adapters/repositories/explicit/userinfo"
 	"neural_storage/database/adapters/repositories/mock"
 	"neural_storage/database/core/ports/config"
 )
@@ -10,7 +11,17 @@ func NewUserInfoAdapter(conf config.UserInfoRepositoryConfig) repositories.UserI
 	if conf.IsMocked() {
 		return &mock.UserInfoRepository{}
 	}
-	return nil
+
+	switch conf.Adapter() {
+	case "expl":
+		repo, err := userinfo.NewRepository(conf)
+		if err != nil {
+			panic(err)
+		}
+		return &repo
+	}
+
+	panic("wrong db adapter specified")
 }
 
 func NewModelInfoAdapter(conf config.ModelInfoRepositoryConfig) repositories.ModelInfoRepository {

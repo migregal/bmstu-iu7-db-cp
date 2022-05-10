@@ -12,7 +12,7 @@ type Filter struct {
 	Limit     int
 }
 
-func (i *Interactor) Find(filter Filter) ([]*user.Info, error) {
+func (i *Interactor) Find(filter Filter) ([]user.Info, error) {
 	return i.userInfo.Find(
 		repositories.UserInfoFilter{
 			UserIds:   filter.Ids,

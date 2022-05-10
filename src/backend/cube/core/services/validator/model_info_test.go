@@ -72,10 +72,10 @@ func TestValidator_ValidateModelInfo(t *testing.T) {
 							weights.NewInfo(
 								"",
 								[]*weight.Info{
-									weight.NewInfo("", 10.0),
+									weight.NewInfo("", "", 10.0),
 								},
 								[]*offset.Info{
-									offset.NewInfo("", -2.0),
+									offset.NewInfo("", "", -2.0),
 								},
 							),
 						},
