@@ -1,0 +1,30 @@
+version: '3.9'
+
+services:
+  postgres_db:
+    extends:
+      file: common-services.yml
+      service: postgres_db
+    env_file: ./database/.smoke.env
+    ports:
+      - 5432:5432
+
+  mysql:
+    extends:
+      file: common-services.yml
+      service: mysql_db
+    env_file: ./database/.smoke.env
+    ports:
+      - 3306:3306
+
+  migration:
+    extends:
+      file: common-services.yml
+      service: migration
+    env_file: ./database/.smoke.env
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    restart: on-failure:5

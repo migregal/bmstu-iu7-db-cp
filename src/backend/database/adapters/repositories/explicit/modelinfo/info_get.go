@@ -126,7 +126,7 @@ func (r *Repository) getDetailsWeightsInfo(weightsInfo []weights.Weights) ([]acc
 		weightInfo = append(weightInfo,
 			accumulatedWeightInfo{
 				weightsInfo: &weights.Weights{ID: v.ID, Name: v.Name},
-				offsets: offsets, weights: weight})
+				offsets:     offsets, weights: weight})
 	}
 	return weightInfo, nil
 }

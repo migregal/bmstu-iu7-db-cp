@@ -6,12 +6,14 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/google/uuid v1.3.0
 	github.com/stretchr/testify v1.7.1
+	gorm.io/driver/mysql v1.3.3
 	gorm.io/driver/postgres v1.3.5
 	gorm.io/gorm v1.23.5
 )
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.12.0 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
