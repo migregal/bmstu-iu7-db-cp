@@ -1,9 +1,6 @@
 version: "3"
 # https://taskfile.dev/#/installation
 
-env:
-  COVDIR: './tmp/cov'
-
 tasks:
   generate:
     desc: Generates mocks for ports interfaces
@@ -17,13 +14,44 @@ tasks:
 
   test:unit:
     desc: Runs unit test with coverage output
+    deps:
+      - dir:out
+    vars:
+      OUT: ./out/unit-coverage.out
+      HTML: ./out/unit-coverage.html
     cmds:
-      - mkdir -p {{.COVDIR}}
-      - go test -coverpkg=./... -coverprofile $COVDIR/cov.out ./... > /dev/null
+      - go test -tags=unit -coverprofile={{.OUT}} -coverpkg=./... ./...
       - task: test:coverage
+        vars:
+          OUT: "{{.OUT}}"
+          HTML: "{{.HTML}}"
+
+  test:smoke:
+    desc: Run smoke tests for project
+    deps:
+      - dir:out
+    vars:
+      OUT: ./out/smoke-coverage.out
+      HTML: ./out/smoke-coverage.html
+      DOCKERCOMPOSE: docker-compose.smoke.yml
+    cmds:
+      - docker-compose -f {{.DOCKERCOMPOSE}} up --force-recreate -d
+      - defer: docker-compose -f {{.DOCKERCOMPOSE}} down
+      - go test -tags=smoke -coverprofile={{.OUT}} -coverpkg=./... ./...
+      - task: test:coverage
+        vars:
+          OUT: "{{.OUT}}"
+          HTML: "{{.HTML}}"
 
   test:coverage:
     desc: Build coverage report from tests result
     cmds:
-      - go tool cover -html=$COVDIR/cov.out -o $COVDIR/cover.html
-      - go tool cover -func=$COVDIR/cov.out
+      - go tool cover -html={{.OUT}} -o {{.HTML}}
+      - go tool cover -func={{.OUT}}
+
+  dir:out:
+    desc: Creates out directiory
+    cmds:
+      - mkdir -p out
+    status:
+      - test -d out

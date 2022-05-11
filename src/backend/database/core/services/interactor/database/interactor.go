@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 
+	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -13,6 +14,7 @@ type Interactor struct {
 
 type Params struct {
 	Host     string
+	Port     string
 	User     string
 	Password string
 	DBName   string
@@ -31,15 +33,26 @@ func New(p Params) (Interactor, error) {
 func newDBDialector(p Params) gorm.Dialector {
 	switch p.Driver {
 	case "pg":
-		dbConfig := fmt.Sprintf("host=%s dbname=%s user=%s password=%s sslmode=%s",
+		dbConfig := fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=%s",
 			p.Host,
-			p.User,
+			p.Port,
 			p.DBName,
+			p.User,
 			p.Password,
 			"disable",
 		)
 
 		return postgres.Open(dbConfig)
+	case "mysql":
+		dbConfig := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+			p.User,
+			p.Password,
+			p.Host,
+			p.Port,
+			p.DBName,
+		)
+
+		return mysql.Open(dbConfig)
 	}
 
 	panic("wrong db driver specified")
