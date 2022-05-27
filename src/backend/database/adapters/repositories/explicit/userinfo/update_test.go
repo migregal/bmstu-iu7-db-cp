@@ -24,13 +24,13 @@ func (s *UpdateSuite) TearDownTest() {
 	s.TestSuite.TearDownTest()
 }
 
-func (s *UpdateSuite) TestAdd() {
+func (s *UpdateSuite) TestUpdate() {
 	id := "test"
-	expected := *user.NewInfo(&id, nil, nil, nil, nil, nil)
+	expected := *user.NewInfo(&id, nil, nil, nil, nil, 0, nil)
 
 	s.SqlMock.
 		ExpectExec(`^UPDATE "users_info" SET`).
-		WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), id).
+		WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), id).
 		WillReturnResult(sqlmock.NewResult(0, 1))
 
 	err := s.repo.Update(expected)

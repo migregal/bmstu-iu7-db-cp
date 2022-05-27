@@ -12,6 +12,6 @@ type Info struct {
 	offsets []*offset.Info
 }
 
-func NewInfo(name string, weights []*weight.Info, offsets []*offset.Info) *Info {
-	return &Info{name: name, weights: weights, offsets: offsets}
+func NewInfo(id string, name string, weights []*weight.Info, offsets []*offset.Info) *Info {
+	return &Info{id: id, name: name, weights: weights, offsets: offsets}
 }

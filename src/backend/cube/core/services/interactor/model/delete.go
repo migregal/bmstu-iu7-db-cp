@@ -1,5 +1,7 @@
 package model
 
-func (i *Interactor) Delete(modelId string) error {
-	return i.modelInfo.Delete(modelId)
+import "neural_storage/cube/core/entities/model"
+
+func (i *Interactor) Delete(ownerID, modelID string) error {
+	return i.modelInfo.Delete(*model.NewInfo(ownerID, modelID, nil))
 }

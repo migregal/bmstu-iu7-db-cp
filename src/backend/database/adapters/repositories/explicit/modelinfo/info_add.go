@@ -70,25 +70,31 @@ func (r *Repository) Add(info model.Info) (string, error) {
 }
 
 func (r *Repository) createModelInfo(info dbmodel.Model) (string, error) {
-	m := dbmodel.Model{ID: info.ID, Name: info.Name}
+	m := dbmodel.Model{ID: info.GetID(), Name: info.GetName()}
 	err := r.db.Create(&m).Error
-	return m.ID, err
+	return m.GetID(), err
 }
 
 func (r *Repository) createStructInfo(info dbstructure.Structure) (string, error) {
-	m := dbstructure.Structure{ID: info.ID, Name: info.Name}
+	m := dbstructure.Structure{ID: info.GetID(), ModelID: info.GetModelID(), Name: info.GetName()}
 	err := r.db.Create(&m).Error
 
 	if err != nil {
-		return m.ID, fmt.Errorf("add struct info: %w", err)
+		return m.GetID(), fmt.Errorf("add struct info: %w", err)
 	}
-	return m.ID, nil
+	return m.GetID(), nil
 }
 
 func (r *Repository) createLayersInfo(info []dblayer.Layer) error {
 	var layers []dblayer.Layer
 	for _, v := range info {
-		layers = append(layers, dblayer.Layer{StructID: v.StructID, LimitFunc: v.LimitFunc, ActivationFunc: v.ActivationFunc})
+		layers = append(layers,
+			dblayer.Layer{
+				StructureID:    v.GetStructID(),
+				LimitFunc:      v.GetLimitFunc(),
+				ActivationFunc: v.GetActivationFunc(),
+			},
+		)
 	}
 	if err := r.db.Create(&layers).Error; err != nil {
 		return fmt.Errorf("add struct info: %w", err)
@@ -99,23 +105,16 @@ func (r *Repository) createLayersInfo(info []dblayer.Layer) error {
 func (r *Repository) createNeuronsInfo(info []dbneuron.Neuron) error {
 	var neurons []dbneuron.Neuron
 	for _, v := range info {
-		neurons = append(neurons, dbneuron.Neuron{NeuronID: v.NeuronID, LayerID: v.LayerID})
+		neurons = append(neurons, dbneuron.Neuron{ID: v.ID, LayerID: v.LayerID})
 	}
 	return r.db.Create(&neurons).Error
 }
 
 func (r *Repository) createLinksInfo(structureID string, info []dblink.Link) error {
-	var links []dblink.Link
-	for _, v := range info {
-		links = append(links,
-			dblink.Link{
-				StructureID: structureID,
-				LinkID:      v.LinkID,
-				FromID:      v.FromID,
-				ToID:        v.ToID,
-			})
+	for i := range info {
+		info[i].Structure = structureID
 	}
-	return r.db.Create(&links).Error
+	return r.db.Create(&info).Error
 }
 
 func (r *Repository) createWeightsInfoTransact(tx database.Interactor, info []accumulatedWeightInfo) error {

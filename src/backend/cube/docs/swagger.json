@@ -1,0 +1,1349 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is cube server.",
+        "title": "Cube API",
+        "contact": {},
+        "license": {
+            "name": "MIT",
+            "url": "https://mit-license.org/"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api/v1",
+    "paths": {
+        "/api/v1/admin/login": {
+            "post": {
+                "description": "login to existing account",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth",
+                    "admin"
+                ],
+                "summary": "Admin login",
+                "parameters": [
+                    {
+                        "description": "The body to create a thing",
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Login was successfull",
+                        "schema": {
+                            "$ref": "#/definitions/LoginResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Login data is invalid or missing, check request",
+                        "schema": {
+                            "$ref": "#/definitions/Unauthorized"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/models": {
+            "get": {
+                "description": "Find such model info as id, username, email and fullname",
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Find model info",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Model ID to search for",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "User ID that owns model to search for",
+                        "name": "owner_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Model name to search for",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number for pagination",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page size for pagination",
+                        "name": "per_page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Model info found",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/AdminModelInfoResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    },
+                    "500": {
+                        "description": "Failed to get model info from storage"
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes model info from any user",
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Delete model info",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Model ID to delete",
+                        "name": "id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Model info deleted"
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    },
+                    "500": {
+                        "description": "Failed to delete model info from storage"
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/models/weights": {
+            "get": {
+                "description": "Find such model info as id, username, email and fullname",
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Find model info",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Weight ID to search for",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Structure ID to search for",
+                        "name": "structure_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Weights name to search for",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number for pagination",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page size for pagination",
+                        "name": "per_page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Model weights info found",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/AdminModelWeightsInfoResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    },
+                    "500": {
+                        "description": "Failed to get model weights info from storage"
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes model info from any user",
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Delete model info",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Model ID to delete",
+                        "name": "id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Model info deleted"
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    },
+                    "403": {
+                        "description": "Invalid token, user id not specified"
+                    },
+                    "500": {
+                        "description": "Failed to delete model info from storage"
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/users": {
+            "get": {
+                "description": "Find such users info as id, username, email and fullname",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Find user info",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UserId to search for",
+                        "name": "user_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Username to search for",
+                        "name": "username",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Email to search for",
+                        "name": "email",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Email to search for",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Email to search for",
+                        "name": "per_page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Users info found",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/AdminUserInfoResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    },
+                    "500": {
+                        "description": "Failed to get user info from storage"
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes user by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Delete user info",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UserId to delete",
+                        "name": "id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User deleted"
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    },
+                    "500": {
+                        "description": "Failed to delete user info from storage"
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/users/blocked": {
+            "get": {
+                "description": "Find such users info as id and block time",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Find user block info",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UserId to search for",
+                        "name": "user_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Users block info found",
+                        "schema": {
+                            "$ref": "#/definitions/AdminBlockUserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    },
+                    "500": {
+                        "description": "Failed to get user info from storage"
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes user block info by user id",
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Delete user block info",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID to unblock",
+                        "name": "id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User unblocked"
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    },
+                    "500": {
+                        "description": "Failed to delete user block info from storage"
+                    }
+                }
+            }
+        },
+        "/api/v1/login": {
+            "post": {
+                "description": "Login to existing account",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth",
+                    "user"
+                ],
+                "summary": "User login",
+                "parameters": [
+                    {
+                        "description": "The body to create a thing",
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Login was successfull",
+                        "schema": {
+                            "$ref": "#/definitions/LoginResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Login data is invalid or missing, check request",
+                        "schema": {
+                            "$ref": "#/definitions/Unauthorized"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/models": {
+            "get": {
+                "description": "Find such model info as id, username, email and fullname",
+                "tags": [
+                    "user"
+                ],
+                "summary": "Find model info",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Model ID to search for",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "User ID that owns model to search for",
+                        "name": "owner_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Model name to search for",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number for pagination",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page size for pagination",
+                        "name": "per_page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Model info found",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ModelInfoResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    },
+                    "500": {
+                        "description": "Failed to get model info from storage"
+                    }
+                }
+            },
+            "post": {
+                "description": "Adds such model info as title, structure, weights",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Create new model",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Model Title to create",
+                        "name": "title",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Model Structure Title to add",
+                        "name": "structure_title",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Model Structure to add",
+                        "name": "structure",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Model Weights Title to add",
+                        "name": "weights_title",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Model Weights to add",
+                        "name": "weights",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Model created"
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    },
+                    "403": {
+                        "description": "Invalid token, user id not specified"
+                    },
+                    "500": {
+                        "description": "Failed to create model info"
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes model info owned by authorized user",
+                "tags": [
+                    "user"
+                ],
+                "summary": "Delete model info",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Model ID to delete",
+                        "name": "id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Model info deleted"
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    },
+                    "403": {
+                        "description": "Invalid token, user id not specified"
+                    },
+                    "500": {
+                        "description": "Failed to delete model info from storage"
+                    }
+                }
+            },
+            "patch": {
+                "description": "Update such model info as weights, weights titles",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Update model info",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Model ID to update",
+                        "name": "id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Model Weights ID to update",
+                        "name": "weights_id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Model Weights Title to set",
+                        "name": "weights_title",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "Model Weights to Update/Add",
+                        "name": "weights",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Model info updated"
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    },
+                    "403": {
+                        "description": "Invalid token, user id not specified"
+                    },
+                    "500": {
+                        "description": "Failed to update model info"
+                    }
+                }
+            }
+        },
+        "/api/v1/models/weights": {
+            "get": {
+                "description": "Find such model info as id, username, email and fullname",
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Find model info",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Weight ID to search for",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Structure ID to search for",
+                        "name": "structure_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Weights name to search for",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number for pagination",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page size for pagination",
+                        "name": "per_page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Model weights info found",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ModelWeightsInfoResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    },
+                    "500": {
+                        "description": "Failed to get model weights info from storage"
+                    }
+                }
+            },
+            "post": {
+                "description": "Adds model weights info to existing model",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Create new model weights info",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Model ID to add weights to",
+                        "name": "id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Model Weights Title to add",
+                        "name": "weights_title",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Model Weights to add",
+                        "name": "weights",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Weights added"
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    },
+                    "403": {
+                        "description": "Invalid token, user id not specified"
+                    },
+                    "500": {
+                        "description": "Failed to create model weights info"
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes model info from any user",
+                "tags": [
+                    "user"
+                ],
+                "summary": "Delete model info",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Model ID to delete",
+                        "name": "id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Model info deleted"
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    },
+                    "403": {
+                        "description": "Invalid token, user id not specified"
+                    },
+                    "500": {
+                        "description": "Failed to delete model info from storage"
+                    }
+                }
+            },
+            "patch": {
+                "description": "Update such model info as weights, weights titles",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Update model info",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Model Weights ID to update",
+                        "name": "weights_id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Model Weights Title to set",
+                        "name": "weights_title",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "Model Weights to Update/Add",
+                        "name": "weights",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Model info updated"
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    },
+                    "403": {
+                        "description": "Invalid token, user id not specified"
+                    },
+                    "500": {
+                        "description": "Failed to update model info"
+                    }
+                }
+            }
+        },
+        "/api/v1/registration": {
+            "post": {
+                "description": "register new user",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth",
+                    "user"
+                ],
+                "summary": "User registration",
+                "parameters": [
+                    {
+                        "description": "The body to create a thing",
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/RegistrationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "307": {
+                        "description": "Registration was successfull, redirect request to login (/api/v1/login)"
+                    },
+                    "400": {
+                        "description": "Registration data is invalid or missing, check request",
+                        "schema": {
+                            "$ref": "#/definitions/Unauthorized"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to register user due to some reasons. For example: user already exists",
+                        "schema": {
+                            "$ref": "#/definitions/Unauthorized"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/stat/login": {
+            "post": {
+                "description": "login to existing account",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth",
+                    "stat"
+                ],
+                "summary": "Stat login",
+                "parameters": [
+                    {
+                        "description": "The body to create a thing",
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Login was successfull",
+                        "schema": {
+                            "$ref": "#/definitions/LoginResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Login data is invalid or missing, check request",
+                        "schema": {
+                            "$ref": "#/definitions/Unauthorized"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/stat/models": {
+            "get": {
+                "description": "Get such model stat info as load and edit stat per period",
+                "tags": [
+                    "stat"
+                ],
+                "summary": "Get models stat info",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "\"2006-01-02T15:04:05Z07:00\"",
+                        "description": "Time to start from, RFC3339",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "\"2006-01-02T15:04:05Z07:00\"",
+                        "description": "Time to stop at, RFC3339",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Search for load stat",
+                        "name": "load",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Search for update stats",
+                        "name": "update",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Models stat info found",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/neural_storage_cube_handlers_http_v1_stat_statmodels.ModelStatInfoResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    },
+                    "500": {
+                        "description": "Failed to get model stat info"
+                    }
+                }
+            }
+        },
+        "/api/v1/stat/users": {
+            "get": {
+                "description": "Get such user stat info as registration and edit stat per period",
+                "tags": [
+                    "stat"
+                ],
+                "summary": "Get users stat info",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "\"2006-01-02T15:04:05Z07:00\"",
+                        "description": "Time to start from, RFC3339",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "\"2006-01-02T15:04:05Z07:00\"",
+                        "description": "Time to stop at, RFC3339",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Search for load stat",
+                        "name": "load",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Search for update stats",
+                        "name": "update",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Users stat info found",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/neural_storage_cube_handlers_http_v1_stat_statweights.ModelStatInfoResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    },
+                    "500": {
+                        "description": "Failed to get user stat info"
+                    }
+                }
+            }
+        },
+        "/api/v1/stat/users/blocked": {
+            "patch": {
+                "description": "Blocks user until specified moment",
+                "tags": [
+                    "stat"
+                ],
+                "summary": "Block user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID to block",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Time to block until",
+                        "name": "until",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User blocked"
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    },
+                    "500": {
+                        "description": "Failed to block user "
+                    }
+                }
+            }
+        },
+        "/api/v1/users": {
+            "get": {
+                "description": "Find such users info as id, username, email and fullname",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Find user info",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UserId to search for",
+                        "name": "user_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Username to search for",
+                        "name": "username",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Email to search for",
+                        "name": "email",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number for pagination",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page size for pagination",
+                        "name": "per_page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Users info found",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/UserInfoResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    },
+                    "500": {
+                        "description": "Failed to get user info from storage"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "AdminBlockUserResponse": {
+            "type": "object",
+            "properties": {
+                "blocked_until": {
+                    "type": "string",
+                    "example": "2025-08-09T15:00:00.053Z"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "f6457bdf-4e67-4f05-9108-1cbc0fec9405"
+                }
+            }
+        },
+        "AdminModelInfoResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "f6457bdf-4e67-4f05-9108-1cbc0fec9405"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "awesome_username"
+                },
+                "structure": {}
+            }
+        },
+        "AdminModelWeightsInfoResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "f6457bdf-4e67-4f05-9108-1cbc0fec9405"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "awesome_username"
+                },
+                "offsets": {},
+                "weights": {}
+            }
+        },
+        "AdminUserInfoResponse": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "my_awesome@email.com"
+                },
+                "fullname": {
+                    "type": "string",
+                    "example": "Ivanov Ivan Ivanovich"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "f6457bdf-4e67-4f05-9108-1cbc0fec9405"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "awesome_username"
+                }
+            }
+        },
+        "LoginRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "my_awesome@email.com"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "Really, you're waiting for example?"
+                }
+            }
+        },
+        "LoginResponse": {
+            "type": "object",
+            "properties": {
+                "expire": {
+                    "type": "string",
+                    "example": "2022-03-20T17:00:01Z"
+                },
+                "token": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NDc..."
+                }
+            }
+        },
+        "ModelInfoResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "f6457bdf-4e67-4f05-9108-1cbc0fec9405"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "awesome_username"
+                },
+                "structure": {}
+            }
+        },
+        "ModelWeightsInfoResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "f6457bdf-4e67-4f05-9108-1cbc0fec9405"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "awesome_username"
+                },
+                "offsets": {},
+                "weights": {}
+            }
+        },
+        "RegistrationRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "fullname",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "my_awesome@email.com"
+                },
+                "fullname": {
+                    "type": "string",
+                    "example": "John Smith"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "Really, you're waiting for example?"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "my_awesome_nickname"
+                }
+            }
+        },
+        "Unauthorized": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "user not found"
+                }
+            }
+        },
+        "UserInfoResponse": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "my_awesome@email.com"
+                },
+                "fullname": {
+                    "type": "string",
+                    "example": "Ivanov Ivan Ivanovich"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "f6457bdf-4e67-4f05-9108-1cbc0fec9405"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "awesome_username"
+                }
+            }
+        },
+        "neural_storage_cube_handlers_http_v1_stat_statmodels.ModelStatInfoResponse": {
+            "type": "object",
+            "properties": {
+                "edit": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/statmodels.StatInfo"
+                    }
+                },
+                "load": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/statmodels.StatInfo"
+                    }
+                }
+            }
+        },
+        "neural_storage_cube_handlers_http_v1_stat_statusers.ModelStatInfoResponse": {
+            "type": "object",
+            "properties": {
+                "edit": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/statusers.StatInfo"
+                    }
+                },
+                "registration": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/statusers.StatInfo"
+                    }
+                }
+            }
+        },
+        "neural_storage_cube_handlers_http_v1_stat_statweights.ModelStatInfoResponse": {
+            "type": "object",
+            "properties": {
+                "edit": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/statweights.StatInfo"
+                    }
+                },
+                "load": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/statweights.StatInfo"
+                    }
+                }
+            }
+        },
+        "statmodels.StatInfo": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "3f8bf2a3-01cc-4c4a-9759-86cec9cf8da9"
+                },
+                "time": {
+                    "type": "string",
+                    "example": "2006-01-02T15:04:05Z07:00"
+                }
+            }
+        },
+        "statusers.StatInfo": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "3f8bf2a3-01cc-4c4a-9759-86cec9cf8da9"
+                },
+                "time": {
+                    "type": "string",
+                    "example": "2006-01-02T15:04:05Z07:00"
+                }
+            }
+        },
+        "statweights.StatInfo": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "3f8bf2a3-01cc-4c4a-9759-86cec9cf8da9"
+                },
+                "time": {
+                    "type": "string",
+                    "example": "2006-01-02T15:04:05Z07:00"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "Bearer": {
+            "type": "basic"
+        }
+    }
+}

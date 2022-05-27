@@ -5,7 +5,7 @@ import (
 	"neural_storage/cube/core/entities/neuron/offset"
 )
 
-func (i *Info) Id() string {
+func (i *Info) ID() string {
 	return i.id
 }
 

@@ -25,10 +25,10 @@ func (s *DeleteStructureWeightsSuite) TearDownTest() {
 }
 
 func (s *DeleteStructureWeightsSuite) TestDelete() {
-	m := sw.NewInfo("", nil, nil)
-	s.mockedWeightsInfo.On("Delete", mock.Anything).Return(nil)
+	m := sw.NewInfo("", "", nil, nil)
+	s.mockedWeightsInfo.On("Delete", mock.Anything, mock.Anything).Return(nil)
 
-	err := s.interactor.DeleteStructureWeights(m.Id())
+	err := s.interactor.DeleteStructureWeights("test", m.ID())
 
 	require.NoError(s.T(), err)
 

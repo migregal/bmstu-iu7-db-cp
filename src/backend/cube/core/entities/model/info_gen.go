@@ -2,8 +2,12 @@ package model
 
 import "neural_storage/cube/core/entities/structure"
 
-func (i *Info) Id() string {
+func (i *Info) ID() string {
 	return i.id
+}
+
+func (i *Info) OwnerID() string {
+	return i.ownerID
 }
 
 func (i *Info) Name() string {

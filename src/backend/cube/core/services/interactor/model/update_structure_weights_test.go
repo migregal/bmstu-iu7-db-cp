@@ -4,6 +4,7 @@
 package model
 
 import (
+	"neural_storage/cube/core/entities/model"
 	"neural_storage/cube/core/entities/structure"
 	sw "neural_storage/cube/core/entities/structure/weights"
 	"testing"
@@ -27,15 +28,16 @@ func (s *UpdateStructureWeightsSuite) TearDownTest() {
 
 func (s *UpdateStructureWeightsSuite) TestUpdate() {
 	s.mockedModelInfo.
-		On("GetStructure", mock.Anything).
-		Return(structure.NewInfo("", nil, nil, nil, nil), nil)
+		On("Get", mock.Anything).
+		Return(model.NewInfo("", "", structure.NewInfo("", nil, nil, nil, nil)), nil)
 
 	s.mockedValidator.On("ValidateModelInfo", mock.Anything).Return(nil)
 
-	expected := sw.NewInfo("", nil, nil)
-	s.mockedWeightsInfo.On("Update", mock.Anything).Return(nil)
+	s.mockedWeightsInfo.On("Update", mock.Anything, mock.Anything).Return(nil)
 
-	err := s.interactor.UpdateStructureWeights("", *expected)
+	expected := sw.NewInfo("", "", nil, nil)
+
+	err := s.interactor.UpdateStructureWeights("", "", *expected)
 
 	require.NoError(s.T(), err)
 

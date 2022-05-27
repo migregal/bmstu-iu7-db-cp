@@ -27,8 +27,8 @@ func (s *AddSuite) TearDownTest() {
 func (s *AddSuite) TestAdd() {
 	s.mockedValidator.On("ValidateModelInfo", mock.Anything).Return(nil)
 
-	m := model.NewInfo("", nil)
-	s.mockedModelInfo.On("Add", mock.Anything).Return(nil)
+	m := model.NewInfo("", "", nil)
+	s.mockedModelInfo.On("Add", mock.Anything).Return("", nil)
 
 	err := s.interactor.Add(*m)
 

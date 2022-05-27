@@ -13,45 +13,46 @@ import (
 	"neural_storage/database/core/entities/structure/weights"
 )
 
-func (r *Repository) Get(id string) (model.Info, error) {
+func (r *Repository) Get(id string) (*model.Info, error) {
 	var err error
 	dbInfo := accumulatedModelInfo{}
 
 	dbInfo.model, err = r.getModelInfo(id)
 	if err != nil {
-		return model.Info{}, err
+		return nil, err
 	}
 
 	structure, err := r.getStructInfo(id)
 	if err != nil {
-		return model.Info{}, err
+		return nil, err
 	}
 	dbInfo.structure = &structure
 
 	layers, err := r.getLayersInfo(id)
 	if err != nil {
-		return model.Info{}, err
+		return nil, err
 	}
 	dbInfo.layers = layers
 
-	dbInfo.neurons, err = r.getNeuronsInfo(structure.ID)
+	dbInfo.neurons, err = r.getNeuronsInfo(structure.GetID())
 	if err != nil {
-		return model.Info{}, err
+		return nil, err
 	}
 
-	dbInfo.links, err = r.getNeuronLinksInfo(structure.ID)
+	dbInfo.links, err = r.getNeuronLinksInfo(structure.GetID())
 	if err != nil {
-		return model.Info{}, err
+		return nil, err
 	}
 
-	weights, err := r.getWeightsInfo(structure.ID)
+	weights, err := r.getWeightsInfo(structure.GetID())
 	if err != nil {
-		return model.Info{}, err
+		return nil, err
 	}
 
 	dbInfo.weights, err = r.getDetailsWeightsInfo(weights)
 
-	return fromDBEntity(dbInfo), nil
+	res := fromDBEntity(dbInfo)
+	return &res, nil
 }
 
 func (r *Repository) getModelInfo(id string) (dbmodel.Model, error) {
@@ -112,21 +113,25 @@ func (r *Repository) getDetailsWeightsInfo(weightsInfo []weights.Weights) ([]acc
 	var weightInfo []accumulatedWeightInfo
 	for _, v := range weightsInfo {
 		var offsets []offset.Offset
-		err := r.db.Find(&offsets, "weights_id = ?", v.ID).Error
+		err := r.db.Find(&offsets, "weights_id = ?", v.GetID()).Error
 		if err != nil {
 			return nil, fmt.Errorf("neuron offsets get error: %w", err)
 		}
 
 		var weight []weight.Weight
-		err = r.db.Find(&weight, "weights_id = ?", v.ID).Error
+		err = r.db.Find(&weight, "weights_id = ?", v.GetID()).Error
 		if err != nil {
 			return nil, fmt.Errorf("neuron links weights get error: %w", err)
 		}
 
 		weightInfo = append(weightInfo,
 			accumulatedWeightInfo{
-				weightsInfo: &weights.Weights{ID: v.ID, Name: v.Name},
-				offsets:     offsets, weights: weight})
+				weightsInfo: &weights.Weights{
+					ID:          v.GetID(),
+					Name:        v.GetName(),
+					StructureID: v.GetStructureID(),
+				},
+				offsets: offsets, weights: weight})
 	}
 	return weightInfo, nil
 }

@@ -25,7 +25,7 @@ func (s *GetStructureWeightsSuite) TearDownTest() {
 }
 
 func (s *GetStructureWeightsSuite) TestGet() {
-	expected := sw.NewInfo("", nil, nil)
+	expected := sw.NewInfo("", "", nil, nil)
 	s.mockedWeightsInfo.On("Get", mock.Anything).Return(expected, nil)
 
 	info, err := s.interactor.GetStructureWeights("")

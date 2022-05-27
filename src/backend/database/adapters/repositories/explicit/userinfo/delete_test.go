@@ -24,12 +24,12 @@ func (s *DeleteSuite) TearDownTest() {
 	s.TestSuite.TearDownTest()
 }
 
-func (s *DeleteSuite) TestAdd() {
+func (s *DeleteSuite) TestDelete() {
 	id := "test"
-	expected := *user.NewInfo(&id, nil, nil, nil, nil, nil)
+	expected := *user.NewInfo(&id, nil, nil, nil, nil, 0, nil)
 
 	s.SqlMock.
-		ExpectExec(`^DELETE FROM "users_info" WHERE "users_info"."user_id"`).
+		ExpectExec(`^DELETE FROM "users_info" WHERE "users_info"."id"`).
 		WithArgs(id).
 		WillReturnResult(sqlmock.NewResult(0, 1))
 

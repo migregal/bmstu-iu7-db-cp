@@ -27,7 +27,7 @@ func (s *RegisterSuite) TearDownTest() {
 func (s *RegisterSuite) TestRegister() {
 	s.mockedValidator.On("ValidateUserInfo", mock.Anything).Return(true)
 
-	expected := user.NewInfo(nil, nil, nil, nil, nil, nil)
+	expected := user.NewInfo(nil, nil, nil, nil, nil, 0, nil)
 	s.mockedRepo.On("Add", mock.Anything).Return("hehe", nil)
 
 	id, err := s.interactor.Register(*expected)

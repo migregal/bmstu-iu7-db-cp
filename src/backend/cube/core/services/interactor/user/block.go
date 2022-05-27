@@ -7,7 +7,7 @@ import (
 )
 
 func (i *Interactor) Block(userId string, until time.Time) error {
-	info := user.NewInfo(&userId, nil, nil, nil, nil, &until)
+	info := user.NewInfo(&userId, nil, nil, nil, nil, 0, until)
 	valid := i.validator.ValidateUserInfo(info)
 	if !valid {
 		return fmt.Errorf("invalid user info")

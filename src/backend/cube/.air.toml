@@ -1,0 +1,14 @@
+root = "."
+tmp_dir = "tmp"
+
+[build]
+cmd = "go build -o /tmp/bin/cube ./cmd/cube"
+
+bin = "/tmp/bin/cube"
+
+exclude_dir = ["assets", "tmp", "vendor", "cube/test/"]
+
+delay = 500 # ms
+
+[misc]
+clean_on_exit = true
