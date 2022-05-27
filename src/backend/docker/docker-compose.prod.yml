@@ -1,0 +1,75 @@
+version: '3.9'
+
+services:
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ../nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - api-gateaway
+      - backend
+    ports:
+      - 4000:4000
+      - 4001:4001
+    restart: always
+
+  postgres_db:
+    extends:
+      file: common-services.yml
+      service: postgres_db
+    env_file: ./database/.env
+    networks:
+      - database
+
+  migration:
+    extends:
+      file: common-services.yml
+      service: migration
+    env_file: ./database/.env
+    networks:
+      - database
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+
+  tarantool-db:
+    extends:
+      file: common-services.yml
+      service: tarantool-db
+    env_file:
+      - ./cache/.env
+    networks:
+      - cache
+
+  cube:
+    extends:
+      file: common-services.yml
+      service: cube
+    build:
+      context: ../
+      dockerfile: ./docker/cube/Dockerfile
+    volumes:
+      - ../out/crypto:/tmp/crypto/
+      - ../cube/prod.yml:/tmp/config.yml:ro
+    networks:
+      - backend
+      - database
+      - cache
+    expose:
+      - 10001
+    deploy:
+      mode: replicated
+      replicas: 3
+
+networks:
+  api-gateaway:
+    driver: bridge
+  backend:
+    driver: bridge
+    internal: true
+  cache:
+    driver: bridge
+    internal: true
+  database:
+    driver: bridge
+    internal: true

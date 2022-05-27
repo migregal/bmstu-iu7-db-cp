@@ -1,0 +1,42 @@
+db:
+  adapter: "expl"
+  host: "postgres_db"
+  port: 5432
+  user: <prod username>
+  password: <prod user password>
+  db_name: <prod database>
+  driver: "pg"
+
+statdb:
+  adapter: "expl"
+  host: "postgres_db"
+  port: 5432
+  user: <stat prod username>
+  password: <stat prod user password>
+  db_name: <stat prod database>
+  driver: "pg"
+
+admindb:
+  adapter: "expl"
+  host: "postgres_db"
+  port: 5432
+  user: <admin prod username>
+  password: <admin prod user password>
+  db_name: <admin prod database>
+  driver: "pg"
+
+cache:
+  adapter: "trnt"
+  host: "tarantool-db"
+  port: 3301
+  user: <prod username>
+  password: <prod user password>
+
+validation:
+  min_username_len: 8
+  max_username_len: 32
+  min_pwd_len: 8
+  max_pwd_len: 64
+
+priv_key_path: /tmp/crypto/pkcs8.key
+pub_key_path: /tmp/crypto/publickey.crt

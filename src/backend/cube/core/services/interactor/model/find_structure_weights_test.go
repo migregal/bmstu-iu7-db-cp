@@ -4,12 +4,14 @@
 package model
 
 import (
-	sw "neural_storage/cube/core/entities/structure/weights"
 	"testing"
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
+
+	sw "neural_storage/cube/core/entities/structure/weights"
+	"neural_storage/cube/core/ports/interactors"
 )
 
 type FindStructureWeightsSuite struct {
@@ -25,9 +27,9 @@ func (s *FindStructureWeightsSuite) TearDownTest() {
 }
 
 func (s *FindStructureWeightsSuite) TestFind() {
-	filter := StructureWeightsFilter{}
+	filter := interactors.ModelWeightsInfoFilter{}
 	expected := []*sw.Info{
-		sw.NewInfo("", nil, nil),
+		sw.NewInfo("", "", nil, nil),
 	}
 
 	s.mockedWeightsInfo.On("Find", mock.Anything).Return(expected, nil)

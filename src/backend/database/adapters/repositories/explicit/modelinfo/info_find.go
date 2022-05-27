@@ -7,32 +7,33 @@ import (
 	dbmodel "neural_storage/database/core/entities/model"
 )
 
-func (r *Repository) Find(filter repositories.ModelInfoFilter) ([]model.Info, error) {
-	if len(filter.Ids) == 0 {
-		query := r.db.DB
-		if filter.Limit > 0 {
-			query = query.Limit(filter.Limit)
-		}
-		if len(filter.Ids) > 0 {
-			query = query.Where("id in ?", filter.Ids)
-		}
-		if filter.OwnerID != "" {
-			query = query.Where("owner_id = ?", filter.OwnerID)
-		}
-		var modelInfo []dbmodel.Model
-		err := query.Find(&modelInfo).Error
-		if err != nil {
-			return nil, fmt.Errorf("model get error: %w", err)
-		}
-
-		for _, v := range modelInfo {
-			filter.Ids = append(filter.Ids, v.ID)
-		}
+func (r *Repository) Find(filter repositories.ModelInfoFilter) ([]*model.Info, error) {
+	query := r.db.DB
+	if len(filter.Ids) > 0 {
+		query = query.Where("id in ?", filter.Ids)
+	}
+	if len(filter.Names) > 0 {
+		query = query.Where("name in ?", filter.Names)
+	}
+	if len(filter.Owners) > 0 {
+		query = query.Where("owner_id in ?", filter.Owners)
+	}
+	if filter.Offset > 0 {
+		query = query.Offset(filter.Offset)
+	}
+	if filter.Limit > 0 {
+		query = query.Limit(filter.Limit)
 	}
 
-	dbInfo := []model.Info{}
-	for _, v := range filter.Ids {
-		data, err := r.Get(v)
+	var modelInfo []dbmodel.Model
+	err := query.Find(&modelInfo).Error
+	if err != nil {
+		return nil, fmt.Errorf("model get error: %w", err)
+	}
+
+	dbInfo := []*model.Info{}
+	for _, v := range modelInfo {
+		data, err := r.Get(v.GetID())
 		if err != nil {
 			return nil, err
 		}

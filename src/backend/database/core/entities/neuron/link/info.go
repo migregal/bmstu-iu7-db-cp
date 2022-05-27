@@ -1,8 +1,12 @@
 package link
 
 type Link struct {
-	StructureID string `gorm:"type:uuid;column:structure_id;"`
-	LinkID      string `gorm:"type:uuid;column:link_id;"`
-	FromID      string `gorm:"type:uuid;column:from_id;"`
-	ToID        string `gorm:"type:uuid;column:to_id;"`
+	ID        string `gorm:"type:uuid;column:link_id;"`
+	Structure string `gorm:"type:uuid;column:structure_id;"`
+	From      string `gorm:"type:uuid;column:from_id;"`
+	To        string `gorm:"type:uuid;column:to_id;"`
+}
+
+func (Link) TableName() string {
+	return "neuron_links"
 }

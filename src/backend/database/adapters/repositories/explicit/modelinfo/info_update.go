@@ -21,7 +21,7 @@ func (r *Repository) Update(info model.Info) error {
 		return err
 	}
 
-	if err := tx.Where("id = ?", data.model.ID).Updates(data.model).Error; err != nil {
+	if err := tx.Where("id = ?", data.model.GetID()).Updates(data.model).Error; err != nil {
 		tx.Rollback()
 		return fmt.Errorf("model info update: %w", err)
 	}
@@ -48,24 +48,24 @@ func (r *Repository) updateModelStructureTransact(tx database.Interactor, info a
 		return nil
 	}
 
-	if err := tx.Where("id = ?", info.structure.ID).Updates(&info.structure).Error; err != nil {
+	if err := tx.Where("id = ?", info.structure.GetID()).Updates(&info.structure).Error; err != nil {
 		return fmt.Errorf("model structure info update: %w", err)
 	}
 
 	for _, v := range info.layers {
-		if err := tx.Where("id = ?", v.ID).Updates(&v).Error; err != nil {
+		if err := tx.Where("id = ?", v.GetID()).Updates(&v).Error; err != nil {
 			return fmt.Errorf("model layers info update: %w", err)
 		}
 	}
 
 	for _, v := range info.neurons {
-		if err := tx.Where("id = ?", v.ID).Updates(&v).Error; err != nil {
+		if err := tx.Where("id = ?", v.GetID()).Updates(&v).Error; err != nil {
 			return fmt.Errorf("model neurons info update: %w", err)
 		}
 	}
 
 	for _, v := range info.links {
-		if err := tx.Where("id = ?", v.LinkID).Updates(&v).Error; err != nil {
+		if err := tx.Where("id = ?", v.GetID()).Updates(&v).Error; err != nil {
 			return fmt.Errorf("model links info update: %w", err)
 		}
 	}
@@ -75,14 +75,17 @@ func (r *Repository) updateModelStructureTransact(tx database.Interactor, info a
 
 func (r *Repository) updateModelWeightsTransact(tx database.Interactor, info []accumulatedWeightInfo) error {
 	for _, v := range info {
+		if err := tx.Where("id = ?", v.weightsInfo.GetID()).Updates(&v.weightsInfo).Error; err != nil {
+			return fmt.Errorf("model weights info update: %w", err)
+		}
 		for _, w := range v.weights {
-			if err := tx.Where("id = ?", w.ID).Updates(&w).Error; err != nil {
-				return fmt.Errorf("model weights info update: %w", err)
+			if err := tx.Where("id = ?", w.GetID()).Updates(&w).Error; err != nil {
+				return fmt.Errorf("model weights update: %w", err)
 			}
 		}
 		for _, o := range v.offsets {
-			if err := tx.Where("id = ?", o.ID).Updates(&o).Error; err != nil {
-				return fmt.Errorf("model offsets info update: %w", err)
+			if err := tx.Where("id = ?", o.GetID()).Updates(&o).Error; err != nil {
+				return fmt.Errorf("model offsets update: %w", err)
 			}
 		}
 	}

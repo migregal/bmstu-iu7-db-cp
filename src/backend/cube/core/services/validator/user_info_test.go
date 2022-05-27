@@ -54,38 +54,38 @@ func (s *UserInfoSuite) TestValidateUserInfo() {
 		{
 			"empty info",
 			fields{s.conf},
-			args{user.NewInfo(nil, nil, nil, nil, nil, nil)},
+			args{user.NewInfo(nil, nil, nil, nil, nil, 0, nil)},
 			true,
 		},
 		{
 			"id",
 			fields{s.conf},
-			args{user.NewInfo(&ids[0], nil, nil, nil, nil, nil)},
+			args{user.NewInfo(&ids[0], nil, nil, nil, nil, 0, nil)},
 			true,
 		},
 		{
 			"username",
 			fields{s.conf},
 
-			args{user.NewInfo(nil, &usernames[0], nil, nil, nil, nil)},
+			args{user.NewInfo(nil, &usernames[0], nil, nil, nil, 0, nil)},
 			true,
 		},
 		{
 			"email",
 			fields{s.conf},
-			args{user.NewInfo(nil, nil, &emails[0], nil, nil, nil)},
+			args{user.NewInfo(nil, nil, &emails[0], nil, nil, 0, nil)},
 			true,
 		},
 		{
 			"password",
 			fields{s.conf},
-			args{user.NewInfo(nil, nil, nil, nil, &passwrods[0], nil)},
+			args{user.NewInfo(nil, nil, nil, nil, &passwrods[0], 0, nil)},
 			true,
 		},
 		{
 			"blocked until",
 			fields{s.conf},
-			args{user.NewInfo(nil, nil, nil, nil, nil, &blocks[0])},
+			args{user.NewInfo(nil, nil, nil, nil, nil, 0, &blocks[0])},
 			true,
 		},
 	}

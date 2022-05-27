@@ -26,7 +26,7 @@ func (s *AddStructureWeightsSuite) TearDownTest() {
 }
 
 func (s *AddStructureWeightsSuite) TestAdd() {
-	m := sw.NewInfo("", nil, nil)
+	m := sw.NewInfo("", "", nil, nil)
 
 	s.mockedModelInfo.
 		On("GetStructure", mock.Anything).
@@ -34,8 +34,8 @@ func (s *AddStructureWeightsSuite) TestAdd() {
 
 	s.mockedValidator.On("ValidateModelInfo", mock.Anything).Return(nil)
 
-	s.mockedWeightsInfo.On("Add", mock.Anything, mock.Anything).Return(nil)
-	err := s.interactor.AddStructureWeights("", *m)
+	s.mockedWeightsInfo.On("Add", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	err := s.interactor.AddStructureWeights("", "", *m)
 
 	require.NoError(s.T(), err)
 

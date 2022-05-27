@@ -26,9 +26,9 @@ func (s *FindSuite) TearDownTest() {
 	s.TestSuite.TearDownTest()
 }
 
-func (s *FindSuite) TestAdd() {
+func (s *FindSuite) TestFind() {
 	id := "test"
-	expected := []user.Info{*user.NewInfo(&id, nil, nil, nil, nil, nil)}
+	expected := []user.Info{*user.NewInfo(&id, nil, nil, nil, nil, 0, nil)}
 	res := []user_info.UserInfo{{ID: id}}
 
 	filter := repositories.UserInfoFilter{UserIds: make([]string, 1), Limit: 10}

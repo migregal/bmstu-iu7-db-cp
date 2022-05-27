@@ -2,7 +2,7 @@ package user
 
 import "time"
 
-func (i *Info) Id() *string {
+func (i *Info) ID() *string {
 	return i.id
 }
 
@@ -42,10 +42,18 @@ func (i *Info) SetPwd(pwdHash *string) {
 	i.pwd = pwdHash
 }
 
-func (i *Info) BlockedUntil() *time.Time {
+func (i *Info) BlockedUntil() time.Time {
 	return i.blockedUntil
 }
 
-func (i *Info) SetBlockedUntil(blockedUntil *time.Time) {
+func (i *Info) SetBlockedUntil(blockedUntil time.Time) {
 	i.blockedUntil = blockedUntil
+}
+
+func (i *Info) Flags() uint64 {
+	return i.flags
+}
+
+func (i *Info) SetFlags(newFlags uint64) {
+	i.flags = newFlags
 }

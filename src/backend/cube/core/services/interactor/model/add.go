@@ -7,5 +7,6 @@ func (i *Interactor) Add(info model.Info) error {
 		return nil
 	}
 
-	return i.modelInfo.Add(info)
+	_, err := i.modelInfo.Add(info)
+	return err
 }

@@ -14,8 +14,12 @@ type UserInfoRepositoryConfig interface {
 
 type ModelInfoRepositoryConfig interface {
 	IsMocked() bool
+	Adapter() string
+	ConnParams() database.Params
 }
 
 type ModelStructureWeightsInfoRepositoryConfig interface {
 	IsMocked() bool
+	Adapter() string
+	ConnParams() database.Params
 }

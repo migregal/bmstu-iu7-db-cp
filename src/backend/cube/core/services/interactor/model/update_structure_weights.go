@@ -1,19 +1,23 @@
 package model
 
 import (
-	"neural_storage/cube/core/entities/model"
+	"fmt"
 	sw "neural_storage/cube/core/entities/structure/weights"
 )
 
-func (i *Interactor) UpdateStructureWeights(modelId string, info sw.Info) error {
-	structure, err := i.modelInfo.GetStructure(modelId)
+func (i *Interactor) UpdateStructureWeights(ownerID, modelId string, info sw.Info) error {
+	model, err := i.modelInfo.Get(modelId)
 	if err != nil {
 		return err
 	}
 
-	structure.SetWeights([]*sw.Info{&info})
+	if ownerID != "" && model.OwnerID() != ownerID {
+		return fmt.Errorf("permission denied")
+	}
 
-	if err := i.validator.ValidateModelInfo(model.NewInfo("", structure)); err != nil {
+	model.Structure().SetWeights([]*sw.Info{&info})
+
+	if err := i.validator.ValidateModelInfo(model); err != nil {
 		return nil
 	}
 

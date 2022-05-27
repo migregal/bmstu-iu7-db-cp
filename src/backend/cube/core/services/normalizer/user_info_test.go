@@ -31,7 +31,7 @@ func (s *UserInfoSuite) TestValidateUserInfo() {
 	pwd := "something good"
 	expected := "ad35ea933f9868ba42c74e6f6c053a870d6ff78d2a722161cfb0c6809f2e4d3b"
 
-	info := user.NewInfo(nil, nil, nil, nil, &pwd, nil)
+	info := user.NewInfo(nil, nil, nil, nil, &pwd, 0, nil)
 
 	n := NewNormalizer(s.conf)
 

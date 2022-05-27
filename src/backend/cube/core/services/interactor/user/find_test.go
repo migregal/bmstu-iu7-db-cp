@@ -5,6 +5,7 @@ package user
 
 import (
 	"neural_storage/cube/core/entities/user"
+	"neural_storage/cube/core/ports/interactors"
 	"testing"
 
 	"github.com/stretchr/testify/mock"
@@ -25,9 +26,9 @@ func (s *FindSuite) TearDownTest() {
 }
 
 func (s *FindSuite) TestFind() {
-	filter := Filter{}
+	filter := interactors.UserInfoFilter{}
 	expected := []user.Info{
-		*user.NewInfo(nil, nil, nil, nil, nil, nil),
+		*user.NewInfo(nil, nil, nil, nil, nil, 0, nil),
 	}
 
 	s.mockedRepo.On("Find", mock.Anything).Return(expected, nil)

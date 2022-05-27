@@ -34,7 +34,7 @@ func TestValidator_ValidateModelInfo(t *testing.T) {
 		{
 			"no info",
 			fields{&mock.ValidatorConfig{}},
-			args{model.NewInfo("", nil)},
+			args{model.NewInfo("", "", nil)},
 			false,
 		},
 		{
@@ -42,6 +42,7 @@ func TestValidator_ValidateModelInfo(t *testing.T) {
 			fields{&mock.ValidatorConfig{}},
 			args{
 				model.NewInfo(
+					"",
 					"",
 					structure.NewInfo(
 						"",
@@ -60,6 +61,7 @@ func TestValidator_ValidateModelInfo(t *testing.T) {
 			args{
 				model.NewInfo(
 					"",
+					"",
 					structure.NewInfo(
 						"",
 						[]*neuron.Info{
@@ -73,6 +75,7 @@ func TestValidator_ValidateModelInfo(t *testing.T) {
 						},
 						[]*weights.Info{
 							weights.NewInfo(
+								"",
 								"",
 								[]*weight.Info{
 									weight.NewInfo("", "", 10.0),

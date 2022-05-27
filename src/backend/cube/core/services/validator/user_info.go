@@ -70,7 +70,7 @@ func (v *Validator) validateBlockTime(t time.Time) bool {
 }
 
 func (v *Validator) ValidateUserInfo(info *user.Info) bool {
-	if info.Id() != nil && !v.validateId(*info.Id()) {
+	if info.ID() != nil && !v.validateId(*info.ID()) {
 		return false
 	}
 	if info.Email() != nil && !v.validateEmail(*info.Email()) {
@@ -82,7 +82,7 @@ func (v *Validator) ValidateUserInfo(info *user.Info) bool {
 	if info.Pwd() != nil && !v.validatePassword(*info.Pwd()) {
 		return false
 	}
-	if info.BlockedUntil() != nil && !v.validateBlockTime(*info.BlockedUntil()) {
+	if !info.BlockedUntil().IsZero() && !v.validateBlockTime(info.BlockedUntil()) {
 		return false
 	}
 

@@ -2,6 +2,8 @@ package repositories
 
 import (
 	"neural_storage/cube/core/ports/repositories"
+	"neural_storage/database/adapters/repositories/explicit/modelinfo"
+	"neural_storage/database/adapters/repositories/explicit/modelstructweightsinfo"
 	"neural_storage/database/adapters/repositories/explicit/userinfo"
 	"neural_storage/database/adapters/repositories/mock"
 	"neural_storage/database/core/ports/config"
@@ -28,7 +30,11 @@ func NewModelInfoAdapter(conf config.ModelInfoRepositoryConfig) repositories.Mod
 	if conf.IsMocked() {
 		return &mock.ModelInfoRepository{}
 	}
-	return nil
+	repo, err := modelinfo.NewRepository(conf)
+	if err != nil {
+		panic(err)
+	}
+	return &repo
 }
 
 func NewModelStructureWeightsInfoAdapter(
@@ -37,5 +43,9 @@ func NewModelStructureWeightsInfoAdapter(
 	if conf.IsMocked() {
 		return &mock.ModelStructWeightsInfoRepository{}
 	}
-	return nil
+	repo, err := modelstructweightsinfo.NewRepository(conf)
+	if err != nil {
+		panic(err)
+	}
+	return &repo
 }

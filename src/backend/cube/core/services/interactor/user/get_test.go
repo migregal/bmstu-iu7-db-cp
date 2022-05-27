@@ -28,10 +28,10 @@ func (s *GetSuite) TestGet() {
 	s.mockedValidator.On("ValidateUserInfo", mock.Anything).Return(true)
 
 	id := ""
-	expected := user.NewInfo(&id, nil, nil, nil, nil, nil)
+	expected := user.NewInfo(&id, nil, nil, nil, nil, 0, nil)
 	s.mockedRepo.On("Get", mock.Anything).Return(*expected, nil)
 
-	info, err := s.interactor.Get(*expected.Id())
+	info, err := s.interactor.Get(*expected.ID())
 
 	require.NoError(s.T(), err)
 	require.Equal(s.T(), info, *expected)

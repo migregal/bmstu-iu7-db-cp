@@ -6,6 +6,48 @@ tasks:
     desc: Generates mocks for ports interfaces
     cmds:
       - go generate ./...
+      - cd cube && swag init -d ../cmd/cube/,./  -g ../../cube/handlers/fabric.go --parseDependency
+
+  dev:start:
+    desc: Starts development backend
+    vars:
+      DOCKERCOMPOSE: ./docker/docker-compose.dev.yml
+    cmds:
+      - docker-compose -f {{.DOCKERCOMPOSE}} up --build
+
+  dev:stop:
+    desc: Stops development backend
+    vars:
+      DOCKERCOMPOSE: ./docker/docker-compose.dev.yml
+    cmds:
+      - docker-compose -f {{.DOCKERCOMPOSE}} down
+
+  prod:start:
+    desc: Starts development backend
+    vars:
+      DOCKERCOMPOSE: ./docker/docker-compose.prod.yml
+    cmds:
+      - docker-compose -f {{.DOCKERCOMPOSE}} up -d
+
+  prod:stop:
+    desc: Stops development backend
+    vars:
+      DOCKERCOMPOSE: ./docker/docker-compose.prod.yml
+    cmds:
+      - docker-compose -f {{.DOCKERCOMPOSE}} down
+
+  bootstrap-crypto:
+    desc: Creates all crypto for authorization
+    vars:
+      OUT: ./out/crypto
+    cmds:
+      - mkdir -p {{.OUT}} | true
+      - openssl genrsa -out {{.OUT}}/keypair.pem 2048
+      - openssl rsa -in {{.OUT}}/keypair.pem -pubout -out {{.OUT}}/publickey.crt
+      - openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in {{.OUT}}/keypair.pem -out {{.OUT}}/pkcs8.key
+    status:
+      - test -d {{.OUT}}
+
 
   test:lint:
     desc: Runs linters for golang code
@@ -33,7 +75,7 @@ tasks:
     vars:
       OUT: ./out/smoke-coverage.out
       HTML: ./out/smoke-coverage.html
-      DOCKERCOMPOSE: docker-compose.smoke.yml
+      DOCKERCOMPOSE: ./docker/docker-compose.smoke.yml
     cmds:
       - docker-compose -f {{.DOCKERCOMPOSE}} up --force-recreate -d
       - defer: docker-compose -f {{.DOCKERCOMPOSE}} down

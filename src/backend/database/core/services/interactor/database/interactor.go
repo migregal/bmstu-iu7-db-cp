@@ -22,7 +22,7 @@ type Params struct {
 }
 
 func New(p Params) (Interactor, error) {
-	conn, err := gorm.Open(newDBDialector(p), &gorm.Config{})
+	conn, err := gorm.Open(newDBDialector(p), &gorm.Config{QueryFields: true})
 	if err != nil {
 		return Interactor{}, err
 	}

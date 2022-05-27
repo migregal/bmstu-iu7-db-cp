@@ -26,15 +26,15 @@ func (s *AddSuite) TearDownTest() {
 
 func (s *AddSuite) TestAdd() {
 	id := "test"
-	expected := user.NewInfo(&id, nil, nil, nil, nil, nil)
-	info := user.NewInfo(&id, nil, nil, nil, nil, nil)
+	expected := user.NewInfo(&id, nil, nil, nil, nil, 0, nil)
+	info := user.NewInfo(&id, nil, nil, nil, nil, 0, nil)
 
 	s.SqlMock.ExpectQuery(`^INSERT INTO "users_info"`).WillReturnRows(utils.MockRows(*expected))
 	res, err := s.repo.Add(*info)
 
 	require.NoError(s.T(), err)
 	require.Equal(s.T(), *expected, *info)
-	require.Equal(s.T(), *expected.Id(), res)
+	require.Equal(s.T(), *expected.ID(), res)
 }
 
 func TestAddSuite(t *testing.T) {

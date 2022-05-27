@@ -6,3 +6,7 @@ type Weight struct {
 	WeightsID string  `gorm:"type:uuid;column:weights_id;"`
 	Value     float64 `gorm:"column:value;"`
 }
+
+func (Weight) TableName() string {
+	return "link_weights"
+}

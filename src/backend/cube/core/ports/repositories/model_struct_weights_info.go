@@ -3,18 +3,27 @@
 package repositories
 
 import (
+	"neural_storage/cube/core/entities/structure/weights"
 	sw "neural_storage/cube/core/entities/structure/weights"
+	"neural_storage/cube/core/entities/structure/weights/weightsstat"
+	"time"
 )
 
 type ModelStructWeightsInfoRepository interface {
-	Add(modelId string, info sw.Info) error
+	Add(structId string, info []sw.Info) error
 	Get(weightsId string) (*sw.Info, error)
 	Find(filter StructWeightsInfoFilter) ([]*sw.Info, error)
 	Update(info sw.Info) error
-	Delete(weightsId string) error
+	Delete(info []weights.Info) error
+
+	GetAddStat(from, to time.Time) ([]*weightsstat.Info, error)
+	GetUpdateStat(from, to time.Time) ([]*weightsstat.Info, error)
 }
 
 type StructWeightsInfoFilter struct {
-	Ids   []string
-	Limit int
+	Structures []string
+	Ids        []string
+	Names      []string
+	Offset     int
+	Limit      int
 }

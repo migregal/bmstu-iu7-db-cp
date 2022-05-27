@@ -25,9 +25,9 @@ func (s *GetSuite) TearDownTest() {
 	s.TestSuite.TearDownTest()
 }
 
-func (s *GetSuite) TestAdd() {
+func (s *GetSuite) TestGet() {
 	id := "test"
-	expected := *user.NewInfo(&id, nil, nil, nil, nil, nil)
+	expected := *user.NewInfo(&id, nil, nil, nil, nil, 0, nil)
 	res := user_info.UserInfo{ID: id}
 
 	s.SqlMock.

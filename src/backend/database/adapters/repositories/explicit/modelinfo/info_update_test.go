@@ -34,6 +34,7 @@ func (s *UpdateSuite) TearDownTest() {
 func (s *UpdateSuite) TestUpdate() {
 	name := "test"
 	info := model.NewInfo(
+		"",
 		name,
 		structure.NewInfo(
 			"awesome struct",
@@ -42,9 +43,10 @@ func (s *UpdateSuite) TestUpdate() {
 			[]*link.Info{link.NewInfo("link1", "neuron1", "neuron1")},
 			[]*weights.Info{
 				weights.NewInfo(
+					"",
 					"weights1",
-					[]*weight.Info{weight.NewInfo("weights1", "w1", 0.1)},
-					[]*offset.Info{offset.NewInfo("weights1", "o1", 0.5)},
+					[]*weight.Info{weight.NewInfo("weight 1", "w1", 0.1)},
+					[]*offset.Info{offset.NewInfo("offset 1", "o1", 0.5)},
 				),
 			},
 		))
@@ -54,9 +56,10 @@ func (s *UpdateSuite) TestUpdate() {
 	s.SqlMock.ExpectExec(`^UPDATE "structures" SET .* WHERE id = .*$`).WillReturnResult(sqlmock.NewResult(0, 1))
 	s.SqlMock.ExpectExec(`^UPDATE "layers" SET .* WHERE id = .*$`).WillReturnResult(sqlmock.NewResult(0, 1))
 	s.SqlMock.ExpectExec(`^UPDATE "neurons" SET .* WHERE id = .*$`).WillReturnResult(sqlmock.NewResult(0, 1))
-	s.SqlMock.ExpectExec(`^UPDATE "links" SET .* WHERE id = .*$`).WillReturnResult(sqlmock.NewResult(0, 1))
-	s.SqlMock.ExpectExec(`^UPDATE "weights" SET .* WHERE id = .*$`).WillReturnResult(sqlmock.NewResult(0, 1))
-	s.SqlMock.ExpectExec(`^UPDATE "offsets" SET .* WHERE id = .*$`).WillReturnResult(sqlmock.NewResult(0, 1))
+	s.SqlMock.ExpectExec(`^UPDATE "neuron_links" SET .* WHERE id = .*$`).WillReturnResult(sqlmock.NewResult(0, 1))
+	s.SqlMock.ExpectExec(`^UPDATE "weights_info" SET .* WHERE id = .*$`).WillReturnResult(sqlmock.NewResult(0, 1))
+	s.SqlMock.ExpectExec(`^UPDATE "link_weights" SET .* WHERE id = .*$`).WillReturnResult(sqlmock.NewResult(0, 1))
+	s.SqlMock.ExpectExec(`^UPDATE "neuron_offsets" SET .* WHERE id = .*$`).WillReturnResult(sqlmock.NewResult(0, 1))
 	s.SqlMock.ExpectCommit()
 
 	err := s.repo.Update(*info)

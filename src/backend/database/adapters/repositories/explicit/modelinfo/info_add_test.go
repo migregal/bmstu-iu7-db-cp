@@ -40,6 +40,7 @@ func (s *AddSuite) TearDownTest() {
 func (s *AddSuite) TestAdd() {
 	name := "test"
 	info := model.NewInfo(
+		"",
 		name,
 		structure.NewInfo(
 			"awesome struct",
@@ -48,9 +49,10 @@ func (s *AddSuite) TestAdd() {
 			[]*link.Info{link.NewInfo("link1", "neuron1", "neuron1")},
 			[]*weights.Info{
 				weights.NewInfo(
+					"",
 					"weights1",
-					[]*weight.Info{weight.NewInfo("weights1", "w1", 0.1)},
-					[]*offset.Info{offset.NewInfo("weights1", "o1", 0.5)},
+					[]*weight.Info{weight.NewInfo("weight 1", "w1", 0.1)},
+					[]*offset.Info{offset.NewInfo("offset 1", "o1", 0.5)},
 				),
 			},
 		))
@@ -60,10 +62,10 @@ func (s *AddSuite) TestAdd() {
 	s.SqlMock.ExpectQuery(`^INSERT INTO "structures" .* RETURNING "id"$`).WillReturnRows(utils.MockRows(dbstructure.Structure{ID: "struct_id"}))
 	s.SqlMock.ExpectQuery(`^INSERT INTO "layers" .* RETURNING "id"$`).WillReturnRows(utils.MockRows(dblayer.Layer{ID: "layer_id"}))
 	s.SqlMock.ExpectQuery(`^INSERT INTO "neurons" .* RETURNING "id"$`).WillReturnRows(utils.MockRows(dbneuron.Neuron{ID: "some id for neuron"}))
-	s.SqlMock.ExpectExec(`^INSERT INTO "links" .*$`).WillReturnResult(sqlmock.NewResult(1, 0))
+	s.SqlMock.ExpectExec(`^INSERT INTO "neuron_links" .*$`).WillReturnResult(sqlmock.NewResult(1, 0))
 	s.SqlMock.ExpectQuery(`^INSERT INTO "weights_info" .* RETURNING "id"$`).WillReturnRows(utils.MockRows(dbweights.Weights{ID: "some id for weights"}))
-	s.SqlMock.ExpectExec(`^INSERT INTO "offsets" .*$`).WillReturnResult(sqlmock.NewResult(1, 0))
-	s.SqlMock.ExpectExec(`^INSERT INTO "weights" .*$`).WillReturnResult(sqlmock.NewResult(1, 0))
+	s.SqlMock.ExpectExec(`^INSERT INTO "neuron_offsets" .*$`).WillReturnResult(sqlmock.NewResult(1, 0))
+	s.SqlMock.ExpectExec(`^INSERT INTO "link_weights" .*$`).WillReturnResult(sqlmock.NewResult(1, 0))
 	s.SqlMock.ExpectCommit()
 
 	res, err := s.repo.Add(*info)

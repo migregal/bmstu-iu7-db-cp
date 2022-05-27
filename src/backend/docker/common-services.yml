@@ -1,0 +1,60 @@
+version: '3.9'
+
+services:
+  postgres_db:
+    image: postgres:14.2-alpine
+    container_name: postgresql
+    env_file: ./database/.env
+    restart: always
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - "pg_isready -d $$POSTGRES_DB -U $$POSTGRES_USER"
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mysql_db:
+    image: mysql:8.0
+    container_name: mysql
+    env_file: ./database/.env
+    restart: always
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - "mysql $$MYSQL_DATABASE --user=$$MYSQL_USER --password=$$MYSQL_PASSWORD --silent --execute \"SELECT 1;\""
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  migration:
+    build:
+      context: ./migration
+    container_name: db-migration
+    working_dir: /usr/app
+    entrypoint: ./migrate
+    env_file: ./migration/.env
+    volumes:
+      - ../database/migration:/usr/app
+      - ../database/migration/init/:/docker-entrypoint-initdb.d/
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+
+  tarantool-db:
+    image: tarantool/tarantool:2.8
+    container_name: tarantool-db
+    command: tarantool /cache/init.lua
+    env_file:
+      - ./cache/.env
+    volumes:
+      - ./cache:/cache
+
+  cube:
+    env_file: ./cube/.env
+    expose:
+      - 8080
+    depends_on:
+      migration:
+        condition: service_completed_successfully
+    restart: always

@@ -1,0 +1,902 @@
+basePath: /api/v1
+definitions:
+  AdminBlockUserResponse:
+    properties:
+      blocked_until:
+        example: "2025-08-09T15:00:00.053Z"
+        type: string
+      id:
+        example: f6457bdf-4e67-4f05-9108-1cbc0fec9405
+        type: string
+    type: object
+  AdminModelInfoResponse:
+    properties:
+      id:
+        example: f6457bdf-4e67-4f05-9108-1cbc0fec9405
+        type: string
+      name:
+        example: awesome_username
+        type: string
+      structure: {}
+    type: object
+  AdminModelWeightsInfoResponse:
+    properties:
+      id:
+        example: f6457bdf-4e67-4f05-9108-1cbc0fec9405
+        type: string
+      name:
+        example: awesome_username
+        type: string
+      offsets: {}
+      weights: {}
+    type: object
+  AdminUserInfoResponse:
+    properties:
+      email:
+        example: my_awesome@email.com
+        type: string
+      fullname:
+        example: Ivanov Ivan Ivanovich
+        type: string
+      id:
+        example: f6457bdf-4e67-4f05-9108-1cbc0fec9405
+        type: string
+      username:
+        example: awesome_username
+        type: string
+    type: object
+  LoginRequest:
+    properties:
+      email:
+        example: my_awesome@email.com
+        type: string
+      password:
+        example: Really, you're waiting for example?
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  LoginResponse:
+    properties:
+      expire:
+        example: "2022-03-20T17:00:01Z"
+        type: string
+      token:
+        example: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NDc...
+        type: string
+    type: object
+  ModelInfoResponse:
+    properties:
+      id:
+        example: f6457bdf-4e67-4f05-9108-1cbc0fec9405
+        type: string
+      name:
+        example: awesome_username
+        type: string
+      structure: {}
+    type: object
+  ModelWeightsInfoResponse:
+    properties:
+      id:
+        example: f6457bdf-4e67-4f05-9108-1cbc0fec9405
+        type: string
+      name:
+        example: awesome_username
+        type: string
+      offsets: {}
+      weights: {}
+    type: object
+  RegistrationRequest:
+    properties:
+      email:
+        example: my_awesome@email.com
+        type: string
+      fullname:
+        example: John Smith
+        type: string
+      password:
+        example: Really, you're waiting for example?
+        type: string
+      username:
+        example: my_awesome_nickname
+        type: string
+    required:
+    - email
+    - fullname
+    - password
+    - username
+    type: object
+  Unauthorized:
+    properties:
+      message:
+        example: user not found
+        type: string
+    type: object
+  UserInfoResponse:
+    properties:
+      email:
+        example: my_awesome@email.com
+        type: string
+      fullname:
+        example: Ivanov Ivan Ivanovich
+        type: string
+      id:
+        example: f6457bdf-4e67-4f05-9108-1cbc0fec9405
+        type: string
+      username:
+        example: awesome_username
+        type: string
+    type: object
+  neural_storage_cube_handlers_http_v1_stat_statmodels.ModelStatInfoResponse:
+    properties:
+      edit:
+        items:
+          $ref: '#/definitions/statmodels.StatInfo'
+        type: array
+      load:
+        items:
+          $ref: '#/definitions/statmodels.StatInfo'
+        type: array
+    type: object
+  neural_storage_cube_handlers_http_v1_stat_statusers.ModelStatInfoResponse:
+    properties:
+      edit:
+        items:
+          $ref: '#/definitions/statusers.StatInfo'
+        type: array
+      registration:
+        items:
+          $ref: '#/definitions/statusers.StatInfo'
+        type: array
+    type: object
+  neural_storage_cube_handlers_http_v1_stat_statweights.ModelStatInfoResponse:
+    properties:
+      edit:
+        items:
+          $ref: '#/definitions/statweights.StatInfo'
+        type: array
+      load:
+        items:
+          $ref: '#/definitions/statweights.StatInfo'
+        type: array
+    type: object
+  statmodels.StatInfo:
+    properties:
+      id:
+        example: 3f8bf2a3-01cc-4c4a-9759-86cec9cf8da9
+        type: string
+      time:
+        example: 2006-01-02T15:04:05Z07:00
+        type: string
+    type: object
+  statusers.StatInfo:
+    properties:
+      id:
+        example: 3f8bf2a3-01cc-4c4a-9759-86cec9cf8da9
+        type: string
+      time:
+        example: 2006-01-02T15:04:05Z07:00
+        type: string
+    type: object
+  statweights.StatInfo:
+    properties:
+      id:
+        example: 3f8bf2a3-01cc-4c4a-9759-86cec9cf8da9
+        type: string
+      time:
+        example: 2006-01-02T15:04:05Z07:00
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: This is cube server.
+  license:
+    name: MIT
+    url: https://mit-license.org/
+  title: Cube API
+  version: "1.0"
+paths:
+  /api/v1/admin/login:
+    post:
+      consumes:
+      - application/json
+      description: login to existing account
+      parameters:
+      - description: The body to create a thing
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/LoginRequest'
+      responses:
+        "200":
+          description: Login was successfull
+          schema:
+            $ref: '#/definitions/LoginResponse'
+        "401":
+          description: Login data is invalid or missing, check request
+          schema:
+            $ref: '#/definitions/Unauthorized'
+      summary: Admin login
+      tags:
+      - auth
+      - admin
+  /api/v1/admin/models:
+    delete:
+      description: Deletes model info from any user
+      parameters:
+      - description: Model ID to delete
+        in: query
+        name: id
+        type: string
+      responses:
+        "200":
+          description: Model info deleted
+        "400":
+          description: Invalid request
+        "500":
+          description: Failed to delete model info from storage
+      summary: Delete model info
+      tags:
+      - admin
+    get:
+      description: Find such model info as id, username, email and fullname
+      parameters:
+      - description: Model ID to search for
+        in: query
+        name: id
+        type: string
+      - description: User ID that owns model to search for
+        in: query
+        name: owner_id
+        type: string
+      - description: Model name to search for
+        in: query
+        name: name
+        type: string
+      - description: Page number for pagination
+        in: query
+        name: page
+        type: integer
+      - description: Page size for pagination
+        in: query
+        name: per_page
+        type: integer
+      responses:
+        "200":
+          description: Model info found
+          schema:
+            items:
+              $ref: '#/definitions/AdminModelInfoResponse'
+            type: array
+        "400":
+          description: Invalid request
+        "500":
+          description: Failed to get model info from storage
+      summary: Find model info
+      tags:
+      - admin
+  /api/v1/admin/models/weights:
+    delete:
+      description: Deletes model info from any user
+      parameters:
+      - description: Model ID to delete
+        in: query
+        name: id
+        type: string
+      responses:
+        "200":
+          description: Model info deleted
+        "400":
+          description: Invalid request
+        "403":
+          description: Invalid token, user id not specified
+        "500":
+          description: Failed to delete model info from storage
+      summary: Delete model info
+      tags:
+      - admin
+    get:
+      description: Find such model info as id, username, email and fullname
+      parameters:
+      - description: Weight ID to search for
+        in: query
+        name: id
+        type: string
+      - description: Structure ID to search for
+        in: query
+        name: structure_id
+        type: string
+      - description: Weights name to search for
+        in: query
+        name: name
+        type: string
+      - description: Page number for pagination
+        in: query
+        name: page
+        type: integer
+      - description: Page size for pagination
+        in: query
+        name: per_page
+        type: integer
+      responses:
+        "200":
+          description: Model weights info found
+          schema:
+            items:
+              $ref: '#/definitions/AdminModelWeightsInfoResponse'
+            type: array
+        "400":
+          description: Invalid request
+        "500":
+          description: Failed to get model weights info from storage
+      summary: Find model info
+      tags:
+      - admin
+  /api/v1/admin/users:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes user by id
+      parameters:
+      - description: UserId to delete
+        in: query
+        name: id
+        type: string
+      responses:
+        "200":
+          description: User deleted
+        "400":
+          description: Invalid request
+        "500":
+          description: Failed to delete user info from storage
+      summary: Delete user info
+      tags:
+      - admin
+    get:
+      consumes:
+      - application/json
+      description: Find such users info as id, username, email and fullname
+      parameters:
+      - description: UserId to search for
+        in: query
+        name: user_id
+        type: string
+      - description: Username to search for
+        in: query
+        name: username
+        type: string
+      - description: Email to search for
+        in: query
+        name: email
+        type: string
+      - description: Email to search for
+        in: query
+        name: page
+        type: integer
+      - description: Email to search for
+        in: query
+        name: per_page
+        type: integer
+      responses:
+        "200":
+          description: Users info found
+          schema:
+            items:
+              $ref: '#/definitions/AdminUserInfoResponse'
+            type: array
+        "400":
+          description: Invalid request
+        "500":
+          description: Failed to get user info from storage
+      summary: Find user info
+      tags:
+      - admin
+  /api/v1/admin/users/blocked:
+    delete:
+      description: Deletes user block info by user id
+      parameters:
+      - description: User ID to unblock
+        in: query
+        name: id
+        type: string
+      responses:
+        "200":
+          description: User unblocked
+        "400":
+          description: Invalid request
+        "500":
+          description: Failed to delete user block info from storage
+      summary: Delete user block info
+      tags:
+      - admin
+    get:
+      description: Find such users info as id and block time
+      parameters:
+      - description: UserId to search for
+        in: query
+        name: user_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Users block info found
+          schema:
+            $ref: '#/definitions/AdminBlockUserResponse'
+        "400":
+          description: Invalid request
+        "500":
+          description: Failed to get user info from storage
+      summary: Find user block info
+      tags:
+      - admin
+  /api/v1/login:
+    post:
+      consumes:
+      - application/json
+      description: Login to existing account
+      parameters:
+      - description: The body to create a thing
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/LoginRequest'
+      responses:
+        "200":
+          description: Login was successfull
+          schema:
+            $ref: '#/definitions/LoginResponse'
+        "401":
+          description: Login data is invalid or missing, check request
+          schema:
+            $ref: '#/definitions/Unauthorized'
+      summary: User login
+      tags:
+      - auth
+      - user
+  /api/v1/models:
+    delete:
+      description: Deletes model info owned by authorized user
+      parameters:
+      - description: Model ID to delete
+        in: query
+        name: id
+        type: string
+      responses:
+        "200":
+          description: Model info deleted
+        "400":
+          description: Invalid request
+        "403":
+          description: Invalid token, user id not specified
+        "500":
+          description: Failed to delete model info from storage
+      summary: Delete model info
+      tags:
+      - user
+    get:
+      description: Find such model info as id, username, email and fullname
+      parameters:
+      - description: Model ID to search for
+        in: query
+        name: id
+        type: string
+      - description: User ID that owns model to search for
+        in: query
+        name: owner_id
+        type: string
+      - description: Model name to search for
+        in: query
+        name: name
+        type: string
+      - description: Page number for pagination
+        in: query
+        name: page
+        type: integer
+      - description: Page size for pagination
+        in: query
+        name: per_page
+        type: integer
+      responses:
+        "200":
+          description: Model info found
+          schema:
+            items:
+              $ref: '#/definitions/ModelInfoResponse'
+            type: array
+        "400":
+          description: Invalid request
+        "500":
+          description: Failed to get model info from storage
+      summary: Find model info
+      tags:
+      - user
+    patch:
+      consumes:
+      - multipart/form-data
+      description: Update such model info as weights, weights titles
+      parameters:
+      - description: Model ID to update
+        in: formData
+        name: id
+        required: true
+        type: string
+      - description: Model Weights ID to update
+        in: formData
+        name: weights_id
+        type: string
+      - description: Model Weights Title to set
+        in: formData
+        name: weights_title
+        type: string
+      - description: Model Weights to Update/Add
+        in: formData
+        name: weights
+        type: file
+      responses:
+        "200":
+          description: Model info updated
+        "400":
+          description: Invalid request
+        "403":
+          description: Invalid token, user id not specified
+        "500":
+          description: Failed to update model info
+      summary: Update model info
+      tags:
+      - user
+    post:
+      consumes:
+      - multipart/form-data
+      description: Adds such model info as title, structure, weights
+      parameters:
+      - description: Model Title to create
+        in: formData
+        name: title
+        required: true
+        type: string
+      - description: Model Structure Title to add
+        in: formData
+        name: structure_title
+        required: true
+        type: string
+      - description: Model Structure to add
+        in: formData
+        name: structure
+        required: true
+        type: file
+      - description: Model Weights Title to add
+        in: formData
+        name: weights_title
+        required: true
+        type: string
+      - description: Model Weights to add
+        in: formData
+        name: weights
+        required: true
+        type: file
+      responses:
+        "200":
+          description: Model created
+        "400":
+          description: Invalid request
+        "403":
+          description: Invalid token, user id not specified
+        "500":
+          description: Failed to create model info
+      summary: Create new model
+      tags:
+      - user
+  /api/v1/models/weights:
+    delete:
+      description: Deletes model info from any user
+      parameters:
+      - description: Model ID to delete
+        in: query
+        name: id
+        type: string
+      responses:
+        "200":
+          description: Model info deleted
+        "400":
+          description: Invalid request
+        "403":
+          description: Invalid token, user id not specified
+        "500":
+          description: Failed to delete model info from storage
+      summary: Delete model info
+      tags:
+      - user
+    get:
+      description: Find such model info as id, username, email and fullname
+      parameters:
+      - description: Weight ID to search for
+        in: query
+        name: id
+        type: string
+      - description: Structure ID to search for
+        in: query
+        name: structure_id
+        type: string
+      - description: Weights name to search for
+        in: query
+        name: name
+        type: string
+      - description: Page number for pagination
+        in: query
+        name: page
+        type: integer
+      - description: Page size for pagination
+        in: query
+        name: per_page
+        type: integer
+      responses:
+        "200":
+          description: Model weights info found
+          schema:
+            items:
+              $ref: '#/definitions/ModelWeightsInfoResponse'
+            type: array
+        "400":
+          description: Invalid request
+        "500":
+          description: Failed to get model weights info from storage
+      summary: Find model info
+      tags:
+      - admin
+    patch:
+      consumes:
+      - multipart/form-data
+      description: Update such model info as weights, weights titles
+      parameters:
+      - description: Model Weights ID to update
+        in: formData
+        name: weights_id
+        type: string
+      - description: Model Weights Title to set
+        in: formData
+        name: weights_title
+        type: string
+      - description: Model Weights to Update/Add
+        in: formData
+        name: weights
+        type: file
+      responses:
+        "200":
+          description: Model info updated
+        "400":
+          description: Invalid request
+        "403":
+          description: Invalid token, user id not specified
+        "500":
+          description: Failed to update model info
+      summary: Update model info
+      tags:
+      - user
+    post:
+      consumes:
+      - multipart/form-data
+      description: Adds model weights info to existing model
+      parameters:
+      - description: Model ID to add weights to
+        in: formData
+        name: id
+        required: true
+        type: string
+      - description: Model Weights Title to add
+        in: formData
+        name: weights_title
+        required: true
+        type: string
+      - description: Model Weights to add
+        in: formData
+        name: weights
+        required: true
+        type: file
+      responses:
+        "200":
+          description: Weights added
+        "400":
+          description: Invalid request
+        "403":
+          description: Invalid token, user id not specified
+        "500":
+          description: Failed to create model weights info
+      summary: Create new model weights info
+      tags:
+      - user
+  /api/v1/registration:
+    post:
+      consumes:
+      - application/json
+      description: register new user
+      parameters:
+      - description: The body to create a thing
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/RegistrationRequest'
+      responses:
+        "307":
+          description: Registration was successfull, redirect request to login (/api/v1/login)
+        "400":
+          description: Registration data is invalid or missing, check request
+          schema:
+            $ref: '#/definitions/Unauthorized'
+        "500":
+          description: 'Failed to register user due to some reasons. For example:
+            user already exists'
+          schema:
+            $ref: '#/definitions/Unauthorized'
+      summary: User registration
+      tags:
+      - auth
+      - user
+  /api/v1/stat/login:
+    post:
+      consumes:
+      - application/json
+      description: login to existing account
+      parameters:
+      - description: The body to create a thing
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/LoginRequest'
+      responses:
+        "200":
+          description: Login was successfull
+          schema:
+            $ref: '#/definitions/LoginResponse'
+        "401":
+          description: Login data is invalid or missing, check request
+          schema:
+            $ref: '#/definitions/Unauthorized'
+      summary: Stat login
+      tags:
+      - auth
+      - stat
+  /api/v1/stat/models:
+    get:
+      description: Get such model stat info as load and edit stat per period
+      parameters:
+      - description: Time to start from, RFC3339
+        format: '"2006-01-02T15:04:05Z07:00"'
+        in: query
+        name: from
+        type: string
+      - description: Time to stop at, RFC3339
+        format: '"2006-01-02T15:04:05Z07:00"'
+        in: query
+        name: to
+        type: string
+      - description: Search for load stat
+        in: query
+        name: load
+        type: boolean
+      - description: Search for update stats
+        in: query
+        name: update
+        type: boolean
+      responses:
+        "200":
+          description: Models stat info found
+          schema:
+            items:
+              $ref: '#/definitions/neural_storage_cube_handlers_http_v1_stat_statmodels.ModelStatInfoResponse'
+            type: array
+        "400":
+          description: Invalid request
+        "500":
+          description: Failed to get model stat info
+      summary: Get models stat info
+      tags:
+      - stat
+  /api/v1/stat/users:
+    get:
+      description: Get such user stat info as registration and edit stat per period
+      parameters:
+      - description: Time to start from, RFC3339
+        format: '"2006-01-02T15:04:05Z07:00"'
+        in: query
+        name: from
+        type: string
+      - description: Time to stop at, RFC3339
+        format: '"2006-01-02T15:04:05Z07:00"'
+        in: query
+        name: to
+        type: string
+      - description: Search for load stat
+        in: query
+        name: load
+        type: boolean
+      - description: Search for update stats
+        in: query
+        name: update
+        type: boolean
+      responses:
+        "200":
+          description: Users stat info found
+          schema:
+            items:
+              $ref: '#/definitions/neural_storage_cube_handlers_http_v1_stat_statweights.ModelStatInfoResponse'
+            type: array
+        "400":
+          description: Invalid request
+        "500":
+          description: Failed to get user stat info
+      summary: Get users stat info
+      tags:
+      - stat
+  /api/v1/stat/users/blocked:
+    patch:
+      description: Blocks user until specified moment
+      parameters:
+      - description: User ID to block
+        in: query
+        name: id
+        type: string
+      - description: Time to block until
+        in: query
+        name: until
+        type: string
+      responses:
+        "200":
+          description: User blocked
+        "400":
+          description: Invalid request
+        "500":
+          description: 'Failed to block user '
+      summary: Block user
+      tags:
+      - stat
+  /api/v1/users:
+    get:
+      consumes:
+      - application/json
+      description: Find such users info as id, username, email and fullname
+      parameters:
+      - description: UserId to search for
+        in: query
+        name: user_id
+        type: string
+      - description: Username to search for
+        in: query
+        name: username
+        type: string
+      - description: Email to search for
+        in: query
+        name: email
+        type: string
+      - description: Page number for pagination
+        in: query
+        name: page
+        type: integer
+      - description: Page size for pagination
+        in: query
+        name: per_page
+        type: integer
+      responses:
+        "200":
+          description: Users info found
+          schema:
+            items:
+              $ref: '#/definitions/UserInfoResponse'
+            type: array
+        "400":
+          description: Invalid request
+        "500":
+          description: Failed to get user info from storage
+      summary: Find user info
+      tags:
+      - user
+securityDefinitions:
+  Bearer:
+    type: basic
+swagger: "2.0"

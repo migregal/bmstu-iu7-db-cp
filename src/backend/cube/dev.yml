@@ -1,0 +1,44 @@
+debug: true
+
+db:
+  adapter: "expl"
+  host: "postgres_db"
+  port: 5432
+  user: <dev username>
+  password: <dev user password>
+  db_name: <dev database>
+  driver: "pg"
+
+statdb:
+  adapter: "expl"
+  host: "postgres_db"
+  port: 5432
+  user: <stat dev username>
+  password: <stat dev user password>
+  db_name: <stat dev database>
+  driver: "pg"
+
+admindb:
+  adapter: "expl"
+  host: "postgres_db"
+  port: 5432
+  user: <admin dev username>
+  password: <admin dev user password>
+  db_name: <admin dev database>
+  driver: "pg"
+
+cache:
+  adapter: "trnt"
+  host: "tarantool-db"
+  port: 3301
+  user: <dev username>
+  password: <dev user password>
+
+validation:
+  min_username_len: 8
+  max_username_len: 32
+  min_pwd_len: 8
+  max_pwd_len: 64
+
+priv_key_path: /tmp/crypto/pkcs8.key
+pub_key_path: /tmp/crypto/publickey.crt

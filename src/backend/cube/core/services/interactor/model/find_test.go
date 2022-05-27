@@ -5,6 +5,7 @@ package model
 
 import (
 	"neural_storage/cube/core/entities/model"
+	"neural_storage/cube/core/ports/interactors"
 	"testing"
 
 	"github.com/stretchr/testify/mock"
@@ -25,9 +26,9 @@ func (s *FindSuite) TearDownTest() {
 }
 
 func (s *FindSuite) TestFind() {
-	filter := Filter{}
+	filter := interactors.ModelInfoFilter{}
 	expected := []*model.Info{
-		model.NewInfo("", nil),
+		model.NewInfo("", "", nil),
 	}
 
 	s.mockedModelInfo.On("Find", mock.Anything).Return(expected, nil)

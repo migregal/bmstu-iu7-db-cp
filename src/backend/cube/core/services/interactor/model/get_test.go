@@ -25,10 +25,10 @@ func (s *GetSuite) TearDownTest() {
 }
 
 func (s *GetSuite) TestGet() {
-	expected := model.NewInfo("", nil)
+	expected := model.NewInfo("", "", nil)
 
 	s.mockedModelInfo.On("Get", mock.Anything).Return(expected, nil)
-	info, err := s.interactor.Get(expected.Id())
+	info, err := s.interactor.Get(expected.ID())
 
 	require.NoError(s.T(), err)
 	require.Equal(s.T(), info, expected)
