@@ -4,13 +4,15 @@
 package user
 
 import (
-	"neural_storage/cube/core/entities/user"
-	"neural_storage/cube/core/ports/interactors"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
+
+	"neural_storage/cube/core/entities/user"
+	"neural_storage/cube/core/ports/interactors"
 )
 
 type FindSuite struct {
@@ -28,11 +30,11 @@ func (s *FindSuite) TearDownTest() {
 func (s *FindSuite) TestFind() {
 	filter := interactors.UserInfoFilter{}
 	expected := []user.Info{
-		*user.NewInfo(nil, nil, nil, nil, nil, 0, nil),
+		*user.NewInfo("", "", "", "", "", 0, time.Time{}),
 	}
 
 	s.mockedRepo.On("Find", mock.Anything).Return(expected, nil)
-	info, err := s.interactor.Find(filter)
+	info, err := s.interactor.Find(s.ctx, filter)
 
 	require.NoError(s.T(), err)
 	require.Equal(s.T(), info, expected)

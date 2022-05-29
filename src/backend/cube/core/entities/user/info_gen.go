@@ -2,43 +2,43 @@ package user
 
 import "time"
 
-func (i *Info) ID() *string {
+func (i *Info) ID() string {
 	return i.id
 }
 
-func (i *Info) SetId(id *string) {
+func (i *Info) SetId(id string) {
 	i.id = id
 }
 
-func (i *Info) Username() *string {
+func (i *Info) Username() string {
 	return i.username
 }
 
-func (i *Info) SetUsername(username *string) {
+func (i *Info) SetUsername(username string) {
 	i.username = username
 }
 
-func (i *Info) Fullname() *string {
+func (i *Info) Fullname() string {
 	return i.fullname
 }
 
-func (i *Info) SetFullname(fullname *string) {
+func (i *Info) SetFullname(fullname string) {
 	i.fullname = fullname
 }
 
-func (i *Info) Email() *string {
+func (i *Info) Email() string {
 	return i.email
 }
 
-func (i *Info) SetEmail(email *string) {
+func (i *Info) SetEmail(email string) {
 	i.email = email
 }
 
-func (i *Info) Pwd() *string {
+func (i *Info) Pwd() string {
 	return i.pwd
 }
 
-func (i *Info) SetPwd(pwdHash *string) {
+func (i *Info) SetPwd(pwdHash string) {
 	i.pwd = pwdHash
 }
 

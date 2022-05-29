@@ -32,7 +32,7 @@ func (s *FindSuite) TestFind() {
 	}
 
 	s.mockedModelInfo.On("Find", mock.Anything).Return(expected, nil)
-	info, err := s.interactor.Find(filter)
+	info, err := s.interactor.Find(s.ctx, filter)
 
 	require.NoError(s.T(), err)
 	require.Equal(s.T(), info, expected)

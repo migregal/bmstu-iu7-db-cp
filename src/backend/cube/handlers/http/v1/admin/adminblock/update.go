@@ -2,13 +2,14 @@ package adminblock
 
 import (
 	"net/http"
+	"neural_storage/pkg/logger"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 type updateRequest struct {
-	UserId string     `json:"id" form:"id" binding:"required"`
+	UserId string    `json:"id" form:"id" binding:"required"`
 	Until  time.Time `json:"until" form:"until" binding:"required"`
 }
 
@@ -23,17 +24,27 @@ type updateRequest struct {
 // @Failure      500 "Failed to block user "
 // @Router       /api/v1/stat/users/blocked [patch]
 func (h *Handler) Update(c *gin.Context) {
+	statCallUpdate.Inc()
+	lg := h.lg.WithFields(map[string]interface{}{logger.ReqIDKey: c.Value(logger.ReqIDKey)})
+
 	var req updateRequest
 	if err := c.ShouldBind(&req); err != nil || req.UserId == "" {
+		statFailUpdate.Inc()
+		lg.Errorf("failed to bind request: %v", err)
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
-	err := h.resolver.Block(req.UserId, req.Until)
+	lg.WithFields(map[string]interface{}{"req": req}).Info("attempt to block user")
+	err := h.resolver.Block(c, req.UserId, req.Until)
 	if err != nil {
+		statFailUpdate.Inc()
+		lg.Errorf("failed to block user: %v", err)
 		c.JSON(http.StatusInternalServerError, "failed to block user")
 		return
 	}
 
+	statOKUpdate.Inc()
+	lg.Info("success")
 	c.AbortWithStatus(http.StatusOK)
 }

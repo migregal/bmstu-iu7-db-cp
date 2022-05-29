@@ -27,7 +27,7 @@ func (s *DeleteSuite) TestDelete() {
 	modelId := ""
 	s.mockedModelInfo.On("Delete", mock.Anything).Return(nil)
 
-	err := s.interactor.Delete("", modelId)
+	err := s.interactor.Delete(s.ctx, "", modelId)
 
 	require.NoError(s.T(), err)
 

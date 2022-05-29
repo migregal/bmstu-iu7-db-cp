@@ -4,14 +4,16 @@
 package userinfo
 
 import (
+	"testing"
+	"time"
+
+	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
+
 	"neural_storage/cube/core/entities/user"
 	"neural_storage/cube/core/ports/repositories"
 	"neural_storage/database/core/entities/user_info"
 	"neural_storage/database/test/mock/utils"
-	"testing"
-
-	"github.com/stretchr/testify/require"
-	"github.com/stretchr/testify/suite"
 )
 
 type FindSuite struct {
@@ -28,7 +30,7 @@ func (s *FindSuite) TearDownTest() {
 
 func (s *FindSuite) TestFind() {
 	id := "test"
-	expected := []user.Info{*user.NewInfo(&id, nil, nil, nil, nil, 0, nil)}
+	expected := []user.Info{*user.NewInfo(id, "", "", "", "", 0, time.Time{})}
 	res := []user_info.UserInfo{{ID: id}}
 
 	filter := repositories.UserInfoFilter{UserIds: make([]string, 1), Limit: 10}

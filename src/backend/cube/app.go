@@ -1,9 +1,11 @@
 package cube
 
 import (
+	"os"
+
 	"neural_storage/config/core/services/config"
 	"neural_storage/cube/handlers"
-	"os"
+	"neural_storage/pkg/logger"
 )
 
 type App struct {
@@ -20,7 +22,9 @@ func New() (*App, error) {
 		return nil, err
 	}
 
-	return &App{srv: handlers.New(config)}, nil
+	var lg = logger.New()
+
+	return &App{srv: handlers.New(config, lg)}, nil
 }
 
 func (a *App) Run() error {

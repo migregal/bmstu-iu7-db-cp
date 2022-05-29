@@ -33,7 +33,7 @@ func (s *FindStructureWeightsSuite) TestFind() {
 	}
 
 	s.mockedWeightsInfo.On("Find", mock.Anything).Return(expected, nil)
-	info, err := s.interactor.FindStructureWeights(filter)
+	info, err := s.interactor.FindStructureWeights(s.ctx, filter)
 
 	require.NoError(s.T(), err)
 	require.Equal(s.T(), info, expected)

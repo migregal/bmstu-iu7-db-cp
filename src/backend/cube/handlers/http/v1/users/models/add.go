@@ -6,9 +6,12 @@ import (
 	"mime/multipart"
 	"net/http"
 	"neural_storage/cube/core/entities/model"
-	"neural_storage/cube/core/entities/structure"
-	"neural_storage/cube/core/entities/structure/weights"
+
+	"neural_storage/cube/handlers/http/v1/entities/structure"
+	"neural_storage/cube/handlers/http/v1/entities/structure/weights"
+
 	"neural_storage/cube/handlers/http/jwt"
+	"neural_storage/pkg/logger"
 
 	"github.com/gin-gonic/gin"
 )
@@ -37,31 +40,44 @@ type AddRequest struct {
 // @Failure      500 "Failed to create model info"
 // @Router       /api/v1/models [post]
 func (h *Handler) Add(c *gin.Context) {
+	statCallAdd.Inc()
+	lg := h.lg.WithFields(map[string]interface{}{logger.ReqIDKey: c.Value(logger.ReqIDKey)})
+
 	claimID, ok := c.Get(jwt.IdentityKey)
 	if !ok {
+		statFailAdd.Inc()
+		lg.Error("access token missing")
 		c.JSON(http.StatusForbidden, "invalid access token")
 		return
 	}
 	usrID, ok := claimID.(string)
 	if !ok {
+		statFailAdd.Inc()
+		lg.Error("invalid access token")
 		c.JSON(http.StatusForbidden, "invalid access token")
 		return
 	}
 
 	var req AddRequest
 
-	if c.ShouldBind(&req) != nil {
+	if err := c.ShouldBind(&req); err != nil {
+		statFailAdd.Inc()
+		lg.Errorf("failed to bind request: %v", err)
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
 	content, err := req.Structure.Open()
 	if err != nil {
+		statFailAdd.Inc()
+		lg.Errorf("failed to find structure info: %v", err)
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 	plan, err := ioutil.ReadAll(content)
 	if err != nil {
+		statFailAdd.Inc()
+		lg.Errorf("failed to read structure info: %v", err)
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
@@ -69,36 +85,50 @@ func (h *Handler) Add(c *gin.Context) {
 	var structure structure.Info
 	err = json.Unmarshal(plan, &structure)
 	if err != nil {
+		statFailAdd.Inc()
+		lg.Errorf("failed to parse structure info: %v", err)
 		c.JSON(http.StatusBadRequest, "invalid structure format")
 		return
 	}
 
 	content, err = req.Weights.Open()
 	if err != nil {
+		statFailAdd.Inc()
+		lg.Errorf("failed to find weights info: %v", err)
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 	plan, err = ioutil.ReadAll(content)
 	if err != nil {
+		statFailAdd.Inc()
+		lg.Errorf("failed to read weights info: %v", err)
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 	var w weights.Info
 	err = json.Unmarshal(plan, &w)
 	if err != nil {
+		statFailAdd.Inc()
+		lg.Errorf("failed to parse weights info: %v", err)
 		c.JSON(http.StatusBadRequest, "invalid weights format")
 		return
 	}
-	structure.SetWeights([]*weights.Info{&w})
+	structure.Weights = []weights.Info{w}
 
-	model := model.NewInfo(usrID, req.ModelTitle, &structure)
-	err = h.resolver.Add(*model)
+	lg.WithFields(map[string]interface{}{"user": usrID, "title": req.ModelTitle}).Info("attempt to add new model")
+	model := model.NewInfo(usrID, req.ModelTitle, structToBL(structure))
+	err = h.resolver.Add(c, *model)
 	if err != nil {
+		statFailAdd.Inc()
+		lg.Errorf("failed to add new model: %v", err)
 		c.JSON(http.StatusInternalServerError, "model creation failed")
 		return
 	}
 
+	lg.Info("attempt to add model to cache")
 	_ = h.cache.UpdateModelInfo(model.ID(), model)
 
-	c.JSON(http.StatusOK, structure)
+	statOKAdd.Inc()
+	lg.Info("success")
+	c.JSON(http.StatusOK, model)
 }

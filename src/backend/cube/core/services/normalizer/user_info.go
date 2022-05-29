@@ -13,9 +13,9 @@ func (n *Normalizer) normalizePwd(pwd string) string {
 }
 
 func (n *Normalizer) NormalizeUserInfo(info user.Info) (user.Info, error) {
-	if info.Pwd() != nil {
-		np := n.normalizePwd(*info.Pwd())
-		info.SetPwd(&np)
+	if info.Pwd() != "" {
+		np := n.normalizePwd(info.Pwd())
+		info.SetPwd(np)
 	}
 
 	return info, nil

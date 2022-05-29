@@ -8,7 +8,6 @@ import (
 	"neural_storage/database/core/services/interactor/database"
 )
 
-
 func (c *Config) AdminUserInfo() config.UserInfoInteractorConfig {
 	return c.getUserInfo(c.conf.DBConnAdmin)
 }

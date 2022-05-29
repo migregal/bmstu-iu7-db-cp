@@ -2,6 +2,7 @@ package statweights
 
 import (
 	"net/http"
+	"neural_storage/pkg/logger"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -38,8 +39,13 @@ type WeightsStatInfo struct {
 // @Failure      500 "Failed to get user stat info"
 // @Router       /api/v1/stat/users [get]
 func (h *Handler) Get(c *gin.Context) {
+	statCallGet.Inc()
+	lg := h.lg.WithFields(map[string]interface{}{logger.ReqIDKey: c.Value(logger.ReqIDKey)})
+
 	var req request
 	if err := c.ShouldBind(&req); err != nil {
+		statFailGet.Inc()
+		lg.Errorf("failed to bind request: %v", err)
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
@@ -47,9 +53,12 @@ func (h *Handler) Get(c *gin.Context) {
 	resp := WeightsStatInfo{}
 
 	if req.Load {
-		data, err := h.resolver.GetWeightsLoadStat(req.From, req.To)
+		lg.WithFields(map[string]interface{}{"req": req}).Info("attempt to get load stat")
+		data, err := h.resolver.GetWeightsLoadStat(c, req.From, req.To)
 		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
+			statFailGet.Inc()
+			lg.Errorf("failed to get load stat data: %v", err)
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
 
@@ -59,9 +68,12 @@ func (h *Handler) Get(c *gin.Context) {
 	}
 
 	if req.Update {
-		data, err := h.resolver.GetWeightsEditStat(req.From, req.To)
+		lg.WithFields(map[string]interface{}{"req": req}).Info("attempt to get update stat")
+		data, err := h.resolver.GetWeightsEditStat(c, req.From, req.To)
 		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
+			statFailGet.Inc()
+			lg.Errorf("failed to get update stat data: %v", err)
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
 		for _, v := range data {
@@ -69,5 +81,7 @@ func (h *Handler) Get(c *gin.Context) {
 		}
 	}
 
+	statOKGet.Inc()
+	lg.WithFields(map[string]interface{}{"res": resp}).Info("success")
 	c.JSON(http.StatusOK, resp)
 }

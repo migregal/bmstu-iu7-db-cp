@@ -50,6 +50,9 @@ func (r *Repository) Get(id string) (*model.Info, error) {
 	}
 
 	dbInfo.weights, err = r.getDetailsWeightsInfo(weights)
+	if err != nil {
+		return nil, err
+	}
 
 	res := fromDBEntity(dbInfo)
 	return &res, nil

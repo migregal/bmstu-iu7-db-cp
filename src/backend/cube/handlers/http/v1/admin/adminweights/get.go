@@ -3,6 +3,7 @@ package adminweights
 import (
 	"net/http"
 	"neural_storage/cube/core/ports/interactors"
+	"neural_storage/pkg/logger"
 
 	"github.com/gin-gonic/gin"
 )
@@ -36,11 +37,17 @@ type WeightInfo struct {
 // @Failure      500 "Failed to get model weights info from storage"
 // @Router       /api/v1/admin/models/weights [get]
 func (h *Handler) Get(c *gin.Context) {
+	statCallGet.Inc()
+	lg := h.lg.WithFields(map[string]interface{}{logger.ReqIDKey: c.Value(logger.ReqIDKey)})
+
 	var req getRequest
 	if err := c.ShouldBind(&req); err != nil {
+		statFailGet.Inc()
+		lg.Errorf("failed to bind request: %v", err)
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
+	lg.WithFields(map[string]interface{}{"req": req}).Info("req binded")
 
 	filter := interactors.ModelWeightsInfoFilter{}
 	if req.ID != "" {
@@ -60,12 +67,17 @@ func (h *Handler) Get(c *gin.Context) {
 	}
 	filter.Limit = req.PerPage
 
-	infos, err := h.resolver.FindStructureWeights(filter)
+	lg.WithFields(map[string]interface{}{"filter": filter}).Info("attempt to find weights info")
+	infos, err := h.resolver.FindStructureWeights(c, filter)
 	if err != nil {
+		statFailGet.Inc()
+		lg.Errorf("failed to find weights info: %v", err)
 		c.JSON(http.StatusInternalServerError, "failed to fetch user info")
 		return
 	}
 	if len(infos) == 0 {
+		statOKGet.Inc()
+		lg.Info("no weights found")
 		c.JSON(http.StatusOK, []WeightInfo{})
 		return
 	}
@@ -78,5 +90,8 @@ func (h *Handler) Get(c *gin.Context) {
 			Offsets: val.Offsets(),
 		})
 	}
+
+	statOKGet.Inc()
+	lg.WithFields(map[string]interface{}{"res": res}).Info("success")
 	c.JSON(http.StatusOK, res)
 }

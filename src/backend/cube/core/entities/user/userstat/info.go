@@ -3,9 +3,9 @@ package userstat
 import "time"
 
 type Info struct {
-	id        string
+	id           string
 	registeredAt time.Time
-	updatedAt time.Time
+	updatedAt    time.Time
 }
 
 func New(id string, registeredAt, updatedAt time.Time) *Info {

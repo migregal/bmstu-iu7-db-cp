@@ -5,13 +5,14 @@ package userinfo
 
 import (
 	"database/sql"
-	"neural_storage/database/core/services/interactor/database"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+
+	"neural_storage/database/core/services/interactor/database"
 )
 
 type TestSuite struct {

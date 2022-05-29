@@ -4,8 +4,13 @@
 package model
 
 import (
+	"context"
+	"io/ioutil"
+
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
+
+	"neural_storage/pkg/logger"
 
 	interactors "neural_storage/config/adapters/interactors/mock"
 	repositories "neural_storage/config/adapters/repositories/mock"
@@ -22,6 +27,8 @@ type TestSuite struct {
 	mockedModelInfo   *r.ModelInfoRepository
 	mockedWeightsInfo *r.ModelStructWeightsInfoRepository
 	mockedValidator   *validator2.Validator
+
+	ctx context.Context
 }
 
 func (s *TestSuite) SetupTest() {
@@ -39,7 +46,12 @@ func (s *TestSuite) SetupTest() {
 	cfg.On("ModelStructureWeightInfoRepoConfig").Return(&modelStructureWeightsInfoRepoCfg)
 	cfg.On("ValidatorConfig").Return(&validatorConf)
 
-	s.interactor = NewInteractor(&cfg)
+	s.ctx = context.Background()
+
+	lg := logger.New()
+	lg.SetOutput(ioutil.Discard)
+
+	s.interactor = NewInteractor(lg, &cfg)
 	require.NotNil(s.T(), s.interactor)
 
 	s.mockedModelInfo = s.interactor.modelInfo.(*r.ModelInfoRepository)

@@ -4,12 +4,15 @@
 package user
 
 import (
-	"neural_storage/cube/core/entities/user"
+	"time"
+
 	"testing"
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
+
+	"neural_storage/cube/core/entities/user"
 )
 
 type RegisterSuite struct {
@@ -27,10 +30,10 @@ func (s *RegisterSuite) TearDownTest() {
 func (s *RegisterSuite) TestRegister() {
 	s.mockedValidator.On("ValidateUserInfo", mock.Anything).Return(true)
 
-	expected := user.NewInfo(nil, nil, nil, nil, nil, 0, nil)
+	expected := *user.NewInfo("", "", "", "", "", 0, time.Time{})
 	s.mockedRepo.On("Add", mock.Anything).Return("hehe", nil)
 
-	id, err := s.interactor.Register(*expected)
+	id, err := s.interactor.Register(s.ctx, expected)
 
 	require.NoError(s.T(), err)
 	require.Equal(s.T(), "hehe", id)

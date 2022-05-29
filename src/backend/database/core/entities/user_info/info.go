@@ -12,7 +12,7 @@ type UserInfo struct {
 	FullName sql.NullString `gorm:"column:fullname;"`
 	Password sql.NullString `gorm:"column:password_hash;"`
 	Flags    uint64         `gorm:"column:flags;"`
-	Until    time.Time     `gorm:"column:blocked;"`
+	Until    time.Time      `gorm:"column:blocked;"`
 }
 
 func (UserInfo) TableName() string {

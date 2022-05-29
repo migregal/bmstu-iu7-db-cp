@@ -4,12 +4,14 @@
 package userinfo
 
 import (
-	"neural_storage/cube/core/entities/user"
-	"neural_storage/database/test/mock/utils"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
+
+	"neural_storage/cube/core/entities/user"
+	"neural_storage/database/test/mock/utils"
 )
 
 type AddSuite struct {
@@ -26,15 +28,15 @@ func (s *AddSuite) TearDownTest() {
 
 func (s *AddSuite) TestAdd() {
 	id := "test"
-	expected := user.NewInfo(&id, nil, nil, nil, nil, 0, nil)
-	info := user.NewInfo(&id, nil, nil, nil, nil, 0, nil)
+	expected := user.NewInfo(id, "", "", "", "", 0, time.Time{})
+	info := user.NewInfo(id, "", "", "", "", 0, time.Time{})
 
 	s.SqlMock.ExpectQuery(`^INSERT INTO "users_info"`).WillReturnRows(utils.MockRows(*expected))
 	res, err := s.repo.Add(*info)
 
 	require.NoError(s.T(), err)
 	require.Equal(s.T(), *expected, *info)
-	require.Equal(s.T(), *expected.ID(), res)
+	require.Equal(s.T(), expected.ID(), res)
 }
 
 func TestAddSuite(t *testing.T) {

@@ -1,8 +1,16 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
+
+	"github.com/sirupsen/logrus"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
+	"github.com/gin-gonic/gin"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"neural_storage/cache/adapters/hotstorage"
 	"neural_storage/config/core/services/config"
@@ -22,13 +30,10 @@ import (
 	"neural_storage/cube/handlers/http/v1/users"
 	"neural_storage/cube/handlers/http/v1/users/models"
 	"neural_storage/cube/handlers/http/v1/users/weights"
+	"neural_storage/pkg/logger"
+	"neural_storage/pkg/stat/statmiddleware"
 
 	_ "neural_storage/cube/docs"
-
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
-
-	"github.com/gin-gonic/gin"
 )
 
 // @title           Cube API
@@ -46,24 +51,29 @@ type Server interface {
 	Run(addr ...string) (err error)
 }
 
-func New(params config.Config) Server {
-	engine := gin.Default()
-	engine.Use(gin.Logger())
+func New(params config.Config, lg *logger.Logger) Server {
+	engine := gin.New()
 	engine.Use(gin.Recovery())
 
-	initRoutes(params, engine)
+	engine.Use(logger.RequestIDSetter())
+	engine.Use(logger.RequestLogger(lg))
+	engine.Use(statmiddleware.MeasureResponseDuration())
 
-	initAdminRoutes(params, engine)
+	initRoutes(params, lg, engine)
 
-	initStatRoutes(params, engine)
+	initAdminRoutes(params, lg, engine)
 
-	initFailure(params, engine)
+	initStatRoutes(params, lg, engine)
+
+	initFailure(params, lg, engine)
 
 	return engine
 }
 
-func initRoutes(params config.Config, engine *gin.Engine) {
-	authManager := auth.NewHandler(user.NewInteractor(params.UserInfo()))
+func initRoutes(params config.Config, lg *logger.Logger, engine *gin.Engine) {
+	engine.GET("/prometheus", gin.WrapH(promhttp.Handler()))
+
+	authManager := auth.NewHandler(lg, user.NewInteractor(lg, params.UserInfo()))
 	authMiddleware := jwt.NewJWTMiddleware(
 		authManager.Authenticator(roles.RoleUser),
 		authManager.Authorizator(roles.RoleUser),
@@ -73,22 +83,27 @@ func initRoutes(params config.Config, engine *gin.Engine) {
 		params.PubKeyPath(),
 	)
 
+	login := func(c *gin.Context) {
+		authMiddleware.LoginHandler(c)
+	}
+
 	v1 := engine.Group("/api/v1")
 	{
-		regManager := registration.New(user.NewInteractor(params.UserInfo()))
+		regManager := registration.New(lg, user.NewInteractor(lg, params.UserInfo()))
 		v1.POST("/registration", regManager.Registration)
-		v1.POST("/login", authMiddleware.LoginHandler)
+		v1.POST("/login", login)
 	}
 
 	v1Authorized := engine.Group("/api/v1").Use(authMiddleware.MiddlewareFunc())
 	{
 		v1Authorized.GET("/refresh_token", authMiddleware.RefreshHandler)
 
-		usrManager := users.New(user.NewInteractor(params.UserInfo()))
+		usrManager := users.New(lg, user.NewInteractor(lg, params.UserInfo()))
 		v1Authorized.GET("/users", usrManager.Get)
 
 		modelManager := models.New(
-			model.NewInteractor(params.ModelInfo()),
+			lg,
+			model.NewInteractor(lg, params.ModelInfo()),
 			hotstorage.New(params.Cache()),
 		)
 		v1Authorized.POST("/models", modelManager.Add)
@@ -96,7 +111,10 @@ func initRoutes(params config.Config, engine *gin.Engine) {
 		v1Authorized.PATCH("/models", modelManager.Update)
 		v1Authorized.DELETE("/models", modelManager.Delete)
 
-		weightsManager := weights.New(model.NewInteractor(params.ModelInfo()))
+		weightsManager := weights.New(
+			lg,
+			model.NewInteractor(lg, params.ModelInfo()),
+			hotstorage.New(params.Cache()))
 		v1Authorized.POST("/models/weights", weightsManager.Add)
 		v1Authorized.GET("/models/weights", weightsManager.Get)
 		v1Authorized.DELETE("/models/weights", weightsManager.Delete)
@@ -104,8 +122,8 @@ func initRoutes(params config.Config, engine *gin.Engine) {
 	}
 }
 
-func initAdminRoutes(params config.Config, engine *gin.Engine) {
-	authManager := auth.NewHandler(user.NewInteractor(params.UserInfo()))
+func initAdminRoutes(params config.Config, lg *logger.Logger, engine *gin.Engine) {
+	authManager := auth.NewHandler(lg, user.NewInteractor(lg, params.UserInfo()))
 	authMiddleware := jwt.NewJWTMiddleware(
 		authManager.Authenticator(roles.RoleAdmin),
 		authManager.Authorizator(roles.RoleAdmin),
@@ -128,27 +146,27 @@ func initAdminRoutes(params config.Config, engine *gin.Engine) {
 	{
 		v1Authorized.GET("/refresh_token", authMiddleware.RefreshHandler)
 
-		usrManager := adminusers.New(user.NewInteractor(params.AdminUserInfo()))
+		usrManager := adminusers.New(lg, user.NewInteractor(lg, params.AdminUserInfo()))
 		v1Authorized.GET("/users", usrManager.Get)
 		v1Authorized.DELETE("/users", usrManager.Delete)
 
-		usrBlockManager := adminblock.New(user.NewInteractor(params.AdminUserInfo()))
+		usrBlockManager := adminblock.New(lg, user.NewInteractor(lg, params.AdminUserInfo()))
 		v1Authorized.GET("/users/blocked", usrBlockManager.Get)
 		v1Authorized.DELETE("/users/blocked", usrBlockManager.Delete)
 		v1Authorized.PATCH("/users/blocked", usrBlockManager.Update)
 
-		modelManager := adminmodels.New(model.NewInteractor(params.AdminModelInfo()))
+		modelManager := adminmodels.New(lg, model.NewInteractor(lg, params.AdminModelInfo()))
 		v1Authorized.GET("/models", modelManager.Get)
 		v1Authorized.DELETE("/models", modelManager.Delete)
 
-		weightsManager := adminweights.New(model.NewInteractor(params.AdminModelInfo()))
+		weightsManager := adminweights.New(lg, model.NewInteractor(lg, params.AdminModelInfo()))
 		v1Authorized.GET("/models/weights", weightsManager.Get)
 		v1Authorized.DELETE("/models/weights", weightsManager.Delete)
 	}
 }
 
-func initStatRoutes(params config.Config, engine *gin.Engine) {
-	authManager := auth.NewHandler(user.NewInteractor(params.UserInfo()))
+func initStatRoutes(params config.Config, lg *logger.Logger, engine *gin.Engine) {
+	authManager := auth.NewHandler(lg, user.NewInteractor(lg, params.UserInfo()))
 	authMiddleware := jwt.NewJWTMiddleware(
 		authManager.Authenticator(roles.RoleStat),
 		authManager.Authorizator(roles.RoleStat),
@@ -167,19 +185,19 @@ func initStatRoutes(params config.Config, engine *gin.Engine) {
 	{
 		v1Authorized.GET("/refresh_token", authMiddleware.RefreshHandler)
 
-		userManager := statusers.New(user.NewInteractor(params.StatUserInfo()))
+		userManager := statusers.New(lg, user.NewInteractor(lg, params.StatUserInfo()))
 		v1Authorized.GET("/users", userManager.Get)
 
-		modelManager := statmodels.New(model.NewInteractor(params.StatModelInfo()))
+		modelManager := statmodels.New(lg, model.NewInteractor(lg, params.StatModelInfo()))
 		v1Authorized.GET("/models", modelManager.Get)
 
-		weightsManager := statweights.New(model.NewInteractor(params.StatModelInfo()))
+		weightsManager := statweights.New(lg, model.NewInteractor(lg, params.StatModelInfo()))
 		v1Authorized.GET("/weights", weightsManager.Get)
 	}
 }
 
-func initFailure(params config.Config, engine *gin.Engine) {
-	authManager := auth.NewHandler(user.NewInteractor(params.UserInfo()))
+func initFailure(params config.Config, lg *logger.Logger, engine *gin.Engine) {
+	authManager := auth.NewHandler(lg, user.NewInteractor(lg, params.UserInfo()))
 	authMiddleware := jwt.NewJWTMiddleware(
 		authManager.Authenticator(roles.RoleUser),
 		authManager.Authorizator(roles.RoleUser),
@@ -191,7 +209,7 @@ func initFailure(params config.Config, engine *gin.Engine) {
 
 	engine.NoRoute(authMiddleware.MiddlewareFunc(), func(c *gin.Context) {
 		claims := jwt.ExtractClaims(c)
-		log.Printf("NoRoute claims: %#v\n", claims)
+		lg.WithFields(logrus.Fields{"claims": claims}).Info("no route")
 		c.JSON(http.StatusNotFound, gin.H{"code": "PAGE_NOT_FOUND", "message": "Page not found"})
 	})
 }

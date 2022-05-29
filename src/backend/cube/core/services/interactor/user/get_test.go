@@ -4,12 +4,15 @@
 package user
 
 import (
-	"neural_storage/cube/core/entities/user"
+	"time"
+
 	"testing"
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
+
+	"neural_storage/cube/core/entities/user"
 )
 
 type GetSuite struct {
@@ -28,10 +31,10 @@ func (s *GetSuite) TestGet() {
 	s.mockedValidator.On("ValidateUserInfo", mock.Anything).Return(true)
 
 	id := ""
-	expected := user.NewInfo(&id, nil, nil, nil, nil, 0, nil)
+	expected := user.NewInfo(id, "", "", "", "", 0, time.Time{})
 	s.mockedRepo.On("Get", mock.Anything).Return(*expected, nil)
 
-	info, err := s.interactor.Get(*expected.ID())
+	info, err := s.interactor.Get(s.ctx, expected.ID())
 
 	require.NoError(s.T(), err)
 	require.Equal(s.T(), info, *expected)

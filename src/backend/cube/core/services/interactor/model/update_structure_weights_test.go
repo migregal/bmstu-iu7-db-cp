@@ -37,7 +37,7 @@ func (s *UpdateStructureWeightsSuite) TestUpdate() {
 
 	expected := sw.NewInfo("", "", nil, nil)
 
-	err := s.interactor.UpdateStructureWeights("", "", *expected)
+	err := s.interactor.UpdateStructureWeights(s.ctx, "", "", *expected)
 
 	require.NoError(s.T(), err)
 

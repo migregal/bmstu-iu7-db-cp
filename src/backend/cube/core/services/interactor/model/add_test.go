@@ -30,7 +30,7 @@ func (s *AddSuite) TestAdd() {
 	m := model.NewInfo("", "", nil)
 	s.mockedModelInfo.On("Add", mock.Anything).Return("", nil)
 
-	err := s.interactor.Add(*m)
+	err := s.interactor.Add(s.ctx, *m)
 
 	require.NoError(s.T(), err)
 
