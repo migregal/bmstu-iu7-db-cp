@@ -20,17 +20,17 @@ SELECT EXISTS (
     );
 
     CREATE TABLE structures (
-        id            UUID         PRIMARY KEY DEFAULT uuid_generate_v4()
-        , title       VARCHAR(64)  UNIQUE NOT NULL
-        , model_id    UUID         NOT NULL
+        id              UUID         PRIMARY KEY DEFAULT uuid_generate_v4()
+        , title         VARCHAR(64)  UNIQUE NOT NULL
+        , model_id      UUID         NOT NULL
         , FOREIGN KEY (model_id) REFERENCES models(id) ON DELETE CASCADE
     );
 
     CREATE TABLE layers (
         id                        UUID  PRIMARY KEY DEFAULT uuid_generate_v4()
+        , limit_func              VARCHAR(64)  NOT NULL
+        , activation_func         VARCHAR(64)  NOT NULL
         , structure_id            UUID  NOT NULL
-        , limit_func              VARCHAR(64)  UNIQUE NOT NULL
-        , activation_func         VARCHAR(64)  UNIQUE NOT NULL
         , FOREIGN KEY (structure_id)           REFERENCES structures(id) ON DELETE CASCADE
     );
 
@@ -42,10 +42,10 @@ SELECT EXISTS (
 
     CREATE TABLE neuron_links (
         id         UUID  PRIMARY KEY DEFAULT uuid_generate_v4()
-        , _from    UUID
-        , _to      UUID  NOT NULL
-        , FOREIGN KEY (_from) REFERENCES neurons(id) ON DELETE CASCADE
-        , FOREIGN KEY (_to)   REFERENCES neurons(id) ON DELETE CASCADE
+        , from_id  UUID
+        , to_id    UUID  NOT NULL
+        , FOREIGN KEY (from_id) REFERENCES neurons(id) ON DELETE CASCADE
+        , FOREIGN KEY (to_id)   REFERENCES neurons(id) ON DELETE CASCADE
     );
 
     CREATE TABLE weights_info (

@@ -1,7 +1,7 @@
 package layer
 
 func (l *Layer) GetID() string {
-	return l.ID
+	return l.InnerID
 }
 
 func (l *Layer) GetStructID() string {

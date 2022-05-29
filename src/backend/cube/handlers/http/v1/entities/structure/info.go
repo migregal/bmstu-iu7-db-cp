@@ -9,9 +9,9 @@ import (
 
 type Info struct {
 	ID      string         `json:"id"`
-	Name    string         `json:"name"`
+	Name    string         `json:"title"`
 	Neurons []neuron.Info  `json:"neurons"`
 	Layers  []layer.Info   `json:"layers"`
 	Links   []link.Info    `json:"links"`
-	Weights []weights.Info `json:"weights"`
+	Weights []weights.Info `json:"-"`
 }

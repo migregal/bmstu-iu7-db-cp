@@ -18,9 +18,7 @@ import (
 
 type AddRequest struct {
 	ModelTitle     string                `form:"title" binding:"required"`
-	StructureTitle string                `form:"strucutre_title" binding:"required"`
 	Structure      *multipart.FileHeader `form:"structure" binding:"required"`
-	WeightsTitle   string                `form:"weights_title" binding:"required"`
 	Weights        *multipart.FileHeader `form:"weights" binding:"required"`
 }
 

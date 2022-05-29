@@ -25,7 +25,7 @@ func (r *Repository) Add(info model.Info) (string, error) {
 		}
 	}()
 
-	id, err := r.createModelInfo(data.model)
+	id, err := r.createModelInfo(database.Interactor{DB: tx}, data.model)
 	if err != nil {
 		tx.Rollback()
 		return "", err
@@ -36,31 +36,42 @@ func (r *Repository) Add(info model.Info) (string, error) {
 		return "", fmt.Errorf("missing model structure info")
 	}
 
-	structureId, err := r.createStructInfo(*data.structure)
+	data.structure.ModelID = id
+	structureId, err := r.createStructInfo(database.Interactor{DB: tx}, *data.structure)
 	if err != nil {
 		tx.Rollback()
 		return "", err
 	}
 
-	err = r.createLayersInfo(data.layers)
+	err = r.createLayersInfo(database.Interactor{DB: tx}, structureId, data.layers)
 	if err != nil {
 		tx.Rollback()
 		return "", err
 	}
 
-	err = r.createNeuronsInfo(data.neurons)
+	err = r.createNeuronsInfo(database.Interactor{DB: tx}, data.layers, data.neurons)
 	if err != nil {
 		tx.Rollback()
 		return "", err
 	}
 
-	err = r.createLinksInfo(structureId, data.links)
+	neuronMap := map[string]*dbneuron.Neuron{}
+	for _, v := range data.neurons {
+		neuronMap[v.ID] = &v
+	}
+
+	err = r.createLinksInfo(database.Interactor{DB: tx}, structureId, neuronMap, data.links)
 	if err != nil {
 		tx.Rollback()
 		return "", err
 	}
 
-	err = r.createWeightsInfoTransact(database.Interactor{DB: tx}, data.weights)
+	linkMap := map[string]*dblink.Link{}
+	for _, v := range data.links {
+		linkMap[v.ID] = &v
+	}
+
+	err = r.createWeightsInfo(database.Interactor{DB: tx}, structureId, neuronMap, linkMap, data.weights)
 	if err != nil {
 		tx.Rollback()
 		return "", err
@@ -69,15 +80,14 @@ func (r *Repository) Add(info model.Info) (string, error) {
 	return id, tx.Commit().Error
 }
 
-func (r *Repository) createModelInfo(info dbmodel.Model) (string, error) {
-	m := dbmodel.Model{ID: info.GetID(), Name: info.GetName()}
-	err := r.db.Create(&m).Error
-	return m.GetID(), err
+func (r *Repository) createModelInfo(tx database.Interactor, info dbmodel.Model) (string, error) {
+	err := tx.Create(&info).Error
+	return info.GetID(), err
 }
 
-func (r *Repository) createStructInfo(info dbstructure.Structure) (string, error) {
+func (r *Repository) createStructInfo(tx database.Interactor, info dbstructure.Structure) (string, error) {
 	m := dbstructure.Structure{ID: info.GetID(), ModelID: info.GetModelID(), Name: info.GetName()}
-	err := r.db.Create(&m).Error
+	err := tx.Create(&m).Error
 
 	if err != nil {
 		return m.GetID(), fmt.Errorf("add struct info: %w", err)
@@ -85,53 +95,69 @@ func (r *Repository) createStructInfo(info dbstructure.Structure) (string, error
 	return m.GetID(), nil
 }
 
-func (r *Repository) createLayersInfo(info []dblayer.Layer) error {
-	var layers []dblayer.Layer
-	for _, v := range info {
-		layers = append(layers,
-			dblayer.Layer{
-				StructureID:    v.GetStructID(),
-				LimitFunc:      v.GetLimitFunc(),
-				ActivationFunc: v.GetActivationFunc(),
-			},
-		)
+func (r *Repository) createLayersInfo(tx database.Interactor, structueID string, info []dblayer.Layer) error {
+	for i := range info {
+		info[i].StructureID = structueID
 	}
-	if err := r.db.Create(&layers).Error; err != nil {
+	if err := tx.Create(&info).Error; err != nil {
 		return fmt.Errorf("add struct info: %w", err)
 	}
 	return nil
 }
 
-func (r *Repository) createNeuronsInfo(info []dbneuron.Neuron) error {
-	var neurons []dbneuron.Neuron
-	for _, v := range info {
-		neurons = append(neurons, dbneuron.Neuron{ID: v.ID, LayerID: v.LayerID})
+func (r *Repository) createNeuronsInfo(tx database.Interactor, layers []dblayer.Layer, info []dbneuron.Neuron) error {
+	layerMap := map[string]*dblayer.Layer{}
+	for _, v := range layers {
+		layerMap[v.ID] = &v
 	}
-	return r.db.Create(&neurons).Error
+
+	for j := range info {
+		info[j].LayerID = layerMap[info[j].LayerID].GetID()
+	}
+
+	return tx.Create(&info).Error
 }
 
-func (r *Repository) createLinksInfo(structureID string, info []dblink.Link) error {
+func (r *Repository) createLinksInfo(
+	tx database.Interactor,
+	structureID string,
+	neurons map[string]*dbneuron.Neuron,
+	info []dblink.Link,
+) error {
 	for i := range info {
-		info[i].Structure = structureID
+		info[i].From = neurons[info[i].From].GetID()
+		info[i].To = neurons[info[i].To].GetID()
 	}
-	return r.db.Create(&info).Error
+
+	return tx.Create(&info).Error
 }
 
-func (r *Repository) createWeightsInfoTransact(tx database.Interactor, info []accumulatedWeightInfo) error {
+func (r *Repository) createWeightsInfo(
+	tx database.Interactor,
+	structureID string,
+	neurons map[string]*dbneuron.Neuron,
+	links map[string]*dblink.Link,
+	info []accumulatedWeightInfo,
+) error {
 	for _, v := range info {
 		if v.weightsInfo == nil {
 			return fmt.Errorf("missing weights info data")
 		}
+		v.weightsInfo.StructureID = structureID
 		if err := tx.Create(v.weightsInfo).Error; err != nil {
 			return fmt.Errorf("create model weights info: %w", err)
 		}
 		for _, o := range v.offsets {
+			o.Weights = v.weightsInfo.GetID()
+			o.Neuron = neurons[o.Neuron].GetID()
 			if err := tx.Create(&o).Error; err != nil {
 				return fmt.Errorf("create model offsets: %w", err)
 			}
 		}
 
 		for _, w := range v.weights {
+			w.WeightsID = v.weightsInfo.GetID()
+			w.LinkID = links[w.LinkID].GetID()
 			if err := tx.Create(&w).Error; err != nil {
 				return fmt.Errorf("create model weights: %w", err)
 			}

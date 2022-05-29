@@ -1,11 +1,8 @@
 package link
 
-func (i *Link) GetStructureID() string {
-	return i.Structure
-}
 
 func (i *Link) GetID() string {
-	return i.ID
+	return i.InnerID
 }
 
 func (i *Link) GetFrom() string {

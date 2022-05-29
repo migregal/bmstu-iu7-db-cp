@@ -97,6 +97,7 @@ func initRoutes(params config.Config, lg *logger.Logger, engine *gin.Engine) {
 	v1Authorized := engine.Group("/api/v1").Use(authMiddleware.MiddlewareFunc())
 	{
 		v1Authorized.GET("/refresh_token", authMiddleware.RefreshHandler)
+		v1Authorized.GET("/logout", authMiddleware.LogoutHandler)
 
 		usrManager := users.New(lg, user.NewInteractor(lg, params.UserInfo()))
 		v1Authorized.GET("/users", usrManager.Get)
@@ -145,6 +146,7 @@ func initAdminRoutes(params config.Config, lg *logger.Logger, engine *gin.Engine
 	v1Authorized := engine.Group("/api/v1/admin").Use(authMiddleware.MiddlewareFunc())
 	{
 		v1Authorized.GET("/refresh_token", authMiddleware.RefreshHandler)
+		v1Authorized.GET("/logout", authMiddleware.LogoutHandler)
 
 		usrManager := adminusers.New(lg, user.NewInteractor(lg, params.AdminUserInfo()))
 		v1Authorized.GET("/users", usrManager.Get)
@@ -184,6 +186,7 @@ func initStatRoutes(params config.Config, lg *logger.Logger, engine *gin.Engine)
 	v1Authorized := engine.Group("/api/v1/stat").Use(authMiddleware.MiddlewareFunc())
 	{
 		v1Authorized.GET("/refresh_token", authMiddleware.RefreshHandler)
+		v1Authorized.GET("/logout", authMiddleware.LogoutHandler)
 
 		userManager := statusers.New(lg, user.NewInteractor(lg, params.StatUserInfo()))
 		v1Authorized.GET("/users", userManager.Get)

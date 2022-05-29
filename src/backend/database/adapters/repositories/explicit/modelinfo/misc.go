@@ -37,7 +37,7 @@ type accumulatedModelInfo struct {
 func toDBEntity(info model.Info) accumulatedModelInfo {
 	data := accumulatedModelInfo{}
 
-	data.model = dbmodel.Model{ID: info.ID(), Name: info.Name()}
+	data.model = dbmodel.Model{ID: info.ID(), OwnerID: info.OwnerID(), Name: info.Name()}
 
 	if info.Structure() != nil {
 		data.structure = &dbstructure.Structure{ID: info.Structure().ID(), ModelID: info.ID(), Name: info.Structure().Name()}
@@ -70,7 +70,6 @@ func toDBEntity(info model.Info) accumulatedModelInfo {
 		var links []dblink.Link
 		for _, v := range info.Structure().Links() {
 			links = append(links, dblink.Link{
-				Structure: data.structure.GetID(),
 				ID:        v.Id(),
 				From:      v.From(),
 				To:        v.To(),

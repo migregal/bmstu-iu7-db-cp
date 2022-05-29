@@ -1,7 +1,7 @@
 package offset
 
 func (i *Offset) GetID() string {
-	return i.ID
+	return i.InternalID
 }
 
 func (i *Offset) GetWeightsID() string {
