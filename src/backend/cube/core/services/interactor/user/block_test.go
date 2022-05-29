@@ -4,8 +4,9 @@
 package user
 
 import (
-	"testing"
 	"time"
+
+	"testing"
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -28,6 +29,7 @@ func (s *BlockSuite) TestBlock() {
 	s.mockedValidator.On("ValidateUserInfo", mock.Anything).Return(true)
 	s.mockedRepo.On("Update", mock.Anything).Return(nil)
 	err := s.interactor.Block(
+		s.ctx,
 		"dacc4a61-49a6-487a-afa9-eb1fc37d528c",
 		time.Now().Add(60*time.Minute))
 

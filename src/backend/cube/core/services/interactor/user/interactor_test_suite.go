@@ -4,6 +4,14 @@
 package user
 
 import (
+	"context"
+	"io/ioutil"
+
+	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
+
+	"neural_storage/pkg/logger"
+
 	interactors "neural_storage/config/adapters/interactors/mock"
 	normalizer "neural_storage/config/adapters/normalizer/mock"
 	repositories "neural_storage/config/adapters/repositories/mock"
@@ -11,9 +19,6 @@ import (
 	validator2 "neural_storage/cube/adapters/validator/mock"
 
 	repo "neural_storage/database/adapters/repositories/mock"
-
-	"github.com/stretchr/testify/require"
-	"github.com/stretchr/testify/suite"
 )
 
 type TestSuite struct {
@@ -23,6 +28,8 @@ type TestSuite struct {
 
 	mockedRepo      *repo.UserInfoRepository
 	mockedValidator *validator2.Validator
+
+	ctx context.Context
 }
 
 func (s *TestSuite) SetupTest() {
@@ -41,7 +48,12 @@ func (s *TestSuite) SetupTest() {
 	cfg.On("ValidatorConfig").Return(&validatorConf)
 	cfg.On("NormalizerConfig").Return(&normalizerConf)
 
-	s.interactor = NewInteractor(&cfg)
+	s.ctx = context.Background()
+
+	lg := logger.New()
+	lg.SetOutput(ioutil.Discard)
+
+	s.interactor = NewInteractor(lg, &cfg)
 	require.NotNil(s.T(), s.interactor)
 
 	s.mockedRepo = s.interactor.userInfo.(*repo.UserInfoRepository)

@@ -70,16 +70,16 @@ func (v *Validator) validateBlockTime(t time.Time) bool {
 }
 
 func (v *Validator) ValidateUserInfo(info *user.Info) bool {
-	if info.ID() != nil && !v.validateId(*info.ID()) {
+	if info.ID() != "" && !v.validateId(info.ID()) {
 		return false
 	}
-	if info.Email() != nil && !v.validateEmail(*info.Email()) {
+	if info.Email() != "" && !v.validateEmail(info.Email()) {
 		return false
 	}
-	if info.Username() != nil && !v.validateUsername(*info.Username()) {
+	if info.Username() != "" && !v.validateUsername(info.Username()) {
 		return false
 	}
-	if info.Pwd() != nil && !v.validatePassword(*info.Pwd()) {
+	if info.Pwd() != "" && !v.validatePassword(info.Pwd()) {
 		return false
 	}
 	if !info.BlockedUntil().IsZero() && !v.validateBlockTime(info.BlockedUntil()) {

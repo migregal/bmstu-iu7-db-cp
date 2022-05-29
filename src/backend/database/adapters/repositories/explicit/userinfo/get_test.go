@@ -4,13 +4,16 @@
 package userinfo
 
 import (
-	"neural_storage/cube/core/entities/user"
-	"neural_storage/database/core/entities/user_info"
-	"neural_storage/database/test/mock/utils"
+	"time"
+
 	"testing"
 
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
+
+	"neural_storage/cube/core/entities/user"
+	"neural_storage/database/core/entities/user_info"
+	"neural_storage/database/test/mock/utils"
 )
 
 type GetSuite struct {
@@ -27,11 +30,11 @@ func (s *GetSuite) TearDownTest() {
 
 func (s *GetSuite) TestGet() {
 	id := "test"
-	expected := *user.NewInfo(&id, nil, nil, nil, nil, 0, nil)
+	expected := *user.NewInfo(id, "", "", "", "", 0, time.Time{})
 	res := user_info.UserInfo{ID: id}
 
 	s.SqlMock.
-		ExpectQuery(`^SELECT \* FROM "users_info" WHERE user_id =`).
+		ExpectQuery(`^SELECT \* FROM "users_info" WHERE id =`).
 		WithArgs(id).
 		WillReturnRows(utils.MockRows(res))
 

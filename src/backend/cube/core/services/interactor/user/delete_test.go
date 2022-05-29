@@ -27,7 +27,7 @@ func (s *DeleteSuite) TestDelete() {
 	s.mockedValidator.On("ValidateUserInfo", mock.Anything).Return(true)
 	s.mockedRepo.On("Delete", mock.Anything).Return(nil)
 
-	err := s.interactor.Delete("b56ee3e1-a5ef-4138-a229-59655a3c66aa")
+	err := s.interactor.Delete(s.ctx, "b56ee3e1-a5ef-4138-a229-59655a3c66aa")
 
 	require.NoError(s.T(), err)
 

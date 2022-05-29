@@ -4,12 +4,15 @@
 package user
 
 import (
-	"neural_storage/cube/core/entities/user"
+	"time"
+
 	"testing"
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
+
+	"neural_storage/cube/core/entities/user"
 )
 
 type UpdateSuite struct {
@@ -27,10 +30,10 @@ func (s *UpdateSuite) TearDownTest() {
 func (s *UpdateSuite) TestUpdate() {
 	s.mockedValidator.On("ValidateUserInfo", mock.Anything).Return(true)
 
-	expected := user.NewInfo(nil, nil, nil, nil, nil, 0, nil)
+	expected := *user.NewInfo("", "", "", "", "", 0, time.Time{})
 	s.mockedRepo.On("Update", mock.Anything).Return(nil)
 
-	err := s.interactor.Update(*expected)
+	err := s.interactor.Update(s.ctx, expected)
 
 	require.NoError(s.T(), err)
 

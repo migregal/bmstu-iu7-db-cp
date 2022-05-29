@@ -9,20 +9,20 @@ import (
 func toDBEntity(info user.Info) user_info.UserInfo {
 	data := user_info.UserInfo{}
 
-	if info.ID() != nil {
-		data.ID = *info.ID()
+	if info.ID() != "" {
+		data.ID = info.ID()
 	}
-	if info.Username() != nil {
-		data.Username = sql.NullString{String: *info.Username(), Valid: true}
+	if info.Username() != "" {
+		data.Username = sql.NullString{String: info.Username(), Valid: true}
 	}
-	if info.Fullname() != nil {
-		data.FullName = sql.NullString{String: *info.Fullname(), Valid: true}
+	if info.Fullname() != "" {
+		data.FullName = sql.NullString{String: info.Fullname(), Valid: true}
 	}
-	if info.Email() != nil {
-		data.Email = sql.NullString{String: *info.Email(), Valid: true}
+	if info.Email() != "" {
+		data.Email = sql.NullString{String: info.Email(), Valid: true}
 	}
-	if info.Pwd() != nil {
-		data.Password = sql.NullString{String: *info.Pwd(), Valid: true}
+	if info.Pwd() != "" {
+		data.Password = sql.NullString{String: info.Pwd(), Valid: true}
 	}
 	if info.Flags() != 0 {
 		data.Flags = info.Flags()
@@ -40,24 +40,19 @@ func fromDBEntity(info user_info.UserInfo) user.Info {
 	data := user.Info{}
 
 	if info.GetID() != "" {
-		temp := info.GetID()
-		data.SetId(&temp)
+		data.SetId(info.GetID())
 	}
 	if info.GetUsername() != "" {
-		temp := info.GetUsername()
-		data.SetUsername(&temp)
+		data.SetUsername(info.GetUsername())
 	}
 	if info.GetFullName() != "" {
-		temp := info.GetFullName()
-		data.SetFullname(&temp)
+		data.SetFullname(info.GetFullName())
 	}
 	if info.GetEmail() != "" {
-		temp := info.GetEmail()
-		data.SetEmail(&temp)
+		data.SetEmail(info.GetEmail())
 	}
 	if info.GetPasswordHash() != "" {
-		temp := info.GetPasswordHash()
-		data.SetPwd(&temp)
+		data.SetPwd(info.GetPasswordHash())
 	}
 	data.SetFlags(info.GetFlags())
 	data.SetBlockedUntil(info.GetBlockedUntil())

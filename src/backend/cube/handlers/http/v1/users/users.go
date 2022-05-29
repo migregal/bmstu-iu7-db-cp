@@ -3,16 +3,32 @@ package users
 import (
 	"net/http"
 	"neural_storage/cube/core/ports/interactors"
+	"neural_storage/pkg/logger"
+	"neural_storage/pkg/stat"
 
 	"github.com/gin-gonic/gin"
 )
 
-type Handler struct {
-	resolver interactors.UserInfoInteractor
+var (
+	statCall stat.Counter
+	statFail stat.Counter
+	statOK   stat.Counter
+)
+
+func init() {
+	statCall = stat.NewCounter("v1", "cube_users_call", "The total number of getting user info attempts")
+	statFail = stat.NewCounter("v1", "cube_users_fail", "The total number of getting user info fails")
+	statOK = stat.NewCounter("v1", "cube_users_ok", "The total number of login attempts")
 }
 
-func New(resolver interactors.UserInfoInteractor) Handler {
-	return Handler{resolver: resolver}
+type Handler struct {
+	resolver interactors.UserInfoInteractor
+
+	lg *logger.Logger
+}
+
+func New(lg *logger.Logger, resolver interactors.UserInfoInteractor) Handler {
+	return Handler{lg: lg, resolver: resolver}
 }
 
 type request struct {
@@ -45,8 +61,13 @@ type UserInfo struct {
 // @Failure      500 "Failed to get user info from storage"
 // @Router       /api/v1/users [get]
 func (h *Handler) Get(c *gin.Context) {
+	statCall.Inc()
+	lg := h.lg.WithFields(map[string]interface{}{logger.ReqIDKey: c.Value(logger.ReqIDKey)})
+
 	var req request
 	if err := c.ShouldBind(&req); err != nil {
+		statFail.Inc()
+		lg.Error("failed to bind request")
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
@@ -69,23 +90,31 @@ func (h *Handler) Get(c *gin.Context) {
 	}
 	filter.Limit = req.PerPage
 
-	infos, err := h.resolver.Find(filter)
+	lg.WithFields(map[string]interface{}{"filter": filter}).Info("attempt to find user info")
+	infos, err := h.resolver.Find(c, filter)
 	if err != nil {
+		statFail.Inc()
+		lg.Error("failed to fetch user info")
 		c.JSON(http.StatusInternalServerError, "failed to fetch user info")
 		return
 	}
 	if len(infos) == 0 {
+		statOK.Inc()
+		lg.Info("no users found")
 		c.JSON(http.StatusOK, []UserInfo{})
 		return
 	}
 	var res []UserInfo
 	for _, val := range infos {
 		res = append(res, UserInfo{
-			Id:       *val.ID(),
-			Email:    *val.Email(),
-			Username: *val.Username(),
-			Fullname: *val.Fullname(),
+			Id:       val.ID(),
+			Email:    val.Email(),
+			Username: val.Username(),
+			Fullname: val.Fullname(),
 		})
 	}
+
+	statOK.Inc()
+	lg.WithFields(map[string]interface{}{"res": res}).Info("success")
 	c.JSON(http.StatusOK, res)
 }

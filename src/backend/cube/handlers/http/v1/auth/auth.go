@@ -1,13 +1,18 @@
 package auth
 
-import "neural_storage/cube/core/ports/interactors"
+import (
+	"neural_storage/cube/core/ports/interactors"
+	"neural_storage/pkg/logger"
+)
 
 type Handler struct {
 	resolver interactors.UserInfoInteractor
+
+	lg *logger.Logger
 }
 
-func NewHandler(resolver interactors.UserInfoInteractor) Handler {
-	return Handler{resolver: resolver}
+func NewHandler(lg *logger.Logger, resolver interactors.UserInfoInteractor) Handler {
+	return Handler{resolver: resolver, lg: lg}
 }
 
 var UserIdIdentityKey = "user_id"

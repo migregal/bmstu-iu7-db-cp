@@ -30,7 +30,7 @@ func (r *Repository) Add(info user.Info) (string, error) {
 
 	err := r.db.Create(&data).Error
 	if err == nil {
-		info.SetId(&data.ID)
+		info.SetId(data.ID)
 	}
 
 	return data.ID, err
@@ -78,12 +78,12 @@ func (r *Repository) Find(filter repositories.UserInfoFilter) ([]user.Info, erro
 
 func (r *Repository) Update(info user.Info) error {
 	data := toDBEntity(info)
-	fmt.Println("uga-buga", info, info.BlockedUntil().UTC())
 	return r.db.DB.Updates(&data).Error
 }
 
 func (r *Repository) Delete(info user.Info) error {
 	data := toDBEntity(info)
+	fmt.Println("fuuuuck:", data)
 	return r.db.Delete(&data).Error
 }
 

@@ -9,7 +9,7 @@ import (
 
 func (r *Repository) GetAddStat(from, to time.Time) ([]*modelstat.Info, error) {
 	query := r.db.DB
-	if!from.IsZero() {
+	if !from.IsZero() {
 		query = query.Where("created_at > ?", from)
 	}
 	if !to.IsZero() {

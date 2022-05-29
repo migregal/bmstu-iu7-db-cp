@@ -2,6 +2,7 @@ package adminweights
 
 import (
 	"net/http"
+	"neural_storage/pkg/logger"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,17 +22,26 @@ type deleteRequest struct {
 // @Failure      500 "Failed to delete model info from storage"
 // @Router       /api/v1/admin/models/weights [delete]
 func (h *Handler) Delete(c *gin.Context) {
+	statCallDelete.Inc()
+	lg := h.lg.WithFields(map[string]interface{}{logger.ReqIDKey: c.Value(logger.ReqIDKey)})
 	var req deleteRequest
 	if err := c.ShouldBind(&req); err != nil {
+		statFailDelete.Inc()
+		lg.Errorf("failed to bind request: %v", err)
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
-	err := h.resolver.DeleteStructureWeights("", req.ID)
+	lg.WithFields(map[string]interface{}{"req": req}).Info("attempt to delete weights info")
+	err := h.resolver.DeleteStructureWeights(c, "", req.ID)
 	if err != nil {
+		statFailDelete.Inc()
+		lg.Errorf("failed to delete weights info: %v", err)
 		c.JSON(http.StatusInternalServerError, "failed to delete model weights info")
 		return
 	}
 
+	statOKDelete.Inc()
+	lg.Info("success")
 	c.JSON(http.StatusOK, nil)
 }

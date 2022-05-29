@@ -46,6 +46,21 @@ SELECT EXISTS (
     FOR ROW
     EXECUTE PROCEDURE model_info_preupdate();
 
+    CREATE OR REPLACE FUNCTION weights_info_preupdate()
+    RETURNS trigger AS
+    $$
+    BEGIN
+        NEW.UPDATED_AT = NOW();
+        RETURN NEW;
+    END;
+    $$
+    LANGUAGE 'plpgsql';
+
+    CREATE TRIGGER updt_weights_info BEFORE UPDATE
+    ON weights_info
+    FOR ROW
+    EXECUTE PROCEDURE weights_info_preupdate();
+
     INSERT INTO migrations(id) VALUES (:'MIGRATION_ID');
 \endif
 

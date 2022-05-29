@@ -28,7 +28,7 @@ func (s *DeleteStructureWeightsSuite) TestDelete() {
 	m := sw.NewInfo("", "", nil, nil)
 	s.mockedWeightsInfo.On("Delete", mock.Anything, mock.Anything).Return(nil)
 
-	err := s.interactor.DeleteStructureWeights("test", m.ID())
+	err := s.interactor.DeleteStructureWeights(s.ctx, "test", m.ID())
 
 	require.NoError(s.T(), err)
 

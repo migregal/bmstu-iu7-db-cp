@@ -17,6 +17,9 @@ func (r *Repository) Get(weightsId string) (*weights.Info, error) {
 	}
 
 	dbInfo, err := r.getDetailsWeightsInfo(weights)
+	if err != nil {
+		return nil, err
+	}
 
 	return fromDBEntity(dbInfo), nil
 }

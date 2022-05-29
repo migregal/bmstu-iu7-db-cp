@@ -4,12 +4,14 @@
 package userinfo
 
 import (
-	"neural_storage/cube/core/entities/user"
 	"testing"
+	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
+
+	"neural_storage/cube/core/entities/user"
 )
 
 type DeleteSuite struct {
@@ -26,7 +28,7 @@ func (s *DeleteSuite) TearDownTest() {
 
 func (s *DeleteSuite) TestDelete() {
 	id := "test"
-	expected := *user.NewInfo(&id, nil, nil, nil, nil, 0, nil)
+	expected := *user.NewInfo(id, "", "", "", "", 0, time.Time{})
 
 	s.SqlMock.
 		ExpectExec(`^DELETE FROM "users_info" WHERE "users_info"."id"`).

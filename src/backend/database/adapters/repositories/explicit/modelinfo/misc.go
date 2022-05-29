@@ -19,16 +19,6 @@ import (
 	dbweights "neural_storage/database/core/entities/structure/weights"
 )
 
-func extractWeightsIDs(neurons []dbweights.Weights) []string {
-	var res []string
-
-	for i := range neurons {
-		res = append(res, neurons[i].GetID())
-	}
-
-	return res
-}
-
 type accumulatedWeightInfo struct {
 	weightsInfo *dbweights.Weights
 	weights     []dbweight.Weight

@@ -1,6 +1,7 @@
 package interactors
 
 import (
+	"context"
 	"neural_storage/cube/core/entities/model"
 	"neural_storage/cube/core/entities/model/modelstat"
 	sw "neural_storage/cube/core/entities/structure/weights"
@@ -19,15 +20,15 @@ type UserInfoFilter struct {
 }
 
 type UserInfoInteractor interface {
-	Register(info user.Info) (string, error)
-	Get(id string) (user.Info, error)
-	Find(filter UserInfoFilter) ([]user.Info, error)
-	Update(info user.Info) error
-	Block(userId string, until time.Time) error
-	Delete(userId string) error
+	Register(ctx context.Context, info user.Info) (string, error)
+	Get(ctx context.Context, id string) (user.Info, error)
+	Find(ctx context.Context, filter UserInfoFilter) ([]user.Info, error)
+	Update(ctx context.Context, info user.Info) error
+	Block(ctx context.Context, userId string, until time.Time) error
+	Delete(ctx context.Context, userId string) error
 
-	GetUserRegistrationStat(from, to time.Time) ([]*userstat.Info, error)
-	GetUserEditStat(from, to time.Time) ([]*userstat.Info, error)
+	GetUserRegistrationStat(ctx context.Context, from, to time.Time) ([]*userstat.Info, error)
+	GetUserEditStat(ctx context.Context, from, to time.Time) ([]*userstat.Info, error)
 }
 
 type ModelInfoFilter struct {
@@ -47,19 +48,19 @@ type ModelWeightsInfoFilter struct {
 }
 
 type NeuralNetworkInteractor interface {
-	Add(info model.Info) error
-	Get(modelID string) (*model.Info, error)
-	Find(filter ModelInfoFilter) ([]*model.Info, error)
-	Delete(userID, modelID string) error
+	Add(ctx context.Context, info model.Info) error
+	Get(ctx context.Context, modelID string) (*model.Info, error)
+	Find(ctx context.Context, filter ModelInfoFilter) ([]*model.Info, error)
+	Delete(ctx context.Context, userID, modelID string) error
 
-	AddStructureWeights(ownerID string, modelID string, info sw.Info) error
-	GetStructureWeights(weightsId string) (*sw.Info, error)
-	FindStructureWeights(filter ModelWeightsInfoFilter) ([]*sw.Info, error)
-	UpdateStructureWeights(ownerID, modelID string, info sw.Info) error
-	DeleteStructureWeights(ownerID, weightsID string) error
+	AddStructureWeights(ctx context.Context, ownerID string, modelID string, info sw.Info) error
+	GetStructureWeights(ctx context.Context, weightsId string) (*sw.Info, error)
+	FindStructureWeights(ctx context.Context, filter ModelWeightsInfoFilter) ([]*sw.Info, error)
+	UpdateStructureWeights(ctx context.Context, ownerID, modelID string, info sw.Info) error
+	DeleteStructureWeights(ctx context.Context, ownerID, weightsID string) error
 
-	GetModelLoadStat(from, to time.Time) ([]*modelstat.Info, error)
-	GetModelEditStat(from, to time.Time) ([]*modelstat.Info, error)
-	GetWeightsLoadStat(from, to time.Time) ([]*weightsstat.Info, error)
-	GetWeightsEditStat(from, to time.Time) ([]*weightsstat.Info, error)
+	GetModelLoadStat(ctx context.Context, from, to time.Time) ([]*modelstat.Info, error)
+	GetModelEditStat(ctx context.Context, from, to time.Time) ([]*modelstat.Info, error)
+	GetWeightsLoadStat(ctx context.Context, from, to time.Time) ([]*weightsstat.Info, error)
+	GetWeightsEditStat(ctx context.Context, from, to time.Time) ([]*weightsstat.Info, error)
 }

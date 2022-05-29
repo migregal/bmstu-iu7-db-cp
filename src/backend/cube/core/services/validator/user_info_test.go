@@ -4,14 +4,14 @@
 package validator
 
 import (
-	validator "neural_storage/config/adapters/validator/mock"
-	"neural_storage/cube/core/entities/user"
-
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
+
+	validator "neural_storage/config/adapters/validator/mock"
+	"neural_storage/cube/core/entities/user"
 )
 
 type UserInfoSuite struct {
@@ -54,38 +54,38 @@ func (s *UserInfoSuite) TestValidateUserInfo() {
 		{
 			"empty info",
 			fields{s.conf},
-			args{user.NewInfo(nil, nil, nil, nil, nil, 0, nil)},
+			args{user.NewInfo("", "", "", "", "", 0, time.Time{})},
 			true,
 		},
 		{
 			"id",
 			fields{s.conf},
-			args{user.NewInfo(&ids[0], nil, nil, nil, nil, 0, nil)},
+			args{user.NewInfo(ids[0], "", "", "", "", 0, time.Time{})},
 			true,
 		},
 		{
 			"username",
 			fields{s.conf},
 
-			args{user.NewInfo(nil, &usernames[0], nil, nil, nil, 0, nil)},
+			args{user.NewInfo("", usernames[0], "", "", "", 0, time.Time{})},
 			true,
 		},
 		{
 			"email",
 			fields{s.conf},
-			args{user.NewInfo(nil, nil, &emails[0], nil, nil, 0, nil)},
+			args{user.NewInfo("", "", emails[0], "", "", 0, time.Time{})},
 			true,
 		},
 		{
 			"password",
 			fields{s.conf},
-			args{user.NewInfo(nil, nil, nil, nil, &passwrods[0], 0, nil)},
+			args{user.NewInfo("", "", "", "", passwrods[0], 0, time.Time{})},
 			true,
 		},
 		{
 			"blocked until",
 			fields{s.conf},
-			args{user.NewInfo(nil, nil, nil, nil, nil, 0, &blocks[0])},
+			args{user.NewInfo("", "", "", "", "", 0, blocks[0])},
 			true,
 		},
 	}
