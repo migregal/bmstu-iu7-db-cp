@@ -18,7 +18,7 @@ type CacheInteractor struct {
 }
 
 func New(p Params) CacheInteractor {
-	return CacheInteractor{}
+	return CacheInteractor{params: p}
 }
 
 func (i *CacheInteractor) newConnection() (*tarantool.Connection, error) {
@@ -62,7 +62,20 @@ func (i *CacheInteractor) Get(space string, key []interface{}) ([]interface{}, e
 		return nil, fmt.Errorf("no record found")
 	}
 
-	return resp.Data, nil
+		if err != nil {
+		return nil, err
+	}
+
+	if len(resp.Data) == 0 {
+		return nil, fmt.Errorf("no data found")
+	}
+
+	tuple, ok := resp.Data[0].([]interface{})
+	if !ok {
+		return nil, fmt.Errorf("invalid data format")
+	}
+
+	return tuple, nil
 }
 
 func (i *CacheInteractor) Delete(space string, key []interface{}) error {

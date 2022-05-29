@@ -65,11 +65,11 @@ func (v *Validator) validateLayers(info *structure.Info) error {
 func (v *Validator) validateNeurons(info *structure.Info) (map[string]struct{}, error) {
 	neuronIds := make(map[string]struct{})
 	for _, v := range info.Neurons() {
-		if _, found := neuronIds[v.Id()]; found {
+		if _, found := neuronIds[v.ID()]; found {
 			return nil, fmt.Errorf("duplicate neuron info")
 		}
 
-		neuronIds[v.Id()] = struct{}{}
+		neuronIds[v.ID()] = struct{}{}
 	}
 
 	return neuronIds, nil
@@ -105,11 +105,11 @@ func (v *Validator) validateNeuronLinks(info *structure.Info, neurons map[string
 
 	linksIds := make(map[string]struct{})
 	for _, v := range info.Links() {
-		if _, found := linksIds[v.Id()]; found {
+		if _, found := linksIds[v.ID()]; found {
 			return fmt.Errorf("duplicate link info")
 		}
 
-		linksIds[v.Id()] = struct{}{}
+		linksIds[v.ID()] = struct{}{}
 
 		if _, found := neurons[v.From()]; !found {
 			return fmt.Errorf("missing neuron info")

@@ -48,7 +48,7 @@ type ModelWeightsInfoFilter struct {
 }
 
 type NeuralNetworkInteractor interface {
-	Add(ctx context.Context, info model.Info) error
+	Add(ctx context.Context, info model.Info) (string, error)
 	Get(ctx context.Context, modelID string) (*model.Info, error)
 	Find(ctx context.Context, filter ModelInfoFilter) ([]*model.Info, error)
 	Delete(ctx context.Context, userID, modelID string) error

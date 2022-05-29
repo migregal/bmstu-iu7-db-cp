@@ -28,18 +28,17 @@ func (r *Repository) Get(id string) (*model.Info, error) {
 	}
 	dbInfo.structure = &structure
 
-	layers, err := r.getLayersInfo(id)
-	if err != nil {
-		return nil, err
-	}
-	dbInfo.layers = layers
-
-	dbInfo.neurons, err = r.getNeuronsInfo(structure.GetID())
+	dbInfo.layers, err = r.getLayersInfo(structure.GetID())
 	if err != nil {
 		return nil, err
 	}
 
-	dbInfo.links, err = r.getNeuronLinksInfo(structure.GetID())
+	dbInfo.neurons, err = r.getNeuronsInfo(dbInfo.layers)
+	if err != nil {
+		return nil, err
+	}
+
+	dbInfo.links, err = r.getNeuronLinksInfo(dbInfo.neurons)
 	if err != nil {
 		return nil, err
 	}
@@ -78,25 +77,35 @@ func (r *Repository) getStructInfo(id string) (structure.Structure, error) {
 
 func (r *Repository) getLayersInfo(id string) ([]layer.Layer, error) {
 	var structLayers []layer.Layer
-	err := r.db.Where("structure_id = ?", id).First(&structLayers).Error
+	err := r.db.Where("structure_id = ?", id).Find(&structLayers).Error
 	if err != nil {
 		return nil, fmt.Errorf("strucutre layers get error: %w", err)
 	}
 	return structLayers, nil
 }
 
-func (r *Repository) getNeuronsInfo(structID string) ([]neuron.Neuron, error) {
+func (r *Repository) getNeuronsInfo(layers []layer.Layer) ([]neuron.Neuron, error) {
+	ids := []string{}
+	for _, v := range layers {
+		ids = append(ids, v.GetID())
+	}
+
 	var neurons []neuron.Neuron
-	err := r.db.Find(&neurons, "structure_id = ?", structID).Error
+	err := r.db.Find(&neurons, "layer_id in ?", ids).Error
 	if err != nil {
 		return nil, fmt.Errorf("neurons get error: %w", err)
 	}
 	return neurons, nil
 }
 
-func (r *Repository) getNeuronLinksInfo(structID string) ([]link.Link, error) {
+func (r *Repository) getNeuronLinksInfo(neurons []neuron.Neuron) ([]link.Link, error) {
+	ids := []string{}
+	for _, v := range neurons {
+		ids = append(ids, v.GetID())
+	}
+
 	var links []link.Link
-	err := r.db.Find(&links, "structure_id = ?", structID).Error
+	err := r.db.Find(&links, "from_id in ?", ids).Error
 	if err != nil {
 		return nil, fmt.Errorf("neuron links get error: %w", err)
 	}
@@ -116,13 +125,13 @@ func (r *Repository) getDetailsWeightsInfo(weightsInfo []weights.Weights) ([]acc
 	var weightInfo []accumulatedWeightInfo
 	for _, v := range weightsInfo {
 		var offsets []offset.Offset
-		err := r.db.Find(&offsets, "weights_id = ?", v.GetID()).Error
+		err := r.db.Find(&offsets, "weights_info_id = ?", v.GetID()).Error
 		if err != nil {
 			return nil, fmt.Errorf("neuron offsets get error: %w", err)
 		}
 
 		var weight []weight.Weight
-		err = r.db.Find(&weight, "weights_id = ?", v.GetID()).Error
+		err = r.db.Find(&weight, "weights_info_id = ?", v.GetID()).Error
 		if err != nil {
 			return nil, fmt.Errorf("neuron links weights get error: %w", err)
 		}
@@ -130,7 +139,7 @@ func (r *Repository) getDetailsWeightsInfo(weightsInfo []weights.Weights) ([]acc
 		weightInfo = append(weightInfo,
 			accumulatedWeightInfo{
 				weightsInfo: &weights.Weights{
-					ID:          v.GetID(),
+					InnerID:     v.GetID(),
 					Name:        v.GetName(),
 					StructureID: v.GetStructureID(),
 				},

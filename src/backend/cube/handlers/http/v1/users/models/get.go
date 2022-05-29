@@ -1,8 +1,11 @@
 package models
 
 import (
+	"encoding/json"
 	"net/http"
 	"neural_storage/cube/core/ports/interactors"
+	httpmodel "neural_storage/cube/handlers/http/v1/entities/model"
+	"neural_storage/cube/handlers/http/v1/entities/structure"
 	"neural_storage/pkg/logger"
 
 	"github.com/gin-gonic/gin"
@@ -17,9 +20,9 @@ type getRequest struct {
 }
 
 type ModelInfo struct {
-	Id        string      `json:"id,omitempty" example:"f6457bdf-4e67-4f05-9108-1cbc0fec9405"`
-	Name      string      `json:"name,omitempty" example:"awesome_username"`
-	Structure interface{} `json:"structure,omitempty"`
+	Id        string         `json:"id,omitempty" example:"f6457bdf-4e67-4f05-9108-1cbc0fec9405"`
+	Name      string         `json:"name,omitempty" example:"awesome_username"`
+	Structure structure.Info `json:"structure,omitempty"`
 } // @name ModelInfoResponse
 
 // Registration  godoc
@@ -47,11 +50,17 @@ func (h *Handler) Get(c *gin.Context) {
 	}
 
 	lg.WithFields(map[string]interface{}{"req": req}).Info("attempt to get model info into cache")
-	if info, err := h.cache.GetModelInfo(req.ModelID); err == nil {
+	if info, err := h.cache.GetModelInfo(req.ModelID); err == nil && len(info) == 2 {
+		var res httpmodel.Info
+		if err := json.Unmarshal(info[1].([]byte), &res); err == nil {
+			statOKGet.Inc()
+			lg.Info("success to get model info")
+			c.JSON(http.StatusOK, res)
+			return
+		}
+	} else {
 		statFailGet.Inc()
 		lg.Errorf("failed to get model info: %v", err)
-		c.JSON(http.StatusOK, info)
-		return
 	}
 
 	filter := interactors.ModelInfoFilter{}
@@ -88,7 +97,7 @@ func (h *Handler) Get(c *gin.Context) {
 		res = append(res, ModelInfo{
 			Id:        val.ID(),
 			Name:      val.Name(),
-			Structure: val.Structure(),
+			Structure: structFromBL(val.Structure()),
 		})
 	}
 

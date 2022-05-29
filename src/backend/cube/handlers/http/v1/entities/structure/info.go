@@ -13,5 +13,5 @@ type Info struct {
 	Neurons []neuron.Info  `json:"neurons"`
 	Layers  []layer.Info   `json:"layers"`
 	Links   []link.Info    `json:"links"`
-	Weights []weights.Info `json:"-"`
+	Weights []weights.Info `json:"weights"`
 }

@@ -21,7 +21,7 @@ func (i *Interactor) AddStructureWeights(ctx context.Context, ownerID, structID 
 
 	structure.SetWeights([]*sw.Info{&info})
 
-	if err := i.validator.ValidateModelInfo(model.NewInfo(ownerID, "", structure)); err != nil {
+	if err := i.validator.ValidateModelInfo(model.NewInfo("", ownerID, "", structure)); err != nil {
 		lg.Error("invlaid model info")
 		return err
 	}

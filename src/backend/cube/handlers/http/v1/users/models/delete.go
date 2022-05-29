@@ -8,8 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type deleteRequest struct {
-	ID string `json:"id" example:"f6457bdf-4e67-4f05-9108-1cbc0fec9405"`
+type DeleteRequest struct {
+	ID string `form:"id" example:"f6457bdf-4e67-4f05-9108-1cbc0fec9405"`
 }
 
 // Registration  godoc
@@ -41,7 +41,7 @@ func (h *Handler) Delete(c *gin.Context) {
 		return
 	}
 
-	var req deleteRequest
+	var req DeleteRequest
 	if err := c.ShouldBind(&req); err != nil {
 		statFailDelete.Inc()
 		lg.Errorf("failed to bind request: %v", err)

@@ -39,9 +39,11 @@ func toDBEntity(info model.Info) accumulatedModelInfo {
 
 	data.model = dbmodel.Model{ID: info.ID(), OwnerID: info.OwnerID(), Name: info.Name()}
 
-	if info.Structure() != nil {
-		data.structure = &dbstructure.Structure{ID: info.Structure().ID(), ModelID: info.ID(), Name: info.Structure().Name()}
+	if info.Structure() == nil {
+		return data
 	}
+
+	data.structure = &dbstructure.Structure{ID: info.Structure().ID(), ModelID: info.ID(), Name: info.Structure().Name()}
 
 	if len(info.Structure().Layers()) > 0 {
 		var layers []dblayer.Layer
@@ -59,8 +61,8 @@ func toDBEntity(info model.Info) accumulatedModelInfo {
 		var neurons []dbneuron.Neuron
 		for _, v := range info.Structure().Neurons() {
 			neurons = append(neurons, dbneuron.Neuron{
-				ID:      v.Id(),
-				LayerID: v.Id(),
+				ID:      v.ID(),
+				LayerID: v.ID(),
 			})
 		}
 		data.neurons = neurons
@@ -70,7 +72,7 @@ func toDBEntity(info model.Info) accumulatedModelInfo {
 		var links []dblink.Link
 		for _, v := range info.Structure().Links() {
 			links = append(links, dblink.Link{
-				ID:        v.Id(),
+				ID:        v.ID(),
 				From:      v.From(),
 				To:        v.To(),
 			})
@@ -130,7 +132,7 @@ func fromDBEntity(info accumulatedModelInfo) model.Info {
 	for i := range info.neurons {
 		neurons = append(
 			neurons,
-			neuron.NewInfo(info.neurons[i].ID, info.neurons[i].LayerID))
+			neuron.NewInfo(info.neurons[i].GetID(), info.neurons[i].GetLayerID()))
 	}
 
 	var layers []*layer.Info
@@ -160,11 +162,12 @@ func fromDBEntity(info accumulatedModelInfo) model.Info {
 	}
 
 	structureInfo := structure.NewInfo(
+		info.structure.GetID(),
 		info.structure.GetName(),
 		neurons,
 		layers,
 		links,
 		wholeWeightsInfo)
 
-	return *model.NewInfo(info.model.GetOwnerID(), info.model.GetName(), structureInfo)
+	return *model.NewInfo(info.model.GetID(), info.model.GetOwnerID(), info.model.GetName(), structureInfo)
 }

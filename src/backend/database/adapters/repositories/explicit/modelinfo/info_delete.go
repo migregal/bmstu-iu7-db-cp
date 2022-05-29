@@ -22,24 +22,10 @@ func (r *Repository) Delete(info model.Info) error {
 		}
 	}()
 
-	if data.structure == nil {
-		if err := tx.Delete(data.model).Error; err != nil {
-			tx.Rollback()
-			return fmt.Errorf("model info update: %w", err)
-		}
-		return tx.Commit().Error
-	}
-
-	if err := r.deleteModelStructureTransact(database.Interactor{DB: tx}, data); err != nil {
+	if err := tx.Where("id = ?", data.model.GetID()).Delete(data.model).Error; err != nil {
 		tx.Rollback()
-		return err
+		return fmt.Errorf("model info update: %w", err)
 	}
-
-	if err := r.deleteModelWeightsTransact(database.Interactor{DB: tx}, data.weights); err != nil {
-		tx.Rollback()
-		return err
-	}
-
 	return tx.Commit().Error
 }
 

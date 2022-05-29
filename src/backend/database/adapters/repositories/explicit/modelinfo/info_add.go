@@ -56,8 +56,8 @@ func (r *Repository) Add(info model.Info) (string, error) {
 	}
 
 	neuronMap := map[string]*dbneuron.Neuron{}
-	for _, v := range data.neurons {
-		neuronMap[v.ID] = &v
+	for i := range data.neurons {
+		neuronMap[data.neurons[i].ID] = &data.neurons[i]
 	}
 
 	err = r.createLinksInfo(database.Interactor{DB: tx}, structureId, neuronMap, data.links)
@@ -67,8 +67,8 @@ func (r *Repository) Add(info model.Info) (string, error) {
 	}
 
 	linkMap := map[string]*dblink.Link{}
-	for _, v := range data.links {
-		linkMap[v.ID] = &v
+	for i := range data.links {
+		linkMap[data.links[i].ID] = &data.links[i]
 	}
 
 	err = r.createWeightsInfo(database.Interactor{DB: tx}, structureId, neuronMap, linkMap, data.weights)
@@ -107,8 +107,8 @@ func (r *Repository) createLayersInfo(tx database.Interactor, structueID string,
 
 func (r *Repository) createNeuronsInfo(tx database.Interactor, layers []dblayer.Layer, info []dbneuron.Neuron) error {
 	layerMap := map[string]*dblayer.Layer{}
-	for _, v := range layers {
-		layerMap[v.ID] = &v
+	for i := range layers {
+		layerMap[layers[i].ID] = &layers[i]
 	}
 
 	for j := range info {
