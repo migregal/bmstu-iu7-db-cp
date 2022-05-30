@@ -12,11 +12,11 @@ import (
 )
 
 type getRequest struct {
-	OwnerID   string `form:"ownerid"`
-	ModelID   string `form:"id"`
-	ModelName string `form:"name"`
-	Page      int    `form:"page"`
-	PerPage   int    `form:"per_page"`
+	OwnerID   string   `form:"ownerid"`
+	ModelID   []string `form:"id"`
+	ModelName string   `form:"name"`
+	Page      int      `form:"page"`
+	PerPage   int      `form:"per_page"`
 }
 
 type ModelInfo struct {
@@ -50,20 +50,43 @@ func (h *Handler) Get(c *gin.Context) {
 	}
 
 	lg.WithFields(map[string]interface{}{"req": req}).Info("attempt to get model info into cache")
-	if info, err := h.cache.GetModelInfo(req.ModelID); err == nil && len(info) == 2 {
-		var res httpmodel.Info
-		if err := json.Unmarshal(info[1].([]byte), &res); err == nil {
-			statOKGet.Inc()
-			lg.Info("success to get model info")
-			c.JSON(http.StatusOK, res)
-			return
+	var cacheRes []httpmodel.Info
+	for i := range req.ModelID {
+		if info, err := h.cache.GetModelInfo(req.ModelID[i]); err == nil && len(info) == 2 {
+			var res httpmodel.Info
+			if err := json.Unmarshal(info[1].([]byte), &res); err == nil {
+				statOKGet.Inc()
+				lg.Info("success to get model info")
+				cacheRes = append(cacheRes, res)
+			}
+		} else {
+			statFailGet.Inc()
+			lg.Errorf("failed to get model info: %v", err)
+			break
 		}
-	} else {
-		statFailGet.Inc()
-		lg.Errorf("failed to get model info: %v", err)
 	}
 
+	if len(cacheRes) == len(req.ModelID) {
+		c.JSON(http.StatusOK, cacheRes)
+		return
+	}
+	// if info, err := h.cache.GetModelInfo(req.ModelID); err == nil && len(info) == 2 {
+	// 	var res httpmodel.Info
+	// 	if err := json.Unmarshal(info[1].([]byte), &res); err == nil {
+	// 		statOKGet.Inc()
+	// 		lg.Info("success to get model info")
+	// 		c.JSON(http.StatusOK, res)
+	// 		return
+	// 	}
+	// } else {
+	// 	statFailGet.Inc()
+	// 	lg.Errorf("failed to get model info: %v", err)
+	// }
+
 	filter := interactors.ModelInfoFilter{}
+	if len(req.ModelID) > 0 {
+		filter.Ids = req.ModelID
+	}
 	if req.OwnerID != "" {
 		filter.Owners = append(filter.Owners, req.OwnerID)
 	}

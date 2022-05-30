@@ -62,7 +62,7 @@ func toDBEntity(info model.Info) accumulatedModelInfo {
 		for _, v := range info.Structure().Neurons() {
 			neurons = append(neurons, dbneuron.Neuron{
 				ID:      v.ID(),
-				LayerID: v.ID(),
+				LayerID: v.LayerID(),
 			})
 		}
 		data.neurons = neurons

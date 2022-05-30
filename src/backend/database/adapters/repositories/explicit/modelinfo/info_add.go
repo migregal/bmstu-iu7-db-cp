@@ -2,6 +2,7 @@ package modelinfo
 
 import (
 	"fmt"
+
 	"neural_storage/cube/core/entities/model"
 	dbmodel "neural_storage/database/core/entities/model"
 	dbneuron "neural_storage/database/core/entities/neuron"
@@ -115,7 +116,7 @@ func (r *Repository) createNeuronsInfo(tx database.Interactor, layers []dblayer.
 		info[j].LayerID = layerMap[info[j].LayerID].GetID()
 	}
 
-	return tx.Create(&info).Error
+	return tx.CreateInBatches(&info, 3000).Error
 }
 
 func (r *Repository) createLinksInfo(

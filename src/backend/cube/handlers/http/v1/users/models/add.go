@@ -1,6 +1,7 @@
 package models
 
 import (
+	"compress/gzip"
 	"encoding/json"
 	"io/ioutil"
 	"mime/multipart"
@@ -72,7 +73,16 @@ func (h *Handler) Add(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	plan, err := ioutil.ReadAll(content)
+	r, err := gzip.NewReader(content)
+	if err != nil {
+		statFailAdd.Inc()
+		lg.Errorf("failed to read gzipped structure info: %v", err)
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	defer r.Close()
+
+	plan, err := ioutil.ReadAll(r)
 	if err != nil {
 		statFailAdd.Inc()
 		lg.Errorf("failed to read structure info: %v", err)
@@ -96,7 +106,17 @@ func (h *Handler) Add(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	plan, err = ioutil.ReadAll(content)
+
+	rw, err := gzip.NewReader(content)
+	if err != nil {
+		statFailAdd.Inc()
+		lg.Errorf("failed to read gzipped weights info: %v", err)
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	defer rw.Close()
+
+	plan, err = ioutil.ReadAll(rw)
 	if err != nil {
 		statFailAdd.Inc()
 		lg.Errorf("failed to read weights info: %v", err)

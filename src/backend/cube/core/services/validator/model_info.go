@@ -41,7 +41,7 @@ func (v *Validator) validateModelStructure(info *structure.Info) error {
 
 func (v *Validator) validateLayers(info *structure.Info) error {
 	if len(info.Layers()) > 0 && len(info.Neurons()) == 0 {
-		return fmt.Errorf("missing neuron info")
+		return fmt.Errorf("validate layers: missing neuron info")
 	}
 
 	layerIds := make(map[string]struct{})
@@ -84,8 +84,8 @@ func (v *Validator) validateNeuronOffsets(info *structure.Info, neurons map[stri
 
 	for _, w := range info.Weights() {
 		for _, v := range w.Offsets() {
-			if _, found := neurons[v.ID()]; !found {
-				return fmt.Errorf("missing neuron info")
+			if _, found := neurons[v.NeuronID()]; !found {
+				return fmt.Errorf("validate offsets: missing neuron info")
 			}
 			if err = validateFloatValue(v.Offset()); err != nil {
 				return fmt.Errorf("neuron offset: %w", err)
@@ -112,17 +112,17 @@ func (v *Validator) validateNeuronLinks(info *structure.Info, neurons map[string
 		linksIds[v.ID()] = struct{}{}
 
 		if _, found := neurons[v.From()]; !found {
-			return fmt.Errorf("missing neuron info")
+			return fmt.Errorf("validate links: missing neuron info")
 		}
 		if _, found := neurons[v.To()]; !found {
-			return fmt.Errorf("missing neuron info")
+			return fmt.Errorf("validate to links: missing neuron info")
 		}
 	}
 
 	for _, w := range info.Weights() {
 		for _, v := range w.Weights() {
-			if _, found := linksIds[v.ID()]; !found {
-				return fmt.Errorf("missing neuron info")
+			if _, found := linksIds[v.LinkID()]; !found {
+				return fmt.Errorf("validate weights: missing link info")
 			}
 			if err = validateFloatValue(v.Weight()); err != nil {
 				return fmt.Errorf("neuron link weight: %w", err)
