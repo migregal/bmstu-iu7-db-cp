@@ -56,9 +56,9 @@ func (r *Repository) Add(info model.Info) (string, error) {
 		return "", err
 	}
 
-	neuronMap := map[string]*dbneuron.Neuron{}
+	neuronMap := map[int]string{}
 	for i := range data.neurons {
-		neuronMap[data.neurons[i].ID] = &data.neurons[i]
+		neuronMap[data.neurons[i].ID] = data.neurons[i].GetID()
 	}
 
 	err = r.createLinksInfo(database.Interactor{DB: tx}, structureId, neuronMap, data.links)
@@ -67,9 +67,9 @@ func (r *Repository) Add(info model.Info) (string, error) {
 		return "", err
 	}
 
-	linkMap := map[string]*dblink.Link{}
+	linkMap := map[int]string{}
 	for i := range data.links {
-		linkMap[data.links[i].ID] = &data.links[i]
+		linkMap[data.links[i].ID] = data.links[i].GetID()
 	}
 
 	err = r.createWeightsInfo(database.Interactor{DB: tx}, structureId, neuronMap, linkMap, data.weights)
@@ -107,13 +107,13 @@ func (r *Repository) createLayersInfo(tx database.Interactor, structueID string,
 }
 
 func (r *Repository) createNeuronsInfo(tx database.Interactor, layers []dblayer.Layer, info []dbneuron.Neuron) error {
-	layerMap := map[string]*dblayer.Layer{}
+	layerMap := map[int]string{}
 	for i := range layers {
-		layerMap[layers[i].ID] = &layers[i]
+		layerMap[layers[i].ID] = layers[i].GetID()
 	}
 
 	for j := range info {
-		info[j].LayerID = layerMap[info[j].LayerID].GetID()
+		info[j].InnerLayerID = layerMap[info[j].LayerID]
 	}
 
 	return tx.CreateInBatches(&info, 3000).Error
@@ -122,12 +122,12 @@ func (r *Repository) createNeuronsInfo(tx database.Interactor, layers []dblayer.
 func (r *Repository) createLinksInfo(
 	tx database.Interactor,
 	structureID string,
-	neurons map[string]*dbneuron.Neuron,
+	neurons map[int]string,
 	info []dblink.Link,
 ) error {
 	for i := range info {
-		info[i].From = neurons[info[i].From].GetID()
-		info[i].To = neurons[info[i].To].GetID()
+		info[i].InnerFrom = neurons[info[i].From]
+		info[i].InnerTo = neurons[info[i].To]
 	}
 
 	return tx.Create(&info).Error
@@ -136,8 +136,8 @@ func (r *Repository) createLinksInfo(
 func (r *Repository) createWeightsInfo(
 	tx database.Interactor,
 	structureID string,
-	neurons map[string]*dbneuron.Neuron,
-	links map[string]*dblink.Link,
+	neurons map[int]string,
+	links map[int]string,
 	info []accumulatedWeightInfo,
 ) error {
 	for _, v := range info {
@@ -149,16 +149,16 @@ func (r *Repository) createWeightsInfo(
 			return fmt.Errorf("create model weights info: %w", err)
 		}
 		for _, o := range v.offsets {
-			o.Weights = v.weightsInfo.GetID()
-			o.Neuron = neurons[o.Neuron].GetID()
+			o.InnerWeights = v.weightsInfo.GetID()
+			o.InnerNeuron = neurons[o.Neuron]
 			if err := tx.Create(&o).Error; err != nil {
 				return fmt.Errorf("create model offsets: %w", err)
 			}
 		}
 
 		for _, w := range v.weights {
-			w.WeightsID = v.weightsInfo.GetID()
-			w.LinkID = links[w.LinkID].GetID()
+			w.InnerWeightsID = v.weightsInfo.GetID()
+			w.InnerLinkID = links[w.LinkID]
 			if err := tx.Create(&w).Error; err != nil {
 				return fmt.Errorf("create model weights: %w", err)
 			}

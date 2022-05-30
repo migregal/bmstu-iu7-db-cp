@@ -6,9 +6,9 @@ func (i *Link) GetID() string {
 }
 
 func (i *Link) GetFrom() string {
-	return i.From
+	return i.InnerFrom
 }
 
 func (i *Link) GetTo() string {
-	return i.To
+	return i.InnerTo
 }

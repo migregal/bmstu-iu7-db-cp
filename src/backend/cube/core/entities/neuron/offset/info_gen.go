@@ -1,10 +1,10 @@
 package offset
 
-func (i *Info) ID() string {
+func (i *Info) ID() int {
 	return i.id
 }
 
-func (i *Info) NeuronID() string {
+func (i *Info) NeuronID() int {
 	return i.neuronID
 }
 

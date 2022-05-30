@@ -72,9 +72,9 @@ func toDBEntity(info model.Info) accumulatedModelInfo {
 		var links []dblink.Link
 		for _, v := range info.Structure().Links() {
 			links = append(links, dblink.Link{
-				ID:        v.ID(),
-				From:      v.From(),
-				To:        v.To(),
+				ID:   v.ID(),
+				From: v.From(),
+				To:   v.To(),
 			})
 		}
 		data.links = links
@@ -82,10 +82,10 @@ func toDBEntity(info model.Info) accumulatedModelInfo {
 
 	if len(info.Structure().Weights()) > 0 {
 		var weights []accumulatedWeightInfo
-		for _, w := range info.Structure().Weights() {
+		for i, w := range info.Structure().Weights() {
 			temp := accumulatedWeightInfo{}
 			temp.weightsInfo = &dbweights.Weights{
-				ID:          w.ID(),
+				ID:          i,
 				Name:        w.Name(),
 				StructureID: info.Structure().ID(),
 			}
@@ -93,7 +93,7 @@ func toDBEntity(info model.Info) accumulatedModelInfo {
 				temp.weights = append(temp.weights, dbweight.Weight{
 					ID:        v.ID(),
 					LinkID:    v.LinkID(),
-					WeightsID: w.ID(),
+					WeightsID: i,
 					Value:     v.Weight(),
 				})
 			}
@@ -102,7 +102,7 @@ func toDBEntity(info model.Info) accumulatedModelInfo {
 				temp.offsets = append(temp.offsets, dboffset.Offset{
 					ID:      o.ID(),
 					Neuron:  o.NeuronID(),
-					Weights: w.ID(),
+					Weights: i,
 					Offset:  o.Offset(),
 				})
 			}
@@ -116,41 +116,47 @@ func toDBEntity(info model.Info) accumulatedModelInfo {
 }
 
 func fromDBEntity(info accumulatedModelInfo) model.Info {
+	layerMap := map[string]int{}
+	var layers []*layer.Info
+	for i, v := range info.layers {
+		layerMap[v.GetID()] = i
+		layers = append(
+			layers,
+			layer.NewInfo(i, v.GetLimitFunc(), v.GetActivationFunc()))
+	}
+
+	neuronMap := map[string]int{}
+	var neurons []*neuron.Info
+	for i := range info.neurons {
+		layerMap[info.neurons[i].GetID()] = i
+		neurons = append(
+			neurons,
+			neuron.NewInfo(i, layerMap[info.neurons[i].GetLayerID()]))
+	}
+
 	var links []*link.Info
 	for i := range info.links {
 		links = append(
 			links,
 			link.NewInfo(
-				info.links[i].GetID(),
-				info.links[i].GetFrom(),
-				info.links[i].GetTo(),
+				i,
+				neuronMap[info.links[i].GetFrom()],
+				neuronMap[info.links[i].GetTo()],
 			),
 		)
-	}
-
-	var neurons []*neuron.Info
-	for i := range info.neurons {
-		neurons = append(
-			neurons,
-			neuron.NewInfo(info.neurons[i].GetID(), info.neurons[i].GetLayerID()))
-	}
-
-	var layers []*layer.Info
-	for _, v := range info.layers {
-		layers = append(
-			layers,
-			layer.NewInfo(v.GetID(), v.GetLimitFunc(), v.GetActivationFunc()))
 	}
 
 	var wholeWeightsInfo []*weights.Info
 	for _, w := range info.weights {
 		var offsets []*offset.Info
-		for _, v := range w.offsets {
-			offsets = append(offsets, offset.NewInfo(v.GetID(), v.GetNeuronID(), v.GetValue()))
+		for j, v := range w.offsets {
+			offsets = append(offsets,
+				offset.NewInfo(j, neuronMap[v.GetNeuronID()], v.GetValue()))
 		}
 		var linkWeights []*weight.Info
-		for _, v := range w.weights {
-			linkWeights = append(linkWeights, weight.NewInfo(v.GetID(), v.GetLinkID(), v.GetValue()))
+		for j, v := range w.weights {
+			linkWeights = append(linkWeights,
+				weight.NewInfo(j, neuronMap[v.GetLinkID()], v.GetValue()))
 		}
 		var info *weights.Info
 		if w.weightsInfo != nil {

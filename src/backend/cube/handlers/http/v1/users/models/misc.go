@@ -39,7 +39,7 @@ func structToBL(info httpstructure.Info) *structure.Info {
 	for _, w := range info.Weights {
 		weights = append(weights, weightToBL(w))
 	}
-	return structure.NewInfo(info.ID, info.Name, neurons, layers, links, weights)
+	return structure.NewInfo("", info.Name, neurons, layers, links, weights)
 }
 
 func weightToBL(info httpweights.Info) *weights.Info {
@@ -81,7 +81,6 @@ func structFromBL(info *structure.Info) httpstructure.Info {
 	}
 
 	return httpstructure.Info{
-		ID: info.ID(),
 		Name: info.Name(),
 		Layers: layers,
 		Neurons: neurons,

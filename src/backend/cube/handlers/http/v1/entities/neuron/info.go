@@ -1,6 +1,6 @@
 package neuron
 
 type Info struct {
-	ID      string `json:"id"`
-	LayerID string `json:"layer_id"`
+	ID      int  `json:"id"`
+	LayerID int `json:"layer_id"`
 }

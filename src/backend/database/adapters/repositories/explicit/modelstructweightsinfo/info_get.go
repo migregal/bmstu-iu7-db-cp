@@ -48,7 +48,7 @@ func (r *Repository) getDetailsWeightsInfo(info dbweights.Weights) (accumulatedW
 
 	return accumulatedWeightInfo{
 			weightsInfo: &dbweights.Weights{
-				ID:          info.GetID(),
+				InnerID:     info.GetID(),
 				Name:        info.GetName(),
 				StructureID: info.GetStructureID(),
 			},

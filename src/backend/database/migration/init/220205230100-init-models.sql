@@ -21,7 +21,7 @@ SELECT EXISTS (
 
     CREATE TABLE structures (
         id              UUID         PRIMARY KEY DEFAULT uuid_generate_v4()
-        , title         VARCHAR(64)  UNIQUE NOT NULL
+        , title         VARCHAR(64)  NOT NULL
         , model_id      UUID         NOT NULL
         , FOREIGN KEY (model_id) REFERENCES models(id) ON DELETE CASCADE
     );
@@ -50,7 +50,7 @@ SELECT EXISTS (
 
     CREATE TABLE weights_info (
         id              UUID         PRIMARY KEY DEFAULT uuid_generate_v4()
-        , name          VARCHAR(64)  UNIQUE NOT NULL
+        , name          VARCHAR(64)  NOT NULL
         , created_at    TIMESTAMP    DEFAULT NOW()
         , updated_at    TIMESTAMP    DEFAULT NOW()
         , structure_id  UUID         NOT NULL
@@ -59,7 +59,7 @@ SELECT EXISTS (
 
     CREATE TABLE neuron_offsets (
         id                 UUID  PRIMARY KEY DEFAULT uuid_generate_v4()
-        , value            REAL  UNIQUE NOT NULL
+        , value            REAL  NOT NULL
         , weights_info_id  UUID  NOT NULL
         , neuron_id        UUID  NOT NULL
         , FOREIGN KEY (weights_info_id) REFERENCES weights_info(id) ON DELETE CASCADE
@@ -68,7 +68,7 @@ SELECT EXISTS (
 
     CREATE TABLE link_weights (
         id                 UUID  PRIMARY KEY DEFAULT uuid_generate_v4()
-        , value            REAL  UNIQUE NOT NULL
+        , value            REAL  NOT NULL
         , weights_info_id  UUID  NOT NULL
         , link_id          UUID  NOT NULL
         , FOREIGN KEY (weights_info_id) REFERENCES weights_info(id) ON DELETE CASCADE

@@ -6,8 +6,8 @@ import (
 )
 
 type Info struct {
-	ID      string         `json:"id"`
-	Name    string         `json:"name"`
+	ID      string        `json:"id"`
+	Name    string        `json:"name"`
 	Weights []weight.Info `json:"weights"`
 	Offsets []offset.Info `json:"offsets"`
 }

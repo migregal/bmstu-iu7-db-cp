@@ -5,11 +5,11 @@ func (i *Offset) GetID() string {
 }
 
 func (i *Offset) GetWeightsID() string {
-	return i.Weights
+	return i.InnerWeights
 }
 
 func (i *Offset) GetNeuronID() string {
-	return i.Neuron
+	return i.InnerNeuron
 }
 
 func (i *Offset) GetValue() float64 {

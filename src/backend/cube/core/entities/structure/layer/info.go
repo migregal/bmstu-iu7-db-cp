@@ -1,11 +1,11 @@
 package layer
 
 type Info struct {
-	id             string
+	id             int
 	limitFunc      string
 	activationFunc string
 }
 
-func NewInfo(id string, limitFunc string, activationFunc string) *Info {
+func NewInfo(id int, limitFunc string, activationFunc string) *Info {
 	return &Info{id: id, limitFunc: limitFunc, activationFunc: activationFunc}
 }

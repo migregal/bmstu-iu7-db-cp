@@ -44,7 +44,7 @@ func (v *Validator) validateLayers(info *structure.Info) error {
 		return fmt.Errorf("validate layers: missing neuron info")
 	}
 
-	layerIds := make(map[string]struct{})
+	layerIds := make(map[int]struct{})
 	for _, v := range info.Layers() {
 		if _, found := layerIds[v.ID()]; found {
 			return fmt.Errorf("duplicate layer info")
@@ -62,8 +62,8 @@ func (v *Validator) validateLayers(info *structure.Info) error {
 	return nil
 }
 
-func (v *Validator) validateNeurons(info *structure.Info) (map[string]struct{}, error) {
-	neuronIds := make(map[string]struct{})
+func (v *Validator) validateNeurons(info *structure.Info) (map[int]struct{}, error) {
+	neuronIds := make(map[int]struct{})
 	for _, v := range info.Neurons() {
 		if _, found := neuronIds[v.ID()]; found {
 			return nil, fmt.Errorf("duplicate neuron info")
@@ -75,7 +75,7 @@ func (v *Validator) validateNeurons(info *structure.Info) (map[string]struct{}, 
 	return neuronIds, nil
 }
 
-func (v *Validator) validateNeuronOffsets(info *structure.Info, neurons map[string]struct{}) (err error) {
+func (v *Validator) validateNeuronOffsets(info *structure.Info, neurons map[int]struct{}) (err error) {
 	if neurons == nil {
 		if neurons, err = v.validateNeurons(info); err != nil {
 			return
@@ -96,14 +96,14 @@ func (v *Validator) validateNeuronOffsets(info *structure.Info, neurons map[stri
 	return
 }
 
-func (v *Validator) validateNeuronLinks(info *structure.Info, neurons map[string]struct{}) (err error) {
+func (v *Validator) validateNeuronLinks(info *structure.Info, neurons map[int]struct{}) (err error) {
 	if neurons == nil {
 		if neurons, err = v.validateNeurons(info); err != nil {
 			return
 		}
 	}
 
-	linksIds := make(map[string]struct{})
+	linksIds := make(map[int]struct{})
 	for _, v := range info.Links() {
 		if _, found := linksIds[v.ID()]; found {
 			return fmt.Errorf("duplicate link info")

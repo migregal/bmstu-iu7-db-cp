@@ -5,11 +5,11 @@ func (w *Weight) GetID() string {
 }
 
 func (w *Weight) GetWeightsID() string {
-	return w.WeightsID
+	return w.InnerWeightsID
 }
 
 func (w *Weight) GetLinkID() string {
-	return w.LinkID
+	return w.InnerLinkID
 }
 
 func (w *Weight) GetValue() float64 {

@@ -1,10 +1,13 @@
 package models
 
 import (
+	"bytes"
+	"compress/gzip"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 	"neural_storage/cube/core/ports/interactors"
-	httpmodel "neural_storage/cube/handlers/http/v1/entities/model"
 	"neural_storage/cube/handlers/http/v1/entities/structure"
 	"neural_storage/pkg/logger"
 
@@ -12,11 +15,11 @@ import (
 )
 
 type getRequest struct {
-	OwnerID   string   `form:"ownerid"`
-	ModelID   []string `form:"id"`
-	ModelName string   `form:"name"`
-	Page      int      `form:"page"`
-	PerPage   int      `form:"per_page"`
+	OwnerID   string `form:"ownerid"`
+	ModelID   string `form:"id"`
+	ModelName string `form:"name"`
+	Page      int    `form:"page"`
+	PerPage   int    `form:"per_page"`
 }
 
 type ModelInfo struct {
@@ -50,42 +53,26 @@ func (h *Handler) Get(c *gin.Context) {
 	}
 
 	lg.WithFields(map[string]interface{}{"req": req}).Info("attempt to get model info into cache")
-	var cacheRes []httpmodel.Info
-	for i := range req.ModelID {
-		if info, err := h.cache.GetModelInfo(req.ModelID[i]); err == nil && len(info) == 2 {
-			var res httpmodel.Info
-			if err := json.Unmarshal(info[1].([]byte), &res); err == nil {
-				statOKGet.Inc()
-				lg.Info("success to get model info")
-				cacheRes = append(cacheRes, res)
-			}
-		} else {
-			statFailGet.Inc()
-			lg.Errorf("failed to get model info: %v", err)
-			break
+	if info, err := h.cache.GetModelInfo(req.ModelID); err == nil && len(info) == 2 {
+		lg.Info("success to get model info from cache")
+		// c.Data(http.StatusOK, "application/json", info[1].([]byte))
+		// return
+		resp, err := unGzip(info[1].([]byte))
+		if err == nil {
+			c.Data(http.StatusOK, "application/json",resp)
+			return
 		}
-	}
-
-	if len(cacheRes) == len(req.ModelID) {
-		c.JSON(http.StatusOK, cacheRes)
+		fmt.Printf("FUCK: %+v\n", err.Error())
+		statOKGet.Inc()
+		c.JSON(http.StatusOK, err.Error())
 		return
+	} else {
+		lg.Errorf("failed to get model info from cache: %v", err)
 	}
-	// if info, err := h.cache.GetModelInfo(req.ModelID); err == nil && len(info) == 2 {
-	// 	var res httpmodel.Info
-	// 	if err := json.Unmarshal(info[1].([]byte), &res); err == nil {
-	// 		statOKGet.Inc()
-	// 		lg.Info("success to get model info")
-	// 		c.JSON(http.StatusOK, res)
-	// 		return
-	// 	}
-	// } else {
-	// 	statFailGet.Inc()
-	// 	lg.Errorf("failed to get model info: %v", err)
-	// }
 
 	filter := interactors.ModelInfoFilter{}
 	if len(req.ModelID) > 0 {
-		filter.Ids = req.ModelID
+		filter.Ids = []string{req.ModelID}
 	}
 	if req.OwnerID != "" {
 		filter.Owners = append(filter.Owners, req.OwnerID)
@@ -115,6 +102,18 @@ func (h *Handler) Get(c *gin.Context) {
 		c.JSON(http.StatusOK, []ModelInfo{})
 		return
 	}
+	if len(infos) == 1 {
+		model := modelFromBL(infos[0])
+		if data, err := jsonGzip(model); err == nil {
+			_ = h.cache.UpdateModelInfo(req.ModelID, data)
+		}
+
+		statOKGet.Inc()
+		lg.Info("successful get full nodel info")
+		c.JSON(http.StatusOK, model)
+		return
+	}
+
 	var res []ModelInfo
 	for _, val := range infos {
 		res = append(res, ModelInfo{
@@ -123,12 +122,49 @@ func (h *Handler) Get(c *gin.Context) {
 			Structure: structFromBL(val.Structure()),
 		})
 	}
-
-	for _, v := range res {
-		_ = h.cache.UpdateModelInfo(v.Id, v)
+	data, err := json.Marshal(res)
+	if err != nil {
+		statFailGet.Inc()
+		lg.Errorf("failed to form response: %v", err)
+		c.JSON(http.StatusInternalServerError, "failed to form response")
+		return
 	}
 
 	statOKGet.Inc()
 	lg.Info("success")
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, data)
+
+}
+
+func jsonGzip(data interface{}) ([]byte, error) {
+	resp, err := json.Marshal(data)
+	if err != nil {
+		return nil, fmt.Errorf("failed to form response: %v", err)
+	}
+
+	buf := new(bytes.Buffer)
+	gz := gzip.NewWriter(buf)
+	if _, err := gz.Write(resp); err != nil {
+		fmt.Printf("ASDASDASD: %+v", err.Error())
+		gz.Close()
+		return nil, fmt.Errorf("failed to gzip response: %v", err)
+	}
+
+	gz.Close()
+	return buf.Bytes(), nil
+}
+
+func unGzip(data []byte) ([]byte, error) {
+	gz, err := gzip.NewReader(bytes.NewReader(data))
+	if err != nil {
+		return nil, fmt.Errorf("failed to read gzipped cache: %v", err)
+	}
+	defer gz.Close()
+
+	s, err := ioutil.ReadAll(gz)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode gzipped cache: %v", err)
+	}
+
+	return s, nil
 }

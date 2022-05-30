@@ -1,4 +1,5 @@
 box.cfg{listen = os.getenv('CACHE_PORT')}
+box.cfg{memtx_max_tuple_size=64*1048576}
 
 box.once("bootstrap", function()
     box.schema.user.create(os.getenv('CACHE_DATABASE_USERNAME'), { password = os.getenv('CACHE_DATABASE_USER_PASSWORD'), if_not_exists = true })

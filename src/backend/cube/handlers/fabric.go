@@ -8,6 +8,7 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
+	"github.com/gin-gonic/contrib/gzip"
 	"github.com/gin-gonic/gin"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -54,6 +55,7 @@ type Server interface {
 func New(params config.Config, lg *logger.Logger) Server {
 	engine := gin.New()
 	engine.Use(gin.Recovery())
+	engine.Use(gzip.Gzip(gzip.BestCompression))
 
 	engine.Use(logger.RequestIDSetter())
 	engine.Use(logger.RequestLogger(lg))

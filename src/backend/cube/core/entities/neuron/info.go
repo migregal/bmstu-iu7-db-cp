@@ -1,10 +1,10 @@
 package neuron
 
 type Info struct {
-	id      string
-	layerID string
+	id      int
+	layerID int
 }
 
-func NewInfo(id string, layerID string) *Info {
+func NewInfo(id int, layerID int) *Info {
 	return &Info{id: id, layerID: layerID}
 }

@@ -1,6 +1,6 @@
 package layer
 
-func (i *Info) ID() string {
+func (i *Info) ID() int {
 	return i.id
 }
 

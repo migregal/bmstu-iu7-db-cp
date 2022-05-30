@@ -5,5 +5,5 @@ func (i *Neuron) GetID() string {
 }
 
 func (i *Neuron) GetLayerID() string {
-	return i.LayerID
+	return i.InnerLayerID
 }

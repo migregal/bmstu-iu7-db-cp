@@ -1,11 +1,13 @@
 package offset
 
 type Offset struct {
-	InternalID string  `gorm:"primaryKey;type:uuid;column:id;default:generated();"`
-	ID          string  `gorm:"-"`
-	Weights     string  `gorm:"type:uuid;column:weights_info_id;"`
-	Neuron      string  `gorm:"type:uuid;column:neuron_id;"`
-	Offset      float64 `gorm:"column:value;"`
+	ID           int     `gorm:"-"`
+	Weights      int     `gorm:"-"`
+	Neuron       int     `gorm:"-"`
+	InternalID   string  `gorm:"primaryKey;type:uuid;column:id;default:generated();"`
+	InnerWeights string  `gorm:"type:uuid;column:weights_info_id;"`
+	InnerNeuron  string  `gorm:"type:uuid;column:neuron_id;"`
+	Offset       float64 `gorm:"column:value;"`
 }
 
 func (Offset) TableName() string {
