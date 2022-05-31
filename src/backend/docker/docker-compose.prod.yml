@@ -24,6 +24,13 @@ services:
     env_file: ./database/.env
     networks:
       - database
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - "pg_isready -d $$POSTGRES_DB -U $$POSTGRES_USER"
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   migration:
     extends:
@@ -91,6 +98,10 @@ services:
       - cache
     expose:
       - 10001
+    depends_on:
+      migration:
+        condition: service_completed_successfully
+    restart: always
     deploy:
       mode: replicated
       replicas: 3

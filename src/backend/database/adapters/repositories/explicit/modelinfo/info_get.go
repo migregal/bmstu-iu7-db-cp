@@ -105,7 +105,7 @@ func (r *Repository) getNeuronLinksInfo(neurons []neuron.Neuron) ([]link.Link, e
 	}
 
 	var links []link.Link
-	err := r.db.Find(&links, "from_id in ?", ids).Error
+	err := r.db.Where("from_id in ?", ids).Find(&links).Error
 	if err != nil {
 		return nil, fmt.Errorf("neuron links get error: %w", err)
 	}
