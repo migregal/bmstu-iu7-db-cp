@@ -14,7 +14,7 @@ SELECT EXISTS (
 \else
   \echo 'migration' :MIGRATION_ID 'does not exist'
 
-  CREATE OR REPLACE FUNCTION user_info_preupdate()
+  CREATE FUNCTION user_info_preupdate()
   RETURNS trigger AS
   $$
   BEGIN
@@ -29,7 +29,7 @@ SELECT EXISTS (
   FOR ROW
   EXECUTE PROCEDURE user_info_preupdate();
 
-  CREATE OR REPLACE FUNCTION model_preupdate()
+  CREATE FUNCTION model_preupdate()
   RETURNS trigger AS
   $$
   BEGIN
@@ -44,7 +44,7 @@ SELECT EXISTS (
   FOR ROW
   EXECUTE PROCEDURE model_preupdate();
 
-  CREATE OR REPLACE FUNCTION weights_info_preupdate()
+  CREATE FUNCTION weights_info_preupdate()
   RETURNS trigger AS
   $$
   BEGIN
@@ -61,7 +61,7 @@ SELECT EXISTS (
 
   CREATE EXTENSION PLPYTHON3U;
 
-  CREATE OR REPLACE FUNCTION remove_model_from_cache_py()
+  CREATE FUNCTION remove_model_from_cache_py()
   RETURNS TRIGGER
   AS $$
       import os
@@ -87,9 +87,12 @@ SELECT EXISTS (
       if pwd is None:
         return
 
-      conn = tarantool.connect(host, port,
-                               user=user, password=pwd)
-      conn.space(model_space).delete(TD["old"]["id"])
+      try:
+        conn = tarantool.connect(host, port,
+                                  user=user, password=pwd)
+        conn.space(model_space).delete(TD["old"]["id"])
+      except:
+        pass
   $$ LANGUAGE PLPYTHON3U;
 
   CREATE TRIGGER rm_model_upd AFTER UPDATE
@@ -116,7 +119,7 @@ SELECT EXISTS (
   ON weights_info FOR ROW
   EXECUTE PROCEDURE remove_model_from_cache_py();
 
-  CREATE OR REPLACE FUNCTION remove_weight_from_cache_py()
+  CREATE FUNCTION remove_weight_from_cache_py()
   RETURNS TRIGGER
   AS $$
       import os
@@ -142,9 +145,12 @@ SELECT EXISTS (
       if pwd is None:
         return
 
-      conn = tarantool.connect(host, port,
-                               user=user, password=pwd)
-      conn.space(weight_space).delete(TD["old"]["id"])
+      try:
+        conn = tarantool.connect(host, port,
+                                user=user, password=pwd)
+        conn.space(weight_space).delete(TD["old"]["id"])
+      except:
+        pass
   $$ LANGUAGE PLPYTHON3U;
 
   CREATE TRIGGER rm_weight_del AFTER DELETE
