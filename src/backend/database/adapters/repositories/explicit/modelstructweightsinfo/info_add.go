@@ -6,10 +6,10 @@ import (
 	"neural_storage/database/core/services/interactor/database"
 )
 
-func (r *Repository) Add(structID string, info []weights.Info) error {
+func (r *Repository) Add(structID string, info []weights.Info) ([]string, error) {
 	tx := r.db.Begin()
 	if err := tx.Error; err != nil {
-		return err
+		return nil, err
 	}
 
 	defer func() {
@@ -21,32 +21,35 @@ func (r *Repository) Add(structID string, info []weights.Info) error {
 
 	data := toDBEntity(structID, info)
 
-	err := r.createWeightsInfoTransact(database.Interactor{DB: tx}, data)
+	ids, err := r.createWeightsInfoTransact(database.Interactor{DB: tx}, data)
 	if err != nil {
 		tx.Rollback()
-		return err
+		return nil, err
 	}
 
-	return tx.Commit().Error
+	return ids, tx.Commit().Error
 }
 
-func (r *Repository) createWeightsInfoTransact(tx database.Interactor, info []accumulatedWeightInfo) error {
+func (r *Repository) createWeightsInfoTransact(tx database.Interactor, info []accumulatedWeightInfo) ([]string, error) {
+	ids := []string{}
 	for _, v := range info {
-		if err := tx.Create(&v.weightsInfo).Error; err != nil {
-			return fmt.Errorf("create model weights info: %w", err)
+		err := tx.Create(&v.weightsInfo).Error
+		if err != nil {
+			return nil, fmt.Errorf("create model weights info: %w", err)
 		}
+		ids = append(ids, v.weightsInfo.InnerID)
 		for _, o := range v.offsets {
-			if err := tx.Create(&o).Error; err != nil {
-				return fmt.Errorf("create model offsets: %w", err)
+			if err = tx.Create(&o).Error; err != nil {
+				return nil, fmt.Errorf("create model offsets: %w", err)
 			}
 		}
 
 		for _, w := range v.weights {
-			if err := tx.Create(&w).Error; err != nil {
-				return fmt.Errorf("create model weights: %w", err)
+			if err = tx.Create(&w).Error; err != nil {
+				return nil, fmt.Errorf("create model weights: %w", err)
 			}
 		}
 	}
 
-	return nil
+	return ids, nil
 }

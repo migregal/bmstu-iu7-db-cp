@@ -85,7 +85,7 @@ func (h *Handler) Add(c *gin.Context) {
 	}
 
 	lg.WithFields(map[string]interface{}{"user": usrID, "id": req.ModelID}).Info("attempt to add weights")
-	err = h.resolver.AddStructureWeights(c, usrID, req.ModelID, weightToBL(w))
+	id, err := h.resolver.AddStructureWeights(c, usrID, req.ModelID, weightToBL(w))
 	if err != nil {
 		statFailAdd.Inc()
 		lg.Errorf("failed to add weights info: %v", err)
@@ -95,6 +95,12 @@ func (h *Handler) Add(c *gin.Context) {
 
 	lg.Info("attempt to delete model from cache")
 	_ = h.cache.Delete(modelStorage, req.ModelID)
+
+	lg.Info("attempt to delete add weight to cache")
+	w.ID = id
+	if stringified, err := jsonGzip(weightToBL(w)); err == nil {
+		_ = h.cache.Update(modelStorage, id, stringified)
+	}
 
 	statOKAdd.Inc()
 	lg.Info("success")

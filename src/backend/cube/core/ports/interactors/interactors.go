@@ -53,7 +53,7 @@ type NeuralNetworkInteractor interface {
 	Find(ctx context.Context, filter ModelInfoFilter) ([]*model.Info, error)
 	Delete(ctx context.Context, userID, modelID string) error
 
-	AddStructureWeights(ctx context.Context, ownerID string, modelID string, info sw.Info) error
+	AddStructureWeights(ctx context.Context, ownerID string, modelID string, info sw.Info) (string, error)
 	GetStructureWeights(ctx context.Context, weightsId string) (*sw.Info, error)
 	FindStructureWeights(ctx context.Context, filter ModelWeightsInfoFilter) ([]*sw.Info, error)
 	UpdateStructureWeights(ctx context.Context, ownerID, modelID string, info sw.Info) error

@@ -22,17 +22,26 @@ type ModelStructWeightsInfoRepository struct {
 }
 
 // Add provides a mock function with given fields: structId, info
-func (_m *ModelStructWeightsInfoRepository) Add(structId string, info []weights.Info) error {
+func (_m *ModelStructWeightsInfoRepository) Add(structId string, info []weights.Info) ([]string, error) {
 	ret := _m.Called(structId, info)
 
-	var r0 error
-	if rf, ok := ret.Get(0).(func(string, []weights.Info) error); ok {
+	var r0 []string
+	if rf, ok := ret.Get(0).(func(string, []weights.Info) []string); ok {
 		r0 = rf(structId, info)
 	} else {
-		r0 = ret.Error(0)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]string)
+		}
 	}
 
-	return r0
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string, []weights.Info) error); ok {
+		r1 = rf(structId, info)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // Delete provides a mock function with given fields: info

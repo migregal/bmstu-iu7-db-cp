@@ -10,7 +10,7 @@ import (
 )
 
 type ModelStructWeightsInfoRepository interface {
-	Add(structId string, info []sw.Info) error
+	Add(structId string, info []sw.Info) ([]string, error)
 	Get(weightsId string) (*sw.Info, error)
 	Find(filter StructWeightsInfoFilter) ([]*sw.Info, error)
 	Update(info sw.Info) error
