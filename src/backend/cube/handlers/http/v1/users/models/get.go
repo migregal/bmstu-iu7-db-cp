@@ -1,11 +1,7 @@
 package models
 
 import (
-	"bytes"
-	"compress/gzip"
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"net/http"
 	"neural_storage/cube/core/ports/interactors"
 	"neural_storage/cube/handlers/http/v1/entities/structure"
@@ -53,19 +49,15 @@ func (h *Handler) Get(c *gin.Context) {
 	}
 
 	lg.WithFields(map[string]interface{}{"req": req}).Info("attempt to get model info into cache")
-	if info, err := h.cache.GetModelInfo(req.ModelID); err == nil && len(info) == 2 {
+	if info, err := h.cache.Get(modelStorage, req.ModelID); err == nil && len(info) == 2 {
 		lg.Info("success to get model info from cache")
-		// c.Data(http.StatusOK, "application/json", info[1].([]byte))
-		// return
 		resp, err := unGzip(info[1].([]byte))
 		if err == nil {
-			c.Data(http.StatusOK, "application/json",resp)
+			statOKGet.Inc()
+			c.Data(http.StatusOK, "application/json", resp)
 			return
 		}
-		fmt.Printf("FUCK: %+v\n", err.Error())
-		statOKGet.Inc()
-		c.JSON(http.StatusOK, err.Error())
-		return
+		lg.Errorf("failed to ungzip model info from cache: %v", err)
 	} else {
 		lg.Errorf("failed to get model info from cache: %v", err)
 	}
@@ -105,7 +97,7 @@ func (h *Handler) Get(c *gin.Context) {
 	if len(infos) == 1 {
 		model := modelFromBL(infos[0])
 		if data, err := jsonGzip(model); err == nil {
-			_ = h.cache.UpdateModelInfo(req.ModelID, data)
+			_ = h.cache.Update(modelStorage, req.ModelID, data)
 		}
 
 		statOKGet.Inc()
@@ -134,37 +126,4 @@ func (h *Handler) Get(c *gin.Context) {
 	lg.Info("success")
 	c.JSON(http.StatusOK, data)
 
-}
-
-func jsonGzip(data interface{}) ([]byte, error) {
-	resp, err := json.Marshal(data)
-	if err != nil {
-		return nil, fmt.Errorf("failed to form response: %v", err)
-	}
-
-	buf := new(bytes.Buffer)
-	gz := gzip.NewWriter(buf)
-	if _, err := gz.Write(resp); err != nil {
-		fmt.Printf("ASDASDASD: %+v", err.Error())
-		gz.Close()
-		return nil, fmt.Errorf("failed to gzip response: %v", err)
-	}
-
-	gz.Close()
-	return buf.Bytes(), nil
-}
-
-func unGzip(data []byte) ([]byte, error) {
-	gz, err := gzip.NewReader(bytes.NewReader(data))
-	if err != nil {
-		return nil, fmt.Errorf("failed to read gzipped cache: %v", err)
-	}
-	defer gz.Close()
-
-	s, err := ioutil.ReadAll(gz)
-	if err != nil {
-		return nil, fmt.Errorf("failed to decode gzipped cache: %v", err)
-	}
-
-	return s, nil
 }

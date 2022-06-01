@@ -22,11 +22,13 @@ type ParsebleConfig struct {
 	DBConnStat  dbConn `yaml:"statdb,omitempty"`
 	DBConnAdmin dbConn `yaml:"admindb,omitempty"`
 	CacheConn   struct {
-		Adapter  string `yaml:"adapter,omitempty"`
-		Host     string `yaml:"host,omitempty"`
-		Port     string `yaml:"port,omitempty"`
-		User     string `yaml:"user,omitempty"`
-		Password string `yaml:"password,omitempty"`
+		Adapter     string `yaml:"adapter,omitempty"`
+		Host        string `yaml:"host,omitempty"`
+		Port        string `yaml:"port,omitempty"`
+		User        string `yaml:"user,omitempty"`
+		Password    string `yaml:"password,omitempty"`
+		ModelSpace  string `yaml:"model,omitempty"`
+		WeightSpace string `yaml:"weight,omitempty"`
 	} `yaml:"cache,omitempty"`
 	Validation struct {
 		MinUserNameLen int `yaml:"min_username_len"`

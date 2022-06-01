@@ -48,6 +48,20 @@ func (h *Handler) Get(c *gin.Context) {
 		return
 	}
 
+	lg.WithFields(map[string]interface{}{"req": req}).Info("attempt to get model info into cache")
+	if info, err := h.cache.Get(weightStorage, req.ID); err == nil && len(info) == 2 {
+		lg.Info("success to get weight info from cache")
+		resp, err := unGzip(info[1].([]byte))
+		if err == nil {
+			statOKGet.Inc()
+			c.Data(http.StatusOK, "application/json", resp)
+			return
+		}
+		lg.Errorf("failed to ungzip weight info from cache: %v", err)
+	} else {
+		lg.Errorf("failed to get weight info from cache: %v", err)
+	}
+
 	filter := interactors.ModelWeightsInfoFilter{}
 	if req.ID != "" {
 		filter.IDs = append(filter.IDs, req.ID)
@@ -80,13 +94,25 @@ func (h *Handler) Get(c *gin.Context) {
 		c.JSON(http.StatusOK, []WeightInfo{})
 		return
 	}
+	if len(infos) == 1 {
+		weight := weightFromBL(*infos[0])
+		if data, err := jsonGzip(weight); err == nil {
+			_ = h.cache.Update(weightStorage, req.ID, data)
+		}
+
+		statOKGet.Inc()
+		lg.Info("successful get full weight info")
+		c.JSON(http.StatusOK, weight)
+		return
+	}
 	var res []WeightInfo
 	for _, val := range infos {
+		w := weightFromBL(*val)
 		res = append(res, WeightInfo{
-			Id:      val.ID(),
-			Name:    val.Name(),
-			Weights: val.Weights(),
-			Offsets: val.Offsets(),
+			Id:      w.ID,
+			Name:    w.Name,
+			Weights: w.Weights,
+			Offsets: w.Offsets,
 		})
 	}
 	statOKGet.Inc()

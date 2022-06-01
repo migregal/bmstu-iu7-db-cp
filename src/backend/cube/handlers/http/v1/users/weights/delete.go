@@ -58,6 +58,9 @@ func (h *Handler) Delete(c *gin.Context) {
 		return
 	}
 
+	lg.Info("attempt to delete weight from cache")
+	_ = h.cache.Delete(weightStorage, req.ID)
+
 	statOKDelete.Inc()
 	c.AbortWithStatus(http.StatusOK)
 }

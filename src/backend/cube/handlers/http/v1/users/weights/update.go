@@ -93,7 +93,9 @@ func (h *Handler) Update(c *gin.Context) {
 	}
 
 	lg.Info("attempt to delete model from cache")
-	_ = h.cache.DeleteModelInfo(req.ModelID)
+	_ = h.cache.Delete(modelStorage, req.ModelID)
+	lg.Info("attempt to delete weight from cache")
+	_ = h.cache.Delete(weightStorage, req.WeightsID)
 
 	statOKUpdate.Inc()
 	lg.Info("success")

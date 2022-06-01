@@ -58,6 +58,9 @@ func (h *Handler) Delete(c *gin.Context) {
 		return
 	}
 
+	lg.Info("attempt to delete model from cache")
+	_ = h.cache.Delete(modelStorage, req.ID)
+
 	statOKDelete.Inc()
 	lg.Info("success")
 	c.AbortWithStatus(http.StatusOK)

@@ -1,6 +1,11 @@
 package models
 
 import (
+	"bytes"
+	"compress/gzip"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"neural_storage/cube/core/entities/model"
 	"neural_storage/cube/core/entities/neuron"
 	"neural_storage/cube/core/entities/neuron/link"
@@ -58,8 +63,8 @@ func weightToBL(info httpweights.Info) *weights.Info {
 
 func modelFromBL(info *model.Info) httpmodel.Info {
 	return httpmodel.Info{
-		ID: info.ID(),
-		OwnerID: info.OwnerID(),
+		ID:        info.ID(),
+		OwnerID:   info.OwnerID(),
 		Structure: structFromBL(info.Structure()),
 	}
 }
@@ -81,10 +86,10 @@ func structFromBL(info *structure.Info) httpstructure.Info {
 	}
 
 	return httpstructure.Info{
-		Name: info.Name(),
-		Layers: layers,
+		Name:    info.Name(),
+		Layers:  layers,
 		Neurons: neurons,
-		Links: links,
+		Links:   links,
 		Weights: weightFromBL(info.Weights()),
 	}
 }
@@ -106,4 +111,36 @@ func weightFromBL(info []*weights.Info) []httpweights.Info {
 	}
 
 	return weights
+}
+
+func jsonGzip(data interface{}) ([]byte, error) {
+	resp, err := json.Marshal(data)
+	if err != nil {
+		return nil, fmt.Errorf("failed to form response: %v", err)
+	}
+
+	buf := new(bytes.Buffer)
+	gz := gzip.NewWriter(buf)
+	if _, err := gz.Write(resp); err != nil {
+		gz.Close()
+		return nil, fmt.Errorf("failed to gzip response: %v", err)
+	}
+
+	gz.Close()
+	return buf.Bytes(), nil
+}
+
+func unGzip(data []byte) ([]byte, error) {
+	gz, err := gzip.NewReader(bytes.NewReader(data))
+	if err != nil {
+		return nil, fmt.Errorf("failed to read gzipped cache: %v", err)
+	}
+	defer gz.Close()
+
+	s, err := ioutil.ReadAll(gz)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode gzipped cache: %v", err)
+	}
+
+	return s, nil
 }

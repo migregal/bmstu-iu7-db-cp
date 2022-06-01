@@ -7,6 +7,11 @@ import (
 	"neural_storage/pkg/stat"
 )
 
+const (
+	modelStorage = "model"
+	weightStorage = "weight"
+)
+
 var (
 	statCallAdd stat.Counter
 	statFailAdd stat.Counter

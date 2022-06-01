@@ -145,8 +145,8 @@ func (h *Handler) Add(c *gin.Context) {
 
 	res := modelFromBL(model)
 	res.ID = modelID
-	if stringified, err := json.Marshal(res); err == nil {
-		_ = h.cache.UpdateModelInfo(modelID, stringified)
+	if stringified, err := jsonGzip(res); err == nil {
+		_ = h.cache.Update(modelStorage, modelID, stringified)
 	}
 
 	statOKAdd.Inc()

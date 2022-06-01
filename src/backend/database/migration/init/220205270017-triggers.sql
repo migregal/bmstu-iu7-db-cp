@@ -29,7 +29,6 @@ SELECT EXISTS (
   FOR ROW
   EXECUTE PROCEDURE user_info_preupdate();
 
-
   CREATE OR REPLACE FUNCTION model_preupdate()
   RETURNS trigger AS
   $$
