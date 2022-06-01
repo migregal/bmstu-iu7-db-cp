@@ -21,13 +21,13 @@ type ModelStructWeightsInfoRepository struct {
 	mock.Mock
 }
 
-// Add provides a mock function with given fields: structId, info
-func (_m *ModelStructWeightsInfoRepository) Add(structId string, info []weights.Info) ([]string, error) {
-	ret := _m.Called(structId, info)
+// Add provides a mock function with given fields: structure, info
+func (_m *ModelStructWeightsInfoRepository) Add(structure string, info []weights.Info) ([]string, error) {
+	ret := _m.Called(structure, info)
 
 	var r0 []string
 	if rf, ok := ret.Get(0).(func(string, []weights.Info) []string); ok {
-		r0 = rf(structId, info)
+		r0 = rf(structure, info)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]string)
@@ -36,7 +36,7 @@ func (_m *ModelStructWeightsInfoRepository) Add(structId string, info []weights.
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(string, []weights.Info) error); ok {
-		r1 = rf(structId, info)
+		r1 = rf(structure, info)
 	} else {
 		r1 = ret.Error(1)
 	}

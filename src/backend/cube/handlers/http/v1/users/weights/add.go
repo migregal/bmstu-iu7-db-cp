@@ -1,6 +1,7 @@
 package weights
 
 import (
+	"compress/gzip"
 	"encoding/json"
 	"io/ioutil"
 	"mime/multipart"
@@ -15,8 +16,7 @@ import (
 )
 
 type AddRequest struct {
-	ModelID      string                `form:"title" binding:"required"`
-	WeightsTitle string                `form:"weights_title" binding:"required"`
+	ModelID      string                `form:"model" binding:"required"`
 	Weights      *multipart.FileHeader `form:"weights" binding:"required"`
 }
 
@@ -68,7 +68,15 @@ func (h *Handler) Add(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	plan, err := ioutil.ReadAll(content)
+	rw, err := gzip.NewReader(content)
+	if err != nil {
+		statFailAdd.Inc()
+		lg.Errorf("failed to read gzipped weights info: %v", err)
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	defer rw.Close()
+	plan, err := ioutil.ReadAll(rw)
 	if err != nil {
 		statFailAdd.Inc()
 		lg.Errorf("failed to read weights info: %v", err)

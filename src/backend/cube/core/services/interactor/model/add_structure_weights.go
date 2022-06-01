@@ -7,13 +7,13 @@ import (
 	"neural_storage/pkg/logger"
 )
 
-func (i *Interactor) AddStructureWeights(ctx context.Context, ownerID, structID string, info sw.Info) (string, error) {
+func (i *Interactor) AddStructureWeights(ctx context.Context, ownerID, modelID string, info sw.Info) (string, error) {
 	lg := i.lg.WithFields(map[string]interface{}{logger.ReqIDKey: ctx.Value(logger.ReqIDKey)})
 
-	lg.WithFields(map[string]interface{}{"owner": ownerID, "struct": structID}).Info("model struct weights add called")
+	lg.WithFields(map[string]interface{}{"owner": ownerID, "struct": modelID}).Info("model struct weights add called")
 
 	lg.Info("attempt to get struct info")
-	structure, err := i.modelInfo.GetStructure(structID)
+	structure, err := i.modelInfo.GetStructure(modelID)
 	if err != nil {
 		lg.Error("failed to get struct info")
 		return "", err
@@ -28,7 +28,7 @@ func (i *Interactor) AddStructureWeights(ctx context.Context, ownerID, structID 
 
 	lg.Info("attempt to add struct weights info")
 
-	if ids, err := i.weightsInfo.Add(structID, []sw.Info{info}); err != nil {
+	if ids, err := i.weightsInfo.Add(structure.ID(), []sw.Info{info}); err != nil {
 		return "", err
 	} else if len(ids) > 0 {
 		return ids[0], nil

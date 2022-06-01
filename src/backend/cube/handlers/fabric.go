@@ -55,7 +55,6 @@ type Server interface {
 func New(params config.Config, lg *logger.Logger) Server {
 	engine := gin.New()
 	engine.Use(gin.Recovery())
-	engine.Use(gzip.Gzip(gzip.BestCompression))
 
 	engine.Use(logger.RequestIDSetter())
 	engine.Use(logger.RequestLogger(lg))
@@ -96,7 +95,10 @@ func initRoutes(params config.Config, lg *logger.Logger, engine *gin.Engine) {
 		v1.POST("/login", login)
 	}
 
-	v1Authorized := engine.Group("/api/v1").Use(authMiddleware.MiddlewareFunc())
+	v1Authorized := engine.
+		Group("/api/v1").
+		Use(authMiddleware.MiddlewareFunc()).
+		Use(gzip.Gzip(gzip.BestCompression))
 	{
 		v1Authorized.GET("/refresh", authMiddleware.RefreshHandler)
 		v1Authorized.GET("/logout", authMiddleware.LogoutHandler)
@@ -145,7 +147,10 @@ func initAdminRoutes(params config.Config, lg *logger.Logger, engine *gin.Engine
 		v1.POST("/login", authMiddleware.LoginHandler)
 	}
 
-	v1Authorized := engine.Group("/api/v1/admin").Use(authMiddleware.MiddlewareFunc())
+	v1Authorized := engine.
+		Group("/api/v1/admin").
+		Use(authMiddleware.MiddlewareFunc()).
+		Use(gzip.Gzip(gzip.BestCompression))
 	{
 		v1Authorized.GET("/refresh", authMiddleware.RefreshHandler)
 		v1Authorized.GET("/logout", authMiddleware.LogoutHandler)
@@ -185,7 +190,10 @@ func initStatRoutes(params config.Config, lg *logger.Logger, engine *gin.Engine)
 		v1.POST("/login", authMiddleware.LoginHandler)
 	}
 
-	v1Authorized := engine.Group("/api/v1/stat").Use(authMiddleware.MiddlewareFunc())
+	v1Authorized := engine.
+		Group("/api/v1/stat").
+		Use(authMiddleware.MiddlewareFunc()).
+		Use(gzip.Gzip(gzip.BestCompression))
 	{
 		v1Authorized.GET("/refresh", authMiddleware.RefreshHandler)
 		v1Authorized.GET("/logout", authMiddleware.LogoutHandler)
