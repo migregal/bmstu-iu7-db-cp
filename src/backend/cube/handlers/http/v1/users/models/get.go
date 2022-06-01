@@ -1,10 +1,9 @@
 package models
 
 import (
-	"encoding/json"
 	"net/http"
 	"neural_storage/cube/core/ports/interactors"
-	"neural_storage/cube/handlers/http/v1/entities/structure"
+	httpmodel "neural_storage/cube/handlers/http/v1/entities/model"
 	"neural_storage/pkg/logger"
 
 	"github.com/gin-gonic/gin"
@@ -18,12 +17,6 @@ type getRequest struct {
 	PerPage   int    `form:"per_page"`
 }
 
-type ModelInfo struct {
-	Id        string         `json:"id,omitempty" example:"f6457bdf-4e67-4f05-9108-1cbc0fec9405"`
-	Name      string         `json:"name,omitempty" example:"awesome_username"`
-	Structure structure.Info `json:"structure,omitempty"`
-} // @name ModelInfoResponse
-
 // Registration  godoc
 // @Summary      Find model info
 // @Description  Find such model info as id, username, email and fullname
@@ -33,7 +26,7 @@ type ModelInfo struct {
 // @Param        name     query string false "Model name to search for"
 // @Param        page     query int    false "Page number for pagination"
 // @Param        per_page query int    false "Page size for pagination"
-// @Success      200 {object} []ModelInfo "Model info found"
+// @Success      200 {object} []httpmodel.Info "Model info found"
 // @Failure      400 "Invalid request"
 // @Failure      500 "Failed to get model info from storage"
 // @Router       /api/v1/models [get]
@@ -91,7 +84,7 @@ func (h *Handler) Get(c *gin.Context) {
 	if len(infos) == 0 {
 		statOKGet.Inc()
 		lg.Info("no models found")
-		c.JSON(http.StatusOK, []ModelInfo{})
+		c.JSON(http.StatusOK, []httpmodel.Info{})
 		return
 	}
 	if len(infos) == 1 {
@@ -106,24 +99,18 @@ func (h *Handler) Get(c *gin.Context) {
 		return
 	}
 
-	var res []ModelInfo
+	var res []httpmodel.Info
 	for _, val := range infos {
-		res = append(res, ModelInfo{
-			Id:        val.ID(),
+		res = append(res, httpmodel.Info{
+			ID:        val.ID(),
+			OwnerID:   val.OwnerID(),
 			Name:      val.Name(),
 			Structure: structFromBL(val.Structure()),
 		})
 	}
-	data, err := json.Marshal(res)
-	if err != nil {
-		statFailGet.Inc()
-		lg.Errorf("failed to form response: %v", err)
-		c.JSON(http.StatusInternalServerError, "failed to form response")
-		return
-	}
 
 	statOKGet.Inc()
 	lg.Info("success")
-	c.JSON(http.StatusOK, data)
+	c.JSON(http.StatusOK, res)
 
 }

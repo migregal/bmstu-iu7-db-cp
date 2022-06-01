@@ -65,11 +65,16 @@ func modelFromBL(info *model.Info) httpmodel.Info {
 	return httpmodel.Info{
 		ID:        info.ID(),
 		OwnerID:   info.OwnerID(),
+		Name:      info.Name(),
 		Structure: structFromBL(info.Structure()),
 	}
 }
 
-func structFromBL(info *structure.Info) httpstructure.Info {
+func structFromBL(info *structure.Info) *httpstructure.Info {
+	if info == nil {
+		return nil
+	}
+
 	layers := []httplayer.Info{}
 	for _, v := range info.Layers() {
 		layers = append(layers, httplayer.Info{ID: v.ID(), ActivationFunc: v.ActivationFunc(), LimitFunc: v.LimitFunc()})
@@ -85,7 +90,8 @@ func structFromBL(info *structure.Info) httpstructure.Info {
 		links = append(links, httplink.Info{ID: v.ID(), From: v.From(), To: v.To()})
 	}
 
-	return httpstructure.Info{
+	return &httpstructure.Info{
+		ID:      info.ID(),
 		Name:    info.Name(),
 		Layers:  layers,
 		Neurons: neurons,

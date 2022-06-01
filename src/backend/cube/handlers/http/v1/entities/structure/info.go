@@ -8,9 +8,10 @@ import (
 )
 
 type Info struct {
-	Name    string         `json:"title"`
-	Neurons []neuron.Info  `json:"neurons"`
-	Layers  []layer.Info   `json:"layers"`
-	Links   []link.Info    `json:"links"`
-	Weights []weights.Info `json:"weights"`
+	ID      string         `json:"id,omitempty"`
+	Name    string         `json:"title,omitempty"`
+	Neurons []neuron.Info  `json:"neurons,omitempty"`
+	Layers  []layer.Info   `json:"layers,omitempty"`
+	Links   []link.Info    `json:"links,omitempty"`
+	Weights []weights.Info `json:"weights,omitempty"`
 }
