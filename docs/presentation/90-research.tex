@@ -1,0 +1,43 @@
+\frame {
+    \frametitle{\LARGE Эксперимент}
+    \pgfplotsset{tick label style={font=\tiny\bfseries},
+        label style={font=\small},
+        legend style={font=\tiny}
+    }
+    \begin{columns}
+        \begin{column}{0.6\textwidth}
+            Кэширование данных показало снижение времени отклика системы вплоть до 39 раз, при условии нахождения запрашиваемых данных в кэше
+            \begin{itemize}
+                \item 23.6~c --- получение информации из базы данных;
+                \item 0.6~с --- получение информации из кэша.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.4\textwidth}
+            \begin{tikzpicture}[scale=.5]
+                \begin{axis}[
+                    legend pos=north west,
+                    ymajorgrids=true,
+                    xtick={32,64,128,256},
+                    xlabel={Количество слоев в нейронной сети (по 16 нейронов)},
+                    ylabel={Время, с}]
+                    \addplot table[x=size,y=db,col sep=comma] {inc/csv/res16.csv};
+                    \addplot table[x=size,y=cache,col sep=comma] {inc/csv/res16.csv};
+                    \legend{Без кэширования, С кэшированием}
+                \end{axis}
+                \end{tikzpicture}
+                \vskip.5em
+                \begin{tikzpicture}[scale=.5]
+                    \begin{axis}[
+                        legend pos=north west,
+                        ymajorgrids=true,
+                        xtick={32,64,128,256},
+                        xlabel={Количество слоев в нейронной сети (по 128 нейронов)},
+                        ylabel={Время, с}]
+                        \addplot table[x=size,y=db,col sep=comma] {inc/csv/res128.csv};
+                        \addplot table[x=size,y=cache,col sep=comma] {inc/csv/res128.csv};
+                        \legend{Без кэширования, С кэшированием}
+                    \end{axis}
+                \end{tikzpicture}
+        \end{column}
+    \end{columns}
+}
