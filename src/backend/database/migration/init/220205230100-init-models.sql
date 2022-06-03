@@ -11,7 +11,7 @@ SELECT EXISTS (
   \echo 'migration' :MIGRATION_ID 'does not exist'
 
   CREATE TABLE models (
-    id           UUID        PRIMARY KEY DEFAULT uuid_generate_v4()
+    id           UUID PRIMARY KEY DEFAULT uuid_generate_v4()
     , title      VARCHAR(64) UNIQUE NOT NULL
     , created_at TIMESTAMP   DEFAULT NOW()
     , updated_at TIMESTAMP   DEFAULT NOW()
@@ -32,6 +32,7 @@ SELECT EXISTS (
 
   CREATE TABLE layers (
     id                UUID PRIMARY KEY DEFAULT uuid_generate_v4()
+    , layer_id        INT
     , limit_func      VARCHAR(64) NOT NULL
     , activation_func VARCHAR(64) NOT NULL
     , structure_id    UUID NOT NULL
@@ -41,8 +42,9 @@ SELECT EXISTS (
   );
 
   CREATE TABLE neurons (
-    id         UUID  PRIMARY KEY DEFAULT uuid_generate_v4()
-    , layer_id UUID  NOT NULL
+    id          UUID  PRIMARY KEY DEFAULT uuid_generate_v4()
+    , neuron_id INT NOT NULL
+    , layer_id  UUID  NOT NULL
     , FOREIGN KEY (layer_id)
       REFERENCES layers(id)
       ON DELETE CASCADE
@@ -50,6 +52,7 @@ SELECT EXISTS (
 
   CREATE TABLE neuron_links (
     id        UUID PRIMARY KEY DEFAULT uuid_generate_v4()
+    , link_id INT  NOT NULL
     , from_id UUID
     , to_id   UUID NOT NULL
     , FOREIGN KEY (from_id)

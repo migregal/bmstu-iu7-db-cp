@@ -1,7 +1,7 @@
 package link
 
 type Link struct {
-	ID        int    `gorm:"-"`
+	ID        int    `gorm:"column:link_id;"`
 	From      int    `gorm:"-"`
 	To        int    `gorm:"-"`
 	InnerID   string `gorm:"primaryKey;type:uuid;column:id;default:generated();"`

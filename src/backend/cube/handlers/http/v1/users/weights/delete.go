@@ -49,6 +49,11 @@ func (h *Handler) Delete(c *gin.Context) {
 		return
 	}
 
+	defer func() {
+		lg.Info("attempt to delete weight from cache")
+		_ = h.cache.Delete(weightStorage, req.ID)
+	}()
+
 	lg.WithFields(map[string]interface{}{"user": usrID, "id": req.ID}).Info("attempt to delete weights")
 	err := h.resolver.DeleteStructureWeights(c, usrID, req.ID)
 	if err != nil {
@@ -57,9 +62,6 @@ func (h *Handler) Delete(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, "failed to delete model weights info")
 		return
 	}
-
-	lg.Info("attempt to delete weight from cache")
-	_ = h.cache.Delete(weightStorage, req.ID)
 
 	statOKDelete.Inc()
 	c.AbortWithStatus(http.StatusOK)

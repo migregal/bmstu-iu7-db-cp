@@ -139,7 +139,7 @@ func fromDBEntity(info accumulatedModelInfo) model.Info {
 		links = append(
 			links,
 			link.NewInfo(
-				i,
+				info.links[i].ID,
 				neuronMap[info.links[i].GetFrom()],
 				neuronMap[info.links[i].GetTo()],
 			),

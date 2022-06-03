@@ -22,7 +22,7 @@ func (r *Repository) Delete(info model.Info) error {
 		}
 	}()
 
-	if err := tx.Where("id = ?", data.model.GetID()).Delete(data.model).Error; err != nil {
+	if err := tx.Delete(data.model).Error; err != nil {
 		tx.Rollback()
 		return fmt.Errorf("model info update: %w", err)
 	}
@@ -43,7 +43,7 @@ func (r *Repository) deleteModelStructureTransact(tx database.Interactor, info a
 
 	if len(info.layers) > 0 {
 		for _, v := range info.layers {
-			if err := tx.Where("id = ?", v.GetID()).Delete(&v).Error; err != nil {
+			if err := tx.Delete(&v).Error; err != nil {
 				return fmt.Errorf("model layers info update: %w", err)
 			}
 		}
@@ -51,7 +51,7 @@ func (r *Repository) deleteModelStructureTransact(tx database.Interactor, info a
 
 	if len(info.neurons) > 0 {
 		for _, v := range info.neurons {
-			if err := tx.Where("id = ?", v.GetID()).Delete(&v).Error; err != nil {
+			if err := tx.Delete(&v).Error; err != nil {
 				return fmt.Errorf("model neurons info update: %w", err)
 			}
 		}
@@ -59,7 +59,7 @@ func (r *Repository) deleteModelStructureTransact(tx database.Interactor, info a
 
 	if len(info.links) > 0 {
 		for _, v := range info.links {
-			if err := tx.Where("id = ?", v.GetID()).Delete(&v).Error; err != nil {
+			if err := tx.Delete(&v).Error; err != nil {
 				return fmt.Errorf("model links info update: %w", err)
 			}
 		}

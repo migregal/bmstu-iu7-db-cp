@@ -29,6 +29,8 @@ SELECT EXISTS (
   CREATE INDEX idx_off_weights ON neuron_offsets(weights_info_id);
 
   CREATE INDEX idx_lw_weights ON link_weights(weights_info_id);
+
+  INSERT INTO migrations(id) VALUES (:'MIGRATION_ID');
 \endif
 
 COMMIT;

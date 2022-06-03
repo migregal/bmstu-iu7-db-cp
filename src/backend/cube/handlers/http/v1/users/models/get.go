@@ -87,28 +87,17 @@ func (h *Handler) Get(c *gin.Context) {
 		c.JSON(http.StatusOK, []httpmodel.Info{})
 		return
 	}
-	if len(infos) == 1 {
-		model := modelFromBL(infos[0])
-		if data, err := jsonGzip(model); err == nil {
-			_ = h.cache.Update(modelStorage, req.ModelID, data)
-		}
-
-		statOKGet.Inc()
-		lg.Info("successful get full nodel info")
-		c.JSON(http.StatusOK, model)
-		return
-	}
 
 	var res []httpmodel.Info
 	for _, val := range infos {
-		res = append(res, httpmodel.Info{
-			ID:        val.ID(),
-			OwnerID:   val.OwnerID(),
-			Name:      val.Name(),
-			Structure: structFromBL(val.Structure()),
-		})
+		res = append(res, modelFromBL(val))
 	}
 
+	if len(req.ModelID) > 0 {
+		if data, err := jsonGzip(res); err == nil {
+			_ = h.cache.Update(modelStorage, req.ModelID, data)
+		}
+	}
 	statOKGet.Inc()
 	lg.Info("success")
 	c.JSON(http.StatusOK, res)

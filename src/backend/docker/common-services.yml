@@ -4,7 +4,6 @@ services:
   postgres_db:
     build:
       context: ./database
-    # image: postgres:14.2-alpine
     container_name: postgresql
     env_file: ./database/.env
     restart: always
@@ -39,9 +38,6 @@ services:
     volumes:
       - ../database/migration:/usr/app
       - ../database/migration/init/:/docker-entrypoint-initdb.d/
-    # depends_on:
-    #   postgres_db:
-    #     condition: service_healthy
 
   tarantool-db:
     image: tarantool/tarantool:2.8
@@ -57,7 +53,6 @@ services:
     container_name: prometheus
     volumes:
       - ./prometheus/:/etc/prometheus/
-      # - prometheus_data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -82,7 +77,3 @@ services:
     env_file: ./cube/.env
     expose:
       - 8080
-    # depends_on:
-    #   migration:
-    #     condition: service_completed_successfully
-    # restart: always

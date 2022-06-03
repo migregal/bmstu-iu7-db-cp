@@ -6,6 +6,8 @@ services:
       file: common-services.yml
       service: postgres_db
     env_file: ./database/.dev.env
+    volumes:
+      - ../database/data:/data/dbcp/
     ports:
       - 5432:5432
     healthcheck:
@@ -30,6 +32,8 @@ services:
     extends:
       file: common-services.yml
       service: tarantool-db
+    ports:
+      - 3301:3301
     env_file:
       - ./cache/.dev.env
 
@@ -47,7 +51,7 @@ services:
     volumes:
       - ../go.sum:/tmp/project/go.sum
       - ../go.mod:/tmp/project/go.mod
-      - ../vendor:/tmp/project/vendor
+      - ../vendor/:/tmp/project/vendor
       - ../pkg:/tmp/project/pkg
       - ../cache:/tmp/project/cache
       - ../config:/tmp/project/config

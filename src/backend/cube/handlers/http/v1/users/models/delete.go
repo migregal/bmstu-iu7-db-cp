@@ -49,6 +49,11 @@ func (h *Handler) Delete(c *gin.Context) {
 		return
 	}
 
+	defer func() {
+		lg.Info("attempt to delete model from cache")
+		_ = h.cache.Delete(modelStorage, req.ID)
+	}()
+
 	lg.WithFields(map[string]interface{}{"req": req}).Info("attempt to delete model")
 	err := h.resolver.Delete(c, usrID, req.ID)
 	if err != nil {
@@ -57,9 +62,6 @@ func (h *Handler) Delete(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, "failed to delete model info")
 		return
 	}
-
-	lg.Info("attempt to delete model from cache")
-	_ = h.cache.Delete(modelStorage, req.ID)
 
 	statOKDelete.Inc()
 	lg.Info("success")

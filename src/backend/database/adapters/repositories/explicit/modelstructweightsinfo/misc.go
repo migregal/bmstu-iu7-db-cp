@@ -49,6 +49,42 @@ func toDBEntity(structureID string, info []weights.Info) []accumulatedWeightInfo
 	return weights
 }
 
+func toDBEntityStructured(structureID string, layers, neurons, links map[int]string, info []weights.Info) []accumulatedWeightInfo {
+	var weights []accumulatedWeightInfo
+	for i, w := range info {
+		temp := accumulatedWeightInfo{}
+		temp.weightsInfo = &dbweights.Weights{
+			ID:          i,
+			InnerID:     w.ID(),
+			Name:        w.Name(),
+			StructureID: structureID,
+		}
+		for _, v := range w.Weights() {
+			temp.weights = append(temp.weights, dbweight.Weight{
+				ID:             v.ID(),
+				LinkID:         v.LinkID(),
+				InnerLinkID:    links[v.LinkID()],
+				WeightsID:      i,
+				InnerWeightsID: w.ID(),
+				Value:          v.Weight(),
+			})
+		}
+
+		for _, o := range w.Offsets() {
+			temp.offsets = append(temp.offsets, dboffset.Offset{
+				Neuron:       o.NeuronID(),
+				InnerNeuron:  neurons[o.NeuronID()],
+				Weights:      i,
+				InnerWeights: w.ID(),
+				Offset:       o.Offset(),
+			})
+		}
+
+		weights = append(weights, temp)
+	}
+	return weights
+}
+
 func fromDBEntity(info accumulatedWeightInfo) *weights.Info {
 	var offsets []*offset.Info
 	for i, v := range info.offsets {

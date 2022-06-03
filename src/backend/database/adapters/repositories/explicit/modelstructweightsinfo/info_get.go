@@ -35,13 +35,13 @@ func (r *Repository) getWeightsInfo(id string) (dbweights.Weights, error) {
 
 func (r *Repository) getDetailsWeightsInfo(info dbweights.Weights) (accumulatedWeightInfo, error) {
 	var offsets []offset.Offset
-	err := r.db.Find(&offsets, "weights_id = ?", info.GetID()).Error
+	err := r.db.Find(&offsets, "weights_info_id = ?", info.GetID()).Error
 	if err != nil {
 		return accumulatedWeightInfo{}, fmt.Errorf("neuron offsets get error: %w", err)
 	}
 
 	var weight []weight.Weight
-	err = r.db.Find(&weight, "weights_id = ?", info.GetID()).Error
+	err = r.db.Find(&weight, "weights_info_id = ?", info.GetID()).Error
 	if err != nil {
 		return accumulatedWeightInfo{}, fmt.Errorf("neuron links weights get error: %w", err)
 	}
