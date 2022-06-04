@@ -82,6 +82,6 @@ func (h *Handler) Get(c *gin.Context) {
 	}
 
 	statOKGet.Inc()
-	lg.WithFields(map[string]interface{}{"res": res}).Info("success")
+	lg.Info("success")
 	c.JSON(http.StatusOK, res)
 }
