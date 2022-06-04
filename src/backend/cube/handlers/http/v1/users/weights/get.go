@@ -17,13 +17,6 @@ type getRequest struct {
 	PerPage     int    `form:"per_page"`
 }
 
-type WeightInfo struct {
-	Id      string      `json:"id,omitempty" example:"f6457bdf-4e67-4f05-9108-1cbc0fec9405"`
-	Name    string      `json:"name,omitempty" example:"awesome_username"`
-	Weights interface{} `json:"offsets,omitempty"`
-	Offsets interface{} `json:"weights,omitempty"`
-} // @name ModelWeightsInfoResponse
-
 // Registration  godoc
 // @Summary      Find model info
 // @Description  Find such model info as id, username, email and fullname
@@ -92,7 +85,7 @@ func (h *Handler) Get(c *gin.Context) {
 	if len(infos) == 0 {
 		statOKGet.Inc()
 		lg.Info("no weights found")
-		c.JSON(http.StatusOK, []WeightInfo{})
+		c.JSON(http.StatusOK, []weights.Info{})
 		return
 	}
 
@@ -101,7 +94,7 @@ func (h *Handler) Get(c *gin.Context) {
 		res = append(res, weightFromBL(*val))
 	}
 
-	if len(infos) == 1 {
+	if len(infos) == 1 && req.ID != "" {
 		if data, err := jsonGzip(res); err == nil {
 			_ = h.cache.Update(weightStorage, req.ID, data)
 		}

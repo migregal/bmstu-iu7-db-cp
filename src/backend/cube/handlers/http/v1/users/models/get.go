@@ -3,7 +3,7 @@ package models
 import (
 	"net/http"
 	"neural_storage/cube/core/ports/interactors"
-	httpmodel "neural_storage/cube/handlers/http/v1/entities/model"
+	"neural_storage/cube/handlers/http/v1/entities/model"
 	"neural_storage/pkg/logger"
 
 	"github.com/gin-gonic/gin"
@@ -26,7 +26,7 @@ type getRequest struct {
 // @Param        name     query string false "Model name to search for"
 // @Param        page     query int    false "Page number for pagination"
 // @Param        per_page query int    false "Page size for pagination"
-// @Success      200 {object} []httpmodel.Info "Model info found"
+// @Success      200 {object} []model.Info "Model info found"
 // @Failure      400 "Invalid request"
 // @Failure      500 "Failed to get model info from storage"
 // @Router       /api/v1/models [get]
@@ -84,16 +84,16 @@ func (h *Handler) Get(c *gin.Context) {
 	if len(infos) == 0 {
 		statOKGet.Inc()
 		lg.Info("no models found")
-		c.JSON(http.StatusOK, []httpmodel.Info{})
+		c.JSON(http.StatusOK, []model.Info{})
 		return
 	}
 
-	var res []httpmodel.Info
+	var res []model.Info
 	for _, val := range infos {
 		res = append(res, modelFromBL(val))
 	}
 
-	if len(req.ModelID) == 1 {
+	if len(req.ModelID) == 1 && req.ModelID != "" {
 		if data, err := jsonGzip(res); err == nil {
 			_ = h.cache.Update(modelStorage, req.ModelID, data)
 		}

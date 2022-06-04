@@ -8,7 +8,7 @@ import (
 )
 
 type deleteRequest struct {
-	ID string `json:"id" example:"f6457bdf-4e67-4f05-9108-1cbc0fec9405"`
+	ID string `form:"id" json:"id" example:"f6457bdf-4e67-4f05-9108-1cbc0fec9405"`
 }
 
 // Registration  godoc
@@ -32,16 +32,16 @@ func (h *Handler) Delete(c *gin.Context) {
 		return
 	}
 
-	lg.WithFields(map[string]interface{}{"req": req}).Info("attempt to delete model info")
+	lg.WithFields(map[string]interface{}{"req": req}).Info("attempt to delete model")
 	err := h.resolver.Delete(c, "", req.ID)
 	if err != nil {
 		statFailDelete.Inc()
-		lg.Errorf("failed to delete model info: %v", err)
-		c.JSON(http.StatusInternalServerError, "failed to delete model info")
+		lg.Errorf("failed to delete model: %v", err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, "failed to delete model info")
 		return
 	}
 
 	statOKDelete.Inc()
-	lg.Info("status")
-	c.JSON(http.StatusOK, nil)
+	lg.Info("success")
+	c.AbortWithStatus(http.StatusOK)
 }
