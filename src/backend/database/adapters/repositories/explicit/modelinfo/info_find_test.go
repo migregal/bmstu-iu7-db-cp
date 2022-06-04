@@ -44,8 +44,8 @@ func (s *FindSuite) TestFind() {
 	name := "test"
 	info := *model.NewInfo(
 		"",
-		"",
 		name,
+		"",
 		structure.NewInfo(
 			"",
 			"awesome struct",

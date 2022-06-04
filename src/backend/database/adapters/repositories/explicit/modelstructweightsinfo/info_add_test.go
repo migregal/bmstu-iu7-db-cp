@@ -4,16 +4,20 @@
 package modelstructweightsinfo
 
 import (
-	"neural_storage/cube/core/entities/neuron/link/weight"
-	"neural_storage/cube/core/entities/neuron/offset"
-	"neural_storage/cube/core/entities/structure/weights"
-	dbweights "neural_storage/database/core/entities/structure/weights"
-	"neural_storage/database/test/mock/utils"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
+
+	"neural_storage/cube/core/entities/neuron/link/weight"
+	"neural_storage/cube/core/entities/neuron/offset"
+	"neural_storage/cube/core/entities/structure/weights"
+	dbneuron "neural_storage/database/core/entities/neuron"
+	dblink "neural_storage/database/core/entities/neuron/link"
+	dbweights "neural_storage/database/core/entities/structure/weights"
+	dblayer "neural_storage/database/core/entities/structure/layer"
+	"neural_storage/database/test/mock/utils"
 )
 
 type AddSuite struct {
@@ -37,6 +41,9 @@ func (s *AddSuite) TestAdd() {
 	)
 
 	s.SqlMock.ExpectBegin()
+	s.SqlMock.ExpectQuery(`^SELECT \* FROM "layers" WHERE structure_id = .*$`).WillReturnRows(utils.MockRows(dblayer.Layer{ID: 1}))
+	s.SqlMock.ExpectQuery(`^SELECT \* FROM "neurons" WHERE layer_id in .*$`).WillReturnRows(utils.MockRows(dbneuron.Neuron{ID: 0, LayerID: 0}))
+	s.SqlMock.ExpectQuery(`^SELECT \* FROM "neuron_links" WHERE from_id in .*$`).WillReturnRows(utils.MockRows(dblink.Link{}))
 	s.SqlMock.ExpectQuery(`^INSERT INTO "weights_info" .* RETURNING "id"$`).WillReturnRows(utils.MockRows(dbweights.Weights{ID: 1}))
 	s.SqlMock.ExpectExec(`^INSERT INTO "neuron_offsets" .*$`).WillReturnResult(sqlmock.NewResult(1, 0))
 	s.SqlMock.ExpectExec(`^INSERT INTO "link_weights" .*$`).WillReturnResult(sqlmock.NewResult(1, 0))

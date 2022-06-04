@@ -64,7 +64,7 @@ func (s *AddSuite) TestAdd() {
 	s.SqlMock.ExpectQuery(`^INSERT INTO "structures" .* RETURNING "id"$`).WillReturnRows(utils.MockRows(dbstructure.Structure{ID: "struct_id"}))
 	s.SqlMock.ExpectQuery(`^INSERT INTO "layers" .* RETURNING "id"$`).WillReturnRows(utils.MockRows(dblayer.Layer{ID: 1}))
 	s.SqlMock.ExpectQuery(`^INSERT INTO "neurons" .* RETURNING "id"$`).WillReturnRows(utils.MockRows(dbneuron.Neuron{ID: 1}))
-	s.SqlMock.ExpectExec(`^INSERT INTO "neuron_links" .*$`).WillReturnResult(sqlmock.NewResult(1, 0))
+	s.SqlMock.ExpectExec(`^INSERT INTO "neuron_links" .*$`).WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnResult(sqlmock.NewResult(1, 0))
 	s.SqlMock.ExpectQuery(`^INSERT INTO "weights_info" .* RETURNING "id"$`).WillReturnRows(utils.MockRows(dbweights.Weights{ID: 1}))
 	s.SqlMock.ExpectExec(`^INSERT INTO "neuron_offsets" .*$`).WillReturnResult(sqlmock.NewResult(1, 0))
 	s.SqlMock.ExpectExec(`^INSERT INTO "link_weights" .*$`).WillReturnResult(sqlmock.NewResult(1, 0))

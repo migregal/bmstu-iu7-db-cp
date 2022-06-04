@@ -11,6 +11,7 @@ import (
 	"neural_storage/cube/core/entities/structure"
 	"neural_storage/cube/core/entities/structure/layer"
 	"neural_storage/cube/core/entities/structure/weights"
+	dblink "neural_storage/database/core/entities/neuron/link"
 	dbneuron "neural_storage/database/core/entities/neuron"
 	dboffset "neural_storage/database/core/entities/neuron/offset"
 	dbweight "neural_storage/database/core/entities/structure/weight"
@@ -40,15 +41,15 @@ func (s *GetSuite) TestGet() {
 	structureInfo := structure.NewInfo(
 		"",
 		"awesome struct",
-		[]*neuron.Info{neuron.NewInfo(1, 1)},
-		[]*layer.Info{layer.NewInfo(1, "alpha", "beta")},
-		[]*link.Info{link.NewInfo(1, 1, 1)},
+		[]*neuron.Info{neuron.NewInfo(0, 0)},
+		[]*layer.Info{layer.NewInfo(0, "alpha", "beta")},
+		[]*link.Info{link.NewInfo(0, 0, 0)},
 		[]*weights.Info{
 			weights.NewInfo(
 				id,
 				"awesome_struct",
-				[]*weight.Info{weight.NewInfo(1, 1, 0.1)},
-				[]*offset.Info{offset.NewInfo(1, 1, 0.5)},
+				[]*weight.Info{weight.NewInfo(0, 0, 0.1)},
+				[]*offset.Info{offset.NewInfo(0, 0, 0.5)},
 			),
 		},
 	)
@@ -74,6 +75,12 @@ func (s *GetSuite) TestGet() {
 			Value:     structureInfo.Weights()[0].Weights()[0].Weight()}))
 	s.SqlMock.
 		ExpectQuery(`^SELECT \* FROM "neurons" WHERE id in .*$`).
+		WillReturnRows(utils.MockRows(dblink.Link{
+			ID:   structureInfo.Links()[0].ID(),
+			From: structureInfo.Links()[0].From(),
+			To:   structureInfo.Links()[0].To()}))
+	s.SqlMock.
+		ExpectQuery(`^SELECT \* FROM "neuron_links" WHERE from_id in .*$`).
 		WillReturnRows(utils.MockRows(dbneuron.Neuron{
 			ID:      structureInfo.Neurons()[0].ID(),
 			LayerID: structureInfo.Neurons()[0].LayerID()}))

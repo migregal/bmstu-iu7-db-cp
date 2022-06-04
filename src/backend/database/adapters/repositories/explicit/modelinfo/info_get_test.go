@@ -42,21 +42,21 @@ func (s *GetSuite) TearDownTest() {
 func (s *GetSuite) TestGet() {
 	name := "test"
 	info := *model.NewInfo(
-		"",
-		"",
 		name,
+		"",
+		"",
 		structure.NewInfo(
 			"",
 			"awesome struct",
-			[]*neuron.Info{neuron.NewInfo(1, 1)},
-			[]*layer.Info{layer.NewInfo(1, "alpha", "beta")},
-			[]*link.Info{link.NewInfo(1, 1, 1)},
+			[]*neuron.Info{neuron.NewInfo(0, 0)},
+			[]*layer.Info{layer.NewInfo(0, "alpha", "beta")},
+			[]*link.Info{link.NewInfo(0, 0, 0)},
 			[]*weights.Info{
 				weights.NewInfo(
 					"",
 					"weights 1",
-					[]*weight.Info{weight.NewInfo(1, 1, 0.1)},
-					[]*offset.Info{offset.NewInfo(1, 1, 0.5)},
+					[]*weight.Info{weight.NewInfo(0, 0, 0.1)},
+					[]*offset.Info{offset.NewInfo(0, 0, 0.5)},
 				),
 			},
 		))
@@ -77,12 +77,12 @@ func (s *GetSuite) TestGet() {
 			LimitFunc:      info.Structure().Layers()[0].LimitFunc(),
 			ActivationFunc: info.Structure().Layers()[0].ActivationFunc()}))
 	s.SqlMock.
-		ExpectQuery(`^SELECT \* FROM "neurons" WHERE structure_id = .*$`).
+		ExpectQuery(`^SELECT \* FROM "neurons" WHERE layer_id in .*$`).
 		WillReturnRows(utils.MockRows(dbneuron.Neuron{
 			ID:      info.Structure().Neurons()[0].ID(),
 			LayerID: info.Structure().Neurons()[0].LayerID()}))
 	s.SqlMock.
-		ExpectQuery(`^SELECT \* FROM "neuron_links" WHERE structure_id = .*$`).
+		ExpectQuery(`^SELECT \* FROM "neuron_links" WHERE from_id in .*$`).
 		WillReturnRows(utils.MockRows(dblink.Link{
 			ID:   info.Structure().Links()[0].ID(),
 			From: info.Structure().Links()[0].From(),
