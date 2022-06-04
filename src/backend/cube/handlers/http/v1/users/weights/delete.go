@@ -9,7 +9,7 @@ import (
 )
 
 type deleteRequest struct {
-	ID string `json:"id" example:"f6457bdf-4e67-4f05-9108-1cbc0fec9405"`
+	ID string `json:"id" form:"id" example:"f6457bdf-4e67-4f05-9108-1cbc0fec9405"`
 }
 
 // Registration  godoc

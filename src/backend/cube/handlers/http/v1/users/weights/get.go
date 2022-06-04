@@ -3,6 +3,7 @@ package weights
 import (
 	"net/http"
 	"neural_storage/cube/core/ports/interactors"
+	"neural_storage/cube/handlers/http/v1/entities/structure/weights"
 	"neural_storage/pkg/logger"
 
 	"github.com/gin-gonic/gin"
@@ -48,8 +49,8 @@ func (h *Handler) Get(c *gin.Context) {
 		return
 	}
 
-	lg.WithFields(map[string]interface{}{"req": req}).Info("attempt to get model info into cache")
-	if info, err := h.cache.Get(weightStorage, req.ID); err == nil && len(info) == 2 {
+	lg.WithFields(map[string]interface{}{"req": req}).Info("attempt to get weight info into cache")
+	if info, err := h.cache.Get(weightStorage, req.ID); err == nil && len(info) >= 2 {
 		lg.Info("success to get weight info from cache")
 		resp, err := unGzip(info[1].([]byte))
 		if err == nil {
@@ -84,7 +85,7 @@ func (h *Handler) Get(c *gin.Context) {
 	infos, err := h.resolver.FindStructureWeights(c, filter)
 	if err != nil {
 		statFailGet.Inc()
-		lg.Errorf("failed to find model info: %v", err)
+		lg.Errorf("failed to find weights info: %v", err)
 		c.JSON(http.StatusInternalServerError, "failed to fetch user info")
 		return
 	}
@@ -94,26 +95,16 @@ func (h *Handler) Get(c *gin.Context) {
 		c.JSON(http.StatusOK, []WeightInfo{})
 		return
 	}
+
+	var res []weights.Info
+	for _, val := range infos {
+		res = append(res, weightFromBL(*val))
+	}
+
 	if len(infos) == 1 {
-		weight := weightFromBL(*infos[0])
-		if data, err := jsonGzip(weight); err == nil {
+		if data, err := jsonGzip(res); err == nil {
 			_ = h.cache.Update(weightStorage, req.ID, data)
 		}
-
-		statOKGet.Inc()
-		lg.Info("successful get full weight info")
-		c.JSON(http.StatusOK, weight)
-		return
-	}
-	var res []WeightInfo
-	for _, val := range infos {
-		w := weightFromBL(*val)
-		res = append(res, WeightInfo{
-			Id:      w.ID,
-			Name:    w.Name,
-			Weights: w.Weights,
-			Offsets: w.Offsets,
-		})
 	}
 	statOKGet.Inc()
 	lg.Info("success")

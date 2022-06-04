@@ -3,6 +3,7 @@ package modelstructweightsinfo
 import (
 	"fmt"
 	"neural_storage/cube/core/entities/structure/weights"
+	"neural_storage/database/core/entities/neuron"
 	"neural_storage/database/core/entities/neuron/offset"
 	"neural_storage/database/core/entities/structure/weight"
 	dbweights "neural_storage/database/core/entities/structure/weights"
@@ -21,7 +22,29 @@ func (r *Repository) Get(weightsId string) (*weights.Info, error) {
 		return nil, err
 	}
 
-	return fromDBEntity(dbInfo), nil
+	neurons, err := r.getNeuronsInfoByOffsets(dbInfo.offsets)
+	if err != nil {
+		return nil, err
+	}
+
+	neuronsMap := map[string]int{}
+	for i := range neurons {
+		neuronsMap[neurons[i].InnerID] = neurons[i].ID
+	}
+
+	links, err := r.getNeuronLinksInfo(neurons)
+	if err != nil {
+		return nil, err
+	}
+	neurons = nil
+
+	linksMap := map[string]int{}
+	for i := range links {
+		linksMap[links[i].InnerID] = links[i].ID
+	}
+	links = nil
+
+	return fromDBEntityStructured(neuronsMap, linksMap, dbInfo), nil
 }
 
 func (r *Repository) getWeightsInfo(id string) (dbweights.Weights, error) {
@@ -56,4 +79,18 @@ func (r *Repository) getDetailsWeightsInfo(info dbweights.Weights) (accumulatedW
 			weights: weight,
 		},
 		nil
+}
+
+func (r *Repository) getNeuronsInfoByOffsets(offsets []offset.Offset) ([]neuron.Neuron, error) {
+	ids := []string{}
+	for _, v := range offsets {
+		ids = append(ids, v.GetNeuronID())
+	}
+
+	var neurons []neuron.Neuron
+	err := r.db.Find(&neurons, "id in ?", ids).Error
+	if err != nil {
+		return nil, fmt.Errorf("neurons get error: %w", err)
+	}
+	return neurons, nil
 }

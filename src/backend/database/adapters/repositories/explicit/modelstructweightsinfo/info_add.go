@@ -27,10 +27,6 @@ func (r *Repository) Add(structID string, info []weights.Info) ([]string, error)
 	if err != nil {
 		return nil, err
 	}
-	layersMap := map[int]string{}
-	for i := range layers {
-		layersMap[layers[i].ID] = layers[i].InnerID
-	}
 
 	neurons, err := r.getNeuronsInfo(layers)
 	if err != nil {
@@ -55,7 +51,7 @@ func (r *Repository) Add(structID string, info []weights.Info) ([]string, error)
 	}
 	links = nil
 
-	data := toDBEntityStructured(structID, layersMap, neuronsMap, linksMap, info)
+	data := toDBEntityStructured(structID, neuronsMap, linksMap, info)
 
 	ids, err := r.createWeightsInfoTransact(database.Interactor{DB: tx}, data)
 	if err != nil {

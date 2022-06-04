@@ -42,7 +42,7 @@ func (h *Handler) Get(c *gin.Context) {
 	}
 
 	lg.WithFields(map[string]interface{}{"req": req}).Info("attempt to get model info into cache")
-	if info, err := h.cache.Get(modelStorage, req.ModelID); err == nil && len(info) == 2 {
+	if info, err := h.cache.Get(modelStorage, req.ModelID); err == nil && len(info) >= 2 {
 		lg.Info("success to get model info from cache")
 		resp, err := unGzip(info[1].([]byte))
 		if err == nil {
@@ -93,7 +93,7 @@ func (h *Handler) Get(c *gin.Context) {
 		res = append(res, modelFromBL(val))
 	}
 
-	if len(req.ModelID) > 0 {
+	if len(req.ModelID) == 1 {
 		if data, err := jsonGzip(res); err == nil {
 			_ = h.cache.Update(modelStorage, req.ModelID, data)
 		}
