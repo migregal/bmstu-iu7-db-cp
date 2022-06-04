@@ -32,17 +32,17 @@ func (s *AddSuite) TestAdd() {
 	info := weights.NewInfo(
 		"awesome_id",
 		"test",
-		[]*weight.Info{weight.NewInfo("weight 1", "link 1", 10)},
-		[]*offset.Info{offset.NewInfo("offset 1", "neuron 1", 0.1)},
+		[]*weight.Info{weight.NewInfo(1, 1, 10)},
+		[]*offset.Info{offset.NewInfo(1, 1, 0.1)},
 	)
 
 	s.SqlMock.ExpectBegin()
-	s.SqlMock.ExpectQuery(`^INSERT INTO "weights_info" .* RETURNING "id"$`).WillReturnRows(utils.MockRows(dbweights.Weights{ID: "some id for weights"}))
+	s.SqlMock.ExpectQuery(`^INSERT INTO "weights_info" .* RETURNING "id"$`).WillReturnRows(utils.MockRows(dbweights.Weights{ID: 1}))
 	s.SqlMock.ExpectExec(`^INSERT INTO "neuron_offsets" .*$`).WillReturnResult(sqlmock.NewResult(1, 0))
 	s.SqlMock.ExpectExec(`^INSERT INTO "link_weights" .*$`).WillReturnResult(sqlmock.NewResult(1, 0))
 	s.SqlMock.ExpectCommit()
 
-	err := s.repo.Add("awesome_struct_id", []weights.Info{*info})
+	_, err := s.repo.Add("awesome_struct_id", []weights.Info{*info})
 
 	require.NoError(s.T(), err)
 }

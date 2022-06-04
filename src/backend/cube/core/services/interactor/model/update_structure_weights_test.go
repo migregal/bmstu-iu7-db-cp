@@ -29,7 +29,7 @@ func (s *UpdateStructureWeightsSuite) TearDownTest() {
 func (s *UpdateStructureWeightsSuite) TestUpdate() {
 	s.mockedModelInfo.
 		On("Get", mock.Anything).
-		Return(model.NewInfo("", "", structure.NewInfo("", nil, nil, nil, nil)), nil)
+		Return(model.NewInfo("", "", "", structure.NewInfo("", "", nil, nil, nil, nil)), nil)
 
 	s.mockedValidator.On("ValidateModelInfo", mock.Anything).Return(nil)
 

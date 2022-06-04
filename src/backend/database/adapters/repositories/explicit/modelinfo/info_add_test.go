@@ -41,18 +41,20 @@ func (s *AddSuite) TestAdd() {
 	name := "test"
 	info := model.NewInfo(
 		"",
+		"",
 		name,
 		structure.NewInfo(
+			"",
 			"awesome struct",
-			[]*neuron.Info{neuron.NewInfo("neuron1", "test")},
-			[]*layer.Info{layer.NewInfo("test", "alpha", "beta")},
-			[]*link.Info{link.NewInfo("link1", "neuron1", "neuron1")},
+			[]*neuron.Info{neuron.NewInfo(1, 1)},
+			[]*layer.Info{layer.NewInfo(1, "alpha", "beta")},
+			[]*link.Info{link.NewInfo(1, 1, 1)},
 			[]*weights.Info{
 				weights.NewInfo(
 					"",
 					"weights1",
-					[]*weight.Info{weight.NewInfo("weight 1", "w1", 0.1)},
-					[]*offset.Info{offset.NewInfo("offset 1", "o1", 0.5)},
+					[]*weight.Info{weight.NewInfo(1, 1, 0.1)},
+					[]*offset.Info{offset.NewInfo(1, 1, 0.5)},
 				),
 			},
 		))
@@ -60,10 +62,10 @@ func (s *AddSuite) TestAdd() {
 	s.SqlMock.ExpectBegin()
 	s.SqlMock.ExpectQuery(`^INSERT INTO "models" .* RETURNING "id"$`).WillReturnRows(utils.MockRows(dbmodel.Model{ID: name}))
 	s.SqlMock.ExpectQuery(`^INSERT INTO "structures" .* RETURNING "id"$`).WillReturnRows(utils.MockRows(dbstructure.Structure{ID: "struct_id"}))
-	s.SqlMock.ExpectQuery(`^INSERT INTO "layers" .* RETURNING "id"$`).WillReturnRows(utils.MockRows(dblayer.Layer{ID: "layer_id"}))
-	s.SqlMock.ExpectQuery(`^INSERT INTO "neurons" .* RETURNING "id"$`).WillReturnRows(utils.MockRows(dbneuron.Neuron{ID: "some id for neuron"}))
+	s.SqlMock.ExpectQuery(`^INSERT INTO "layers" .* RETURNING "id"$`).WillReturnRows(utils.MockRows(dblayer.Layer{ID: 1}))
+	s.SqlMock.ExpectQuery(`^INSERT INTO "neurons" .* RETURNING "id"$`).WillReturnRows(utils.MockRows(dbneuron.Neuron{ID: 1}))
 	s.SqlMock.ExpectExec(`^INSERT INTO "neuron_links" .*$`).WillReturnResult(sqlmock.NewResult(1, 0))
-	s.SqlMock.ExpectQuery(`^INSERT INTO "weights_info" .* RETURNING "id"$`).WillReturnRows(utils.MockRows(dbweights.Weights{ID: "some id for weights"}))
+	s.SqlMock.ExpectQuery(`^INSERT INTO "weights_info" .* RETURNING "id"$`).WillReturnRows(utils.MockRows(dbweights.Weights{ID: 1}))
 	s.SqlMock.ExpectExec(`^INSERT INTO "neuron_offsets" .*$`).WillReturnResult(sqlmock.NewResult(1, 0))
 	s.SqlMock.ExpectExec(`^INSERT INTO "link_weights" .*$`).WillReturnResult(sqlmock.NewResult(1, 0))
 	s.SqlMock.ExpectCommit()

@@ -31,8 +31,8 @@ func (s *UpdateSuite) TestUpdate() {
 	info := weights.NewInfo(
 		id,
 		"awesome weights",
-		[]*weight.Info{weight.NewInfo(id, "w1", 0.1)},
-		[]*offset.Info{offset.NewInfo(id, "o1", 0.5)},
+		[]*weight.Info{weight.NewInfo(1, 1, 0.1)},
+		[]*offset.Info{offset.NewInfo(1, 1, 0.5)},
 	)
 
 	s.SqlMock.ExpectBegin()

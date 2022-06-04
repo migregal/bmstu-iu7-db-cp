@@ -37,40 +37,41 @@ func (s *FindSuite) TearDownTest() {
 func (s *FindSuite) TestFind() {
 	name := "test"
 	structureInfo := structure.NewInfo(
+		"",
 		"awesome struct",
-		[]*neuron.Info{neuron.NewInfo("neuron1", "test")},
-		[]*layer.Info{layer.NewInfo("test", "alpha", "beta")},
-		[]*link.Info{link.NewInfo("link1", "neuron1", "neuron1")},
+		[]*neuron.Info{neuron.NewInfo(1, 1)},
+		[]*layer.Info{layer.NewInfo(1, "alpha", "beta")},
+		[]*link.Info{link.NewInfo(1, 1, 1)},
 		[]*weights.Info{
 			weights.NewInfo(
 				"",
 				name,
-				[]*weight.Info{weight.NewInfo("weight 1", "w1", 0.1)},
-				[]*offset.Info{offset.NewInfo("weight 1", "o1", 0.5)},
+				[]*weight.Info{weight.NewInfo(1, 1, 0.1)},
+				[]*offset.Info{offset.NewInfo(1, 1, 0.5)},
 			),
 		},
 	)
 	s.SqlMock.
 		ExpectQuery(`^SELECT \* FROM "weights_info" WHERE id in .*$`).
 		WillReturnRows(utils.MockRows(dbweights.Weights{
-			ID:   structureInfo.Weights()[0].ID(),
+			InnerID:   structureInfo.Weights()[0].ID(),
 			Name: structureInfo.Weights()[0].Name()}))
 	s.SqlMock.
 		ExpectQuery(`^SELECT \* FROM "weights_info" WHERE id = .* ORDER BY .* LIMIT 1$`).
 		WillReturnRows(utils.MockRows(dbweights.Weights{
-			ID:   structureInfo.Weights()[0].ID(),
+			InnerID:   structureInfo.Weights()[0].ID(),
 			Name: structureInfo.Weights()[0].Name()}))
 	s.SqlMock.
-		ExpectQuery(`^SELECT \* FROM "neuron_offsets" WHERE weights_id = .*$`).
+		ExpectQuery(`^SELECT \* FROM "neuron_offsets" WHERE weights_info_id = .*$`).
 		WillReturnRows(utils.MockRows(dboffset.Offset{
-			Weights: structureInfo.Weights()[0].ID(),
+			InnerWeights: structureInfo.Weights()[0].ID(),
 			ID:      structureInfo.Weights()[0].Offsets()[0].ID(),
 			Neuron:  structureInfo.Weights()[0].Offsets()[0].NeuronID(),
 			Offset:  structureInfo.Weights()[0].Offsets()[0].Offset()}))
 	s.SqlMock.
-		ExpectQuery(`^SELECT \* FROM "link_weights" WHERE weights_id = .*$`).
+		ExpectQuery(`^SELECT \* FROM "link_weights" WHERE weights_info_id = .*$`).
 		WillReturnRows(utils.MockRows(dbweight.Weight{
-			WeightsID: structureInfo.Weights()[0].ID(),
+			InnerWeightsID: structureInfo.Weights()[0].ID(),
 			ID:        structureInfo.Weights()[0].Weights()[0].ID(),
 			LinkID:    structureInfo.Weights()[0].Weights()[0].LinkID(),
 			Value:     structureInfo.Weights()[0].Weights()[0].Weight()}))

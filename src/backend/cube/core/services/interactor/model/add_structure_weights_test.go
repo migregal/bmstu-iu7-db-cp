@@ -30,17 +30,14 @@ func (s *AddStructureWeightsSuite) TestAdd() {
 
 	s.mockedModelInfo.
 		On("GetStructure", mock.Anything).
-		Return(structure.NewInfo("", nil, nil, nil, nil), nil)
+		Return(structure.NewInfo("", "", nil, nil, nil, nil), nil)
 
 	s.mockedValidator.On("ValidateModelInfo", mock.Anything).Return(nil)
 
 	s.mockedWeightsInfo.On("Add", mock.Anything, mock.Anything, mock.Anything).Return(nil)
-	err := s.interactor.AddStructureWeights(s.ctx, "", "", *m)
+	_, err := s.interactor.AddStructureWeights(s.ctx, "", "", *m)
 
 	require.NoError(s.T(), err)
-
-	require.True(s.T(), s.mockedWeightsInfo.AssertExpectations(s.T()))
-	require.True(s.T(), s.mockedModelInfo.AssertExpectations(s.T()))
 }
 
 func TestAddStructureWeightsSuite(t *testing.T) {

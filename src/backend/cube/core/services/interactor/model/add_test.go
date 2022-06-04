@@ -27,10 +27,10 @@ func (s *AddSuite) TearDownTest() {
 func (s *AddSuite) TestAdd() {
 	s.mockedValidator.On("ValidateModelInfo", mock.Anything).Return(nil)
 
-	m := model.NewInfo("", "", nil)
+	m := model.NewInfo("", "", "", nil)
 	s.mockedModelInfo.On("Add", mock.Anything).Return("", nil)
 
-	err := s.interactor.Add(s.ctx, *m)
+	_, err := s.interactor.Add(s.ctx, *m)
 
 	require.NoError(s.T(), err)
 

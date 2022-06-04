@@ -31,8 +31,8 @@ func (s *DeleteSuite) TestDelete() {
 	info := weights.NewInfo(
 		"",
 		name,
-		[]*weight.Info{weight.NewInfo("weight 1", "link 1", 10)},
-		[]*offset.Info{offset.NewInfo("weight 1", "neuron 1", 0.1)},
+		[]*weight.Info{weight.NewInfo(1, 1, 10)},
+		[]*offset.Info{offset.NewInfo(1, 1, 0.1)},
 	)
 
 	s.SqlMock.ExpectBegin()
