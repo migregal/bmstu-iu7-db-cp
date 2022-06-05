@@ -3,6 +3,7 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,linux,go,goland,visualstudiocode,dotenv,latex
 
 ### dotenv ###
+.*.env
 .env
 
 ### Go ###
