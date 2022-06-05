@@ -38,7 +38,7 @@ func TestValidator_ValidateModelInfo(t *testing.T) {
 			false,
 		},
 		{
-			"empty stuct",
+			"empty struct",
 			fields{&mock.ValidatorConfig{}},
 			args{
 				model.NewInfo(
@@ -62,30 +62,30 @@ func TestValidator_ValidateModelInfo(t *testing.T) {
 			fields{&mock.ValidatorConfig{}},
 			args{
 				model.NewInfo(
-					"",
+					"id",
 					"",
 					"",
 					structure.NewInfo(
-						"",
+						"id",
 						"",
 						[]*neuron.Info{
-							neuron.NewInfo(1, 2),
+							neuron.NewInfo(0, 0),
 						},
 						[]*layer.Info{
-							layer.NewInfo(1, "", ""),
+							layer.NewInfo(0, "func 1", "func 2"),
 						},
 						[]*link.Info{
-							link.NewInfo(1, 1, 1),
+							link.NewInfo(0, 0, 0),
 						},
 						[]*weights.Info{
 							weights.NewInfo(
 								"",
 								"",
 								[]*weight.Info{
-									weight.NewInfo(1, 1, 10.0),
+									weight.NewInfo(0, 0, 10.0),
 								},
 								[]*offset.Info{
-									offset.NewInfo(1, 1, -2.0),
+									offset.NewInfo(0, 0, -2.0),
 								},
 							),
 						},

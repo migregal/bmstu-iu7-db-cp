@@ -34,7 +34,7 @@ func (s *DeleteSuite) TearDownTest() {
 func (s *DeleteSuite) TestDelete() {
 	name := "test"
 	info := model.NewInfo(
-		"",
+		"id",
 		"",
 		name,
 		structure.NewInfo(
@@ -54,10 +54,7 @@ func (s *DeleteSuite) TestDelete() {
 		))
 
 	s.SqlMock.ExpectBegin()
-	s.SqlMock.ExpectExec(`^DELETE FROM "layers" WHERE id = .*$`).WillReturnResult(sqlmock.NewResult(0, 1))
-	s.SqlMock.ExpectExec(`^DELETE FROM "neurons" WHERE id = .*$`).WillReturnResult(sqlmock.NewResult(0, 1))
-	s.SqlMock.ExpectExec(`^DELETE FROM "neuron_links" WHERE id = .*$`).WillReturnResult(sqlmock.NewResult(0, 1))
-	s.SqlMock.ExpectExec(`^DELETE FROM "weights_info" WHERE id = .*$`).WillReturnResult(sqlmock.NewResult(0, 1))
+	s.SqlMock.ExpectExec(`^DELETE FROM "models" WHERE "models"."id" = .*$`).WillReturnResult(sqlmock.NewResult(0, 1))
 	s.SqlMock.ExpectCommit()
 
 	err := s.repo.Delete(*info)

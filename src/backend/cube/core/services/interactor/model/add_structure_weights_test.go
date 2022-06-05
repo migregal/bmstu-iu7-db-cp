@@ -34,7 +34,7 @@ func (s *AddStructureWeightsSuite) TestAdd() {
 
 	s.mockedValidator.On("ValidateModelInfo", mock.Anything).Return(nil)
 
-	s.mockedWeightsInfo.On("Add", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	s.mockedWeightsInfo.On("Add", mock.Anything, mock.Anything).Return(nil, nil)
 	_, err := s.interactor.AddStructureWeights(s.ctx, "", "", *m)
 
 	require.NoError(s.T(), err)

@@ -53,6 +53,7 @@ func (v *Validator) validateLayers(info *structure.Info) error {
 		layerIds[v.ID()] = struct{}{}
 	}
 
+	fmt.Printf("FUCK: %#v | %#v\n", layerIds, info.Layers())
 	for _, v := range info.Neurons() {
 		if _, found := layerIds[v.LayerID()]; !found {
 			return fmt.Errorf("missing layer info")
