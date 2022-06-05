@@ -11,6 +11,6 @@ type Info struct {
 	structure *structure.Info
 }
 
-func NewInfo(ownerID, name string, structure *structure.Info) *Info {
-	return &Info{ownerID: ownerID, name: name, structure: structure}
+func NewInfo(id, ownerID, name string, structure *structure.Info) *Info {
+	return &Info{id: id, ownerID: ownerID, name: name, structure: structure}
 }

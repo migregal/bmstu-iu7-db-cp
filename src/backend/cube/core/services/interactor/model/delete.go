@@ -12,5 +12,5 @@ func (i *Interactor) Delete(ctx context.Context, ownerID, modelID string) error 
 	lg.WithFields(map[string]interface{}{"owner": ownerID, "model": modelID}).Info("model delete called")
 
 	lg.Info("attempt to delete model info")
-	return i.modelInfo.Delete(*model.NewInfo(ownerID, modelID, nil))
+	return i.modelInfo.Delete(*model.NewInfo(modelID, ownerID, "", nil))
 }

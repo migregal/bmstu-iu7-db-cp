@@ -34,17 +34,19 @@ func TestValidator_ValidateModelInfo(t *testing.T) {
 		{
 			"no info",
 			fields{&mock.ValidatorConfig{}},
-			args{model.NewInfo("", "", nil)},
+			args{model.NewInfo("", "", "", nil)},
 			false,
 		},
 		{
-			"empty stuct",
+			"empty struct",
 			fields{&mock.ValidatorConfig{}},
 			args{
 				model.NewInfo(
 					"",
 					"",
+					"",
 					structure.NewInfo(
+						"",
 						"",
 						nil,
 						nil,
@@ -60,28 +62,30 @@ func TestValidator_ValidateModelInfo(t *testing.T) {
 			fields{&mock.ValidatorConfig{}},
 			args{
 				model.NewInfo(
+					"id",
 					"",
 					"",
 					structure.NewInfo(
+						"id",
 						"",
 						[]*neuron.Info{
-							neuron.NewInfo("", ""),
+							neuron.NewInfo(0, 0),
 						},
 						[]*layer.Info{
-							layer.NewInfo("", "", ""),
+							layer.NewInfo(0, "func 1", "func 2"),
 						},
 						[]*link.Info{
-							link.NewInfo("", "", ""),
+							link.NewInfo(0, 0, 0),
 						},
 						[]*weights.Info{
 							weights.NewInfo(
 								"",
 								"",
 								[]*weight.Info{
-									weight.NewInfo("", "", 10.0),
+									weight.NewInfo(0, 0, 10.0),
 								},
 								[]*offset.Info{
-									offset.NewInfo("", "", -2.0),
+									offset.NewInfo(0, 0, -2.0),
 								},
 							),
 						},
@@ -163,7 +167,7 @@ func TestValidator_validatelinks(t *testing.T) {
 	}
 	type args struct {
 		info    *structure.Info
-		neurons map[string]struct{}
+		neurons map[int]struct{}
 	}
 	tests := []struct {
 		name    string
@@ -191,7 +195,7 @@ func TestValidator_validateNeuronOffsets(t *testing.T) {
 	}
 	type args struct {
 		info    *structure.Info
-		neurons map[string]struct{}
+		neurons map[int]struct{}
 	}
 	tests := []struct {
 		name    string

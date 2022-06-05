@@ -2,6 +2,13 @@ version: "3"
 # https://taskfile.dev/#/installation
 
 tasks:
+  default:
+    desc: Start dev environment
+    cmds:
+      - task: bootstrap-crypto
+      - task: generate
+      - task: dev:start
+
   lint:
     desc: Generates mocks for ports interfaces
     cmds:
@@ -52,7 +59,6 @@ tasks:
       - openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in {{.OUT}}/keypair.pem -out {{.OUT}}/pkcs8.key
     status:
       - test -d {{.OUT}}
-
 
   test:lint:
     desc: Runs linters for golang code

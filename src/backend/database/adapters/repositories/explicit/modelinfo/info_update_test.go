@@ -35,18 +35,20 @@ func (s *UpdateSuite) TestUpdate() {
 	name := "test"
 	info := model.NewInfo(
 		"",
+		"",
 		name,
 		structure.NewInfo(
+			"",
 			"awesome struct",
-			[]*neuron.Info{neuron.NewInfo("neuron1", "test")},
-			[]*layer.Info{layer.NewInfo("test", "alpha", "beta")},
-			[]*link.Info{link.NewInfo("link1", "neuron1", "neuron1")},
+			[]*neuron.Info{neuron.NewInfo(1, 1)},
+			[]*layer.Info{layer.NewInfo(1, "alpha", "beta")},
+			[]*link.Info{link.NewInfo(1, 1, 1)},
 			[]*weights.Info{
 				weights.NewInfo(
 					"",
 					"weights1",
-					[]*weight.Info{weight.NewInfo("weight 1", "w1", 0.1)},
-					[]*offset.Info{offset.NewInfo("offset 1", "o1", 0.5)},
+					[]*weight.Info{weight.NewInfo(1, 1, 0.1)},
+					[]*offset.Info{offset.NewInfo(1, 1, 0.5)},
 				),
 			},
 		))

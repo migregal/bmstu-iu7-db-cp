@@ -1,12 +1,13 @@
 package models
 
 import (
+	"compress/gzip"
 	"encoding/json"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
-	"neural_storage/cube/core/entities/model"
 
+	"neural_storage/cube/core/entities/model"
 	"neural_storage/cube/handlers/http/v1/entities/structure"
 	"neural_storage/cube/handlers/http/v1/entities/structure/weights"
 
@@ -17,11 +18,9 @@ import (
 )
 
 type AddRequest struct {
-	ModelTitle     string                `form:"title" binding:"required"`
-	StructureTitle string                `form:"strucutre_title" binding:"required"`
-	Structure      *multipart.FileHeader `form:"structure" binding:"required"`
-	WeightsTitle   string                `form:"weights_title" binding:"required"`
-	Weights        *multipart.FileHeader `form:"weights" binding:"required"`
+	ModelTitle string                `form:"title" binding:"required"`
+	Structure  *multipart.FileHeader `form:"structure" binding:"required"`
+	Weights    *multipart.FileHeader `form:"weights" binding:"required"`
 }
 
 // Registration  godoc
@@ -74,7 +73,16 @@ func (h *Handler) Add(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	plan, err := ioutil.ReadAll(content)
+	r, err := gzip.NewReader(content)
+	if err != nil {
+		statFailAdd.Inc()
+		lg.Errorf("failed to read gzipped structure info: %v", err)
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	defer r.Close()
+
+	plan, err := ioutil.ReadAll(r)
 	if err != nil {
 		statFailAdd.Inc()
 		lg.Errorf("failed to read structure info: %v", err)
@@ -98,7 +106,17 @@ func (h *Handler) Add(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	plan, err = ioutil.ReadAll(content)
+
+	rw, err := gzip.NewReader(content)
+	if err != nil {
+		statFailAdd.Inc()
+		lg.Errorf("failed to read gzipped weights info: %v", err)
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	defer rw.Close()
+
+	plan, err = ioutil.ReadAll(rw)
 	if err != nil {
 		statFailAdd.Inc()
 		lg.Errorf("failed to read weights info: %v", err)
@@ -116,8 +134,8 @@ func (h *Handler) Add(c *gin.Context) {
 	structure.Weights = []weights.Info{w}
 
 	lg.WithFields(map[string]interface{}{"user": usrID, "title": req.ModelTitle}).Info("attempt to add new model")
-	model := model.NewInfo(usrID, req.ModelTitle, structToBL(structure))
-	err = h.resolver.Add(c, *model)
+	model := model.NewInfo("", usrID, req.ModelTitle, structToBL(structure))
+	modelID, err := h.resolver.Add(c, *model)
 	if err != nil {
 		statFailAdd.Inc()
 		lg.Errorf("failed to add new model: %v", err)
@@ -125,10 +143,13 @@ func (h *Handler) Add(c *gin.Context) {
 		return
 	}
 
-	lg.Info("attempt to add model to cache")
-	_ = h.cache.UpdateModelInfo(model.ID(), model)
+	res := modelFromBL(model)
+	res.ID = modelID
+	if stringified, err := jsonGzip(res); err == nil {
+		_ = h.cache.Update(modelStorage, modelID, stringified)
+	}
 
 	statOKAdd.Inc()
 	lg.Info("success")
-	c.JSON(http.StatusOK, model)
+	c.JSON(http.StatusOK, res)
 }

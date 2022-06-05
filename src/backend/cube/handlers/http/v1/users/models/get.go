@@ -3,6 +3,7 @@ package models
 import (
 	"net/http"
 	"neural_storage/cube/core/ports/interactors"
+	"neural_storage/cube/handlers/http/v1/entities/model"
 	"neural_storage/pkg/logger"
 
 	"github.com/gin-gonic/gin"
@@ -16,12 +17,6 @@ type getRequest struct {
 	PerPage   int    `form:"per_page"`
 }
 
-type ModelInfo struct {
-	Id        string      `json:"id,omitempty" example:"f6457bdf-4e67-4f05-9108-1cbc0fec9405"`
-	Name      string      `json:"name,omitempty" example:"awesome_username"`
-	Structure interface{} `json:"structure,omitempty"`
-} // @name ModelInfoResponse
-
 // Registration  godoc
 // @Summary      Find model info
 // @Description  Find such model info as id, username, email and fullname
@@ -31,7 +26,7 @@ type ModelInfo struct {
 // @Param        name     query string false "Model name to search for"
 // @Param        page     query int    false "Page number for pagination"
 // @Param        per_page query int    false "Page size for pagination"
-// @Success      200 {object} []ModelInfo "Model info found"
+// @Success      200 {object} []model.Info "Model info found"
 // @Failure      400 "Invalid request"
 // @Failure      500 "Failed to get model info from storage"
 // @Router       /api/v1/models [get]
@@ -47,14 +42,23 @@ func (h *Handler) Get(c *gin.Context) {
 	}
 
 	lg.WithFields(map[string]interface{}{"req": req}).Info("attempt to get model info into cache")
-	if info, err := h.cache.GetModelInfo(req.ModelID); err == nil {
-		statFailGet.Inc()
-		lg.Errorf("failed to get model info: %v", err)
-		c.JSON(http.StatusOK, info)
-		return
+	if info, err := h.cache.Get(modelStorage, req.ModelID); err == nil && len(info) >= 2 {
+		lg.Info("success to get model info from cache")
+		resp, err := unGzip(info[1].([]byte))
+		if err == nil {
+			statOKGet.Inc()
+			c.Data(http.StatusOK, "application/json", resp)
+			return
+		}
+		lg.Errorf("failed to ungzip model info from cache: %v", err)
+	} else {
+		lg.Errorf("failed to get model info from cache: %v", err)
 	}
 
 	filter := interactors.ModelInfoFilter{}
+	if len(req.ModelID) > 0 {
+		filter.Ids = []string{req.ModelID}
+	}
 	if req.OwnerID != "" {
 		filter.Owners = append(filter.Owners, req.OwnerID)
 	}
@@ -80,23 +84,22 @@ func (h *Handler) Get(c *gin.Context) {
 	if len(infos) == 0 {
 		statOKGet.Inc()
 		lg.Info("no models found")
-		c.JSON(http.StatusOK, []ModelInfo{})
+		c.JSON(http.StatusOK, []model.Info{})
 		return
 	}
-	var res []ModelInfo
+
+	var res []model.Info
 	for _, val := range infos {
-		res = append(res, ModelInfo{
-			Id:        val.ID(),
-			Name:      val.Name(),
-			Structure: val.Structure(),
-		})
+		res = append(res, modelFromBL(val))
 	}
 
-	for _, v := range res {
-		_ = h.cache.UpdateModelInfo(v.Id, v)
+	if len(req.ModelID) == 1 && req.ModelID != "" {
+		if data, err := jsonGzip(res); err == nil {
+			_ = h.cache.Update(modelStorage, req.ModelID, data)
+		}
 	}
-
 	statOKGet.Inc()
 	lg.Info("success")
 	c.JSON(http.StatusOK, res)
+
 }

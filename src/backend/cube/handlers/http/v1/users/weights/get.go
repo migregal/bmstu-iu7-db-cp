@@ -3,6 +3,7 @@ package weights
 import (
 	"net/http"
 	"neural_storage/cube/core/ports/interactors"
+	"neural_storage/cube/handlers/http/v1/entities/structure/weights"
 	"neural_storage/pkg/logger"
 
 	"github.com/gin-gonic/gin"
@@ -15,13 +16,6 @@ type getRequest struct {
 	Page        int    `form:"page"`
 	PerPage     int    `form:"per_page"`
 }
-
-type WeightInfo struct {
-	Id      string      `json:"id,omitempty" example:"f6457bdf-4e67-4f05-9108-1cbc0fec9405"`
-	Name    string      `json:"name,omitempty" example:"awesome_username"`
-	Weights interface{} `json:"offsets,omitempty"`
-	Offsets interface{} `json:"weights,omitempty"`
-} // @name ModelWeightsInfoResponse
 
 // Registration  godoc
 // @Summary      Find model info
@@ -48,6 +42,20 @@ func (h *Handler) Get(c *gin.Context) {
 		return
 	}
 
+	lg.WithFields(map[string]interface{}{"req": req}).Info("attempt to get weight info into cache")
+	if info, err := h.cache.Get(weightStorage, req.ID); err == nil && len(info) >= 2 {
+		lg.Info("success to get weight info from cache")
+		resp, err := unGzip(info[1].([]byte))
+		if err == nil {
+			statOKGet.Inc()
+			c.Data(http.StatusOK, "application/json", resp)
+			return
+		}
+		lg.Errorf("failed to ungzip weight info from cache: %v", err)
+	} else {
+		lg.Errorf("failed to get weight info from cache: %v", err)
+	}
+
 	filter := interactors.ModelWeightsInfoFilter{}
 	if req.ID != "" {
 		filter.IDs = append(filter.IDs, req.ID)
@@ -70,24 +78,26 @@ func (h *Handler) Get(c *gin.Context) {
 	infos, err := h.resolver.FindStructureWeights(c, filter)
 	if err != nil {
 		statFailGet.Inc()
-		lg.Errorf("failed to find model info: %v", err)
+		lg.Errorf("failed to find weights info: %v", err)
 		c.JSON(http.StatusInternalServerError, "failed to fetch user info")
 		return
 	}
 	if len(infos) == 0 {
 		statOKGet.Inc()
 		lg.Info("no weights found")
-		c.JSON(http.StatusOK, []WeightInfo{})
+		c.JSON(http.StatusOK, []weights.Info{})
 		return
 	}
-	var res []WeightInfo
+
+	var res []weights.Info
 	for _, val := range infos {
-		res = append(res, WeightInfo{
-			Id:      val.ID(),
-			Name:    val.Name(),
-			Weights: val.Weights(),
-			Offsets: val.Offsets(),
-		})
+		res = append(res, weightFromBL(*val))
+	}
+
+	if len(infos) == 1 && req.ID != "" {
+		if data, err := jsonGzip(res); err == nil {
+			_ = h.cache.Update(weightStorage, req.ID, data)
+		}
 	}
 	statOKGet.Inc()
 	lg.Info("success")

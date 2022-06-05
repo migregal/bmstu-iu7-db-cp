@@ -34,28 +34,27 @@ func (s *DeleteSuite) TearDownTest() {
 func (s *DeleteSuite) TestDelete() {
 	name := "test"
 	info := model.NewInfo(
+		"id",
 		"",
 		name,
 		structure.NewInfo(
+			"",
 			"awesome struct",
-			[]*neuron.Info{neuron.NewInfo("neuron1", "test")},
-			[]*layer.Info{layer.NewInfo("test", "alpha", "beta")},
-			[]*link.Info{link.NewInfo("link1", "neuron1", "neuron1")},
+			[]*neuron.Info{neuron.NewInfo(1, 1)},
+			[]*layer.Info{layer.NewInfo(1, "alpha", "beta")},
+			[]*link.Info{link.NewInfo(1, 1, 1)},
 			[]*weights.Info{
 				weights.NewInfo(
 					"",
 					"weights1",
-					[]*weight.Info{weight.NewInfo("weight 1", "w1", 0.1)},
-					[]*offset.Info{offset.NewInfo("offset 1", "o1", 0.5)},
+					[]*weight.Info{weight.NewInfo(1, 1, 0.1)},
+					[]*offset.Info{offset.NewInfo(1, 1, 0.5)},
 				),
 			},
 		))
 
 	s.SqlMock.ExpectBegin()
-	s.SqlMock.ExpectExec(`^DELETE FROM "layers" WHERE id = .*$`).WillReturnResult(sqlmock.NewResult(0, 1))
-	s.SqlMock.ExpectExec(`^DELETE FROM "neurons" WHERE id = .*$`).WillReturnResult(sqlmock.NewResult(0, 1))
-	s.SqlMock.ExpectExec(`^DELETE FROM "neuron_links" WHERE id = .*$`).WillReturnResult(sqlmock.NewResult(0, 1))
-	s.SqlMock.ExpectExec(`^DELETE FROM "weights_info" WHERE id = .*$`).WillReturnResult(sqlmock.NewResult(0, 1))
+	s.SqlMock.ExpectExec(`^DELETE FROM "models" WHERE "models"."id" = .*$`).WillReturnResult(sqlmock.NewResult(0, 1))
 	s.SqlMock.ExpectCommit()
 
 	err := s.repo.Delete(*info)

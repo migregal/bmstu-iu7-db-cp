@@ -2,8 +2,11 @@ package adminmodels
 
 import (
 	"net/http"
+
 	"neural_storage/cube/core/ports/interactors"
 	"neural_storage/pkg/logger"
+
+	"neural_storage/cube/handlers/http/v1/entities/model"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,12 +19,6 @@ type getRequest struct {
 	PerPage   int    `form:"per_page"`
 }
 
-type ModelInfo struct {
-	Id        string      `json:"id,omitempty" example:"f6457bdf-4e67-4f05-9108-1cbc0fec9405"`
-	Name      string      `json:"name,omitempty" example:"awesome_username"`
-	Structure interface{} `json:"structure,omitempty"`
-} // @name AdminModelInfoResponse
-
 // Registration  godoc
 // @Summary      Find model info
 // @Description  Find such model info as id, username, email and fullname
@@ -31,7 +28,7 @@ type ModelInfo struct {
 // @Param        name     query string false "Model name to search for"
 // @Param        page     query int    false "Page number for pagination"
 // @Param        per_page query int    false "Page size for pagination"
-// @Success      200 {object} []ModelInfo "Model info found"
+// @Success      200 {object} []model.Info "Model info found"
 // @Failure      400 "Invalid request"
 // @Failure      500 "Failed to get model info from storage"
 // @Router       /api/v1/admin/models [get]
@@ -77,16 +74,12 @@ func (h *Handler) Get(c *gin.Context) {
 	if len(infos) == 0 {
 		statOKGet.Inc()
 		lg.Info("no models found")
-		c.JSON(http.StatusOK, []ModelInfo{})
+		c.JSON(http.StatusOK, []model.Info{})
 		return
 	}
-	var res []ModelInfo
+	var res []model.Info
 	for _, val := range infos {
-		res = append(res, ModelInfo{
-			Id:        val.ID(),
-			Name:      val.Name(),
-			Structure: val.Structure(),
-		})
+		res = append(res, modelFromBL(val))
 	}
 	statOKGet.Inc()
 	lg.WithFields(map[string]interface{}{"res": res}).Info("success")

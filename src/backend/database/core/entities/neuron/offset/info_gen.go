@@ -1,15 +1,15 @@
 package offset
 
 func (i *Offset) GetID() string {
-	return i.ID
+	return i.InternalID
 }
 
 func (i *Offset) GetWeightsID() string {
-	return i.Weights
+	return i.InnerWeights
 }
 
 func (i *Offset) GetNeuronID() string {
-	return i.Neuron
+	return i.InnerNeuron
 }
 
 func (i *Offset) GetValue() float64 {

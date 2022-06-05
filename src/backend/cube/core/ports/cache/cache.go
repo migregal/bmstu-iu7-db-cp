@@ -1,7 +1,7 @@
 package cache
 
 type CacheInteractor interface {
-	UpdateModelInfo(id string, info interface{}) error
-	GetModelInfo(id string) (interface{}, error)
-	DeleteModelInfo(id string) error
+	Update(storage string, id string, info interface{}) error
+	Get(storage string, id string) ([]interface{}, error)
+	Delete(storage string, id string) error
 }

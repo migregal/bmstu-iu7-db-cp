@@ -28,7 +28,7 @@ func (s *FindSuite) TearDownTest() {
 func (s *FindSuite) TestFind() {
 	filter := interactors.ModelInfoFilter{}
 	expected := []*model.Info{
-		model.NewInfo("", "", nil),
+		model.NewInfo("", "", "", nil),
 	}
 
 	s.mockedModelInfo.On("Find", mock.Anything).Return(expected, nil)

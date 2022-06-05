@@ -16,6 +16,6 @@ type Info struct {
 	weights []*weights.Info
 }
 
-func NewInfo(name string, neurons []*neuron.Info, layers []*layer.Info, links []*link.Info, weights []*weights.Info) *Info {
-	return &Info{name: name, neurons: neurons, layers: layers, links: links, weights: weights}
+func NewInfo(id, name string, neurons []*neuron.Info, layers []*layer.Info, links []*link.Info, weights []*weights.Info) *Info {
+	return &Info{id: id, name: name, neurons: neurons, layers: layers, links: links, weights: weights}
 }

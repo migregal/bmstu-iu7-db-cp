@@ -5,7 +5,8 @@ import (
 )
 
 type Weights struct {
-	ID          string `gorm:"type:uuid;column:id;default:generated();"`
+	ID          int `gorm:"-"`
+	InnerID     string `gorm:"type:uuid;column:id;default:generated();"`
 	StructureID string `gorm:"type:uuid;column:structure_id;"`
 	Name        string `gorm:"column:name"`
 	CreatedAt   time.Time

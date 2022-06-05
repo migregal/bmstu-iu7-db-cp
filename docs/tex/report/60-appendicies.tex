@@ -1,0 +1,124 @@
+\begin{appendices}
+    \chapter{Скрипт проведения миграции базы данных}
+	
+	В Листингах~\ref{lst:migration-1}~--~\ref{lst:migration-2} приведен скрипт проведения миграции базы данных PostgreSQL~версии~14.2 в Docker~контейнере.
+	
+	\listingfile{migrate.sh}{migration-1}{bash}{Скрипт проведения миграции базы данных. Часть 1}{linerange={1-28}}
+	
+	\newpage
+	
+	\listingfile{migrate.sh}{migration-2}{bash}{Скрипт проведения миграции базы данных. Часть 2}{linerange={30-51}, firstnumber=30}
+
+	\chapter{Создания таблиц с информацией о пользователях}
+	
+	В Листинге \ref{lst:migr1} приведен скрипт создания таблицы, содержащей информацию о пользователях.
+	
+	\listingfile{migration-1.sql}{migr1}{SQL}{Создание таблицы с информацией о пользователях}{linerange={1-35}}
+	
+	\chapter{Создание таблиц с информацией о конфигурации нейронных сетей}
+	
+	В Листингах~\ref{lst:migr2-1},~\ref{lst:migr2-2}~и~\ref{lst:migr2-3} приведен скрипт создания таблиц, содержащей информацию о нейронной сети, её структуре и конфигурациях весов.
+	
+	\listingfile{migration-2.sql}{migr2-1}{SQL}{Создание таблиц с информацией о конфигурации нейронных сетей. Часть 1}{linerange={1-31}}
+	
+	\newpage
+	
+	\listingfile{migration-2.sql}{migr2-2}{SQL}{Сценарий второй миграции базы данных. Часть 2}{linerange={33-72}, firstnumber=33}
+	
+	\newpage
+	
+	\listingfile{migration-2.sql}{migr2-3}{SQL}{Сценарий второй миграции базы данных. Часть 3}{linerange={74-103}, firstnumber=74}
+	
+	\chapter{Создание ролевой модели}
+	
+	В Листингах~\ref{lst:migr3-1},~\ref{lst:migr3-2},~\ref{lst:migr3-3}~и~\ref{lst:migr3-4} приведен скрипт конфигурации ролевой модели базы данных, а именно - создания и настройки соответствующих прав доступа для трех ролей:
+    \begin{itemize}
+        \item пользователь;
+        \item аналитик;
+        \item администратор.
+    \end{itemize}
+    
+	\listingfile{migration-3.sql}{migr3-1}{SQL}{Сценарий третьей миграции базы данных. Часть 1}{linerange={1-26}}
+	
+	\newpage
+	
+	\listingfile{migration-3.sql}{migr3-2}{SQL}{Сценарий третьей миграции базы данных. Часть 2}{linerange={28-64}, firstnumber=28}
+	
+	\newpage
+	
+	\listingfile{migration-3.sql}{migr3-3}{SQL}{Сценарий третьей миграции базы данных. Часть 3}{linerange={66-98}, firstnumber=66}
+	
+	\newpage
+	
+	\listingfile{migration-3.sql}{migr3-4}{SQL}{Сценарий третьей миграции базы данных. Часть 4}{linerange={100-132}, firstnumber=100}
+	
+	\chapter{Создание триггеров базы данных}
+	
+	В Листинге~\ref{lst:migr4-1} приведен скрипт создания индексов базы данных.
+    
+	\listingfile{migration-4.sql}{migr4-1}{SQL}{Сценарий четвертой миграции базы данных. Часть 1}{linerange={1-30}}
+	
+	\newpage
+	
+	\listingfile{migration-4.sql}{migr4-2}{SQL}{Сценарий четвертой миграции базы данных. Часть 2}{linerange={32-60}, firstnumber=32}
+	
+	\newpage
+	
+	\listingfile{migration-4.sql}{migr4-3}{SQL}{Сценарий четвертой миграции базы данных. Часть 3}{linerange={62-96}, firstnumber=62}
+	
+	\newpage
+	
+	\listingfile{migration-4.sql}{migr4-4}{SQL}{Сценарий четвертой миграции базы данных. Часть 4}{linerange={98-130}, firstnumber=98}
+	
+	\newpage
+	
+	\listingfile{migration-4.sql}{migr4-5}{SQL}{Сценарий четвертой миграции базы данных. Часть 5}{linerange={132-170}, firstnumber=132}
+	
+	\newpage 
+	
+	\listingfile{migration-4.sql}{migr4-6}{SQL}{Сценарий четвертой миграции базы данных. Часть 6}{linerange={172-179}, firstnumber=172}
+	
+	\chapter{Создания индексов базы данных}
+	
+	В Листинге~\ref{lst:migr5-1} приведен скрипт создания индексов базы данных.
+    
+	\listingfile{migration-5.sql}{migr5-1}{SQL}{Сценарий пятой миграции базы данных}{linerange={1-36}}
+	
+	\chapter{Развертывание приложения}
+	
+	В Листинге~\ref{lst:db-docker} приведен скрипт создания \texttt{docker}-образа базы данных.
+	
+	\listingfile{db-docker}{db-docker}{docker}{Dockerfile для базы данных}{linerange={1-9}}
+	
+	Для развертывания использовался \texttt{docker-compose}. Данная система позволяет реализовать наследование конфигураций, что позволяет, например, реализовать множество конфигураций развертывания, указав общие для них элементы лишь единожды. В Листингах~\ref{lst:common-services}~--~\ref{lst:common-services-3} представлена конфигурация общих элементов для конфигураций развертывания приложения.
+	
+	\listingfile{common-services.yml}{common-services}{docker-compose}{Конфигурация общих элементов развертывания. Часть 1}{linerange={1-16}}
+	
+	\newpage
+	
+	\listingfile{common-services.yml}{common-services-2}{docker-compose}{Конфигурация общих элементов развертывания. Часть 2}{linerange={18-50},firstnumber=18}
+
+    \newpage
+    
+    \listingfile{common-services.yml}{common-services-3}{docker-compose}{Конфигурация общих элементов развертывания. Часть 3}{linerange={52-70},firstnumber=52}
+    
+    Листингах~\ref{lst:prod}~--~\ref{lst:prod-5} представлена итоговая конфигурация развертывания приложения.
+    
+    \listingfile{prod.yml}{prod}{docker-compose}{Конфигурация итоговых элементов развертывания. Часть 1}{linerange={1-18}}
+    
+    \newpage
+    
+    \listingfile{prod.yml}{prod-2}{docker-compose}{Конфигурация итоговых элементов развертывания. Часть 2}{linerange={20-56},firstnumber=20}
+    
+    \newpage
+    
+    \listingfile{prod.yml}{prod-3}{docker-compose}{Конфигурация итоговых элементов развертывания. Часть 3}{linerange={58-85},firstnumber=58}
+    
+    \newpage
+    
+    \listingfile{prod.yml}{prod-4}{docker-compose}{Конфигурация итоговых элементов развертывания. Часть 4}{linerange={87-125},firstnumber=87}
+    
+    \newpage
+    
+    \listingfile{prod.yml}{prod-5}{docker-compose}{Конфигурация итоговых элементов развертывания. Часть 5}{linerange={127-133},firstnumber=127}
+\end{appendices}

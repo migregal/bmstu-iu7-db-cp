@@ -1,9 +1,9 @@
 package neuron
 
 func (i *Neuron) GetID() string {
-	return i.ID
+	return i.InnerID
 }
 
 func (i *Neuron) GetLayerID() string {
-	return i.LayerID
+	return i.InnerLayerID
 }

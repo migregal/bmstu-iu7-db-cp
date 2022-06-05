@@ -2,7 +2,9 @@ package adminweights
 
 import (
 	"net/http"
+
 	"neural_storage/cube/core/ports/interactors"
+	"neural_storage/cube/handlers/http/v1/entities/structure/weights"
 	"neural_storage/pkg/logger"
 
 	"github.com/gin-gonic/gin"
@@ -15,13 +17,6 @@ type getRequest struct {
 	Page        int    `form:"page"`
 	PerPage     int    `form:"per_page"`
 }
-
-type WeightInfo struct {
-	Id      string      `json:"id,omitempty" example:"f6457bdf-4e67-4f05-9108-1cbc0fec9405"`
-	Name    string      `json:"name,omitempty" example:"awesome_username"`
-	Weights interface{} `json:"offsets,omitempty"`
-	Offsets interface{} `json:"weights,omitempty"`
-} // @name AdminModelWeightsInfoResponse
 
 // Registration  godoc
 // @Summary      Find model info
@@ -78,20 +73,15 @@ func (h *Handler) Get(c *gin.Context) {
 	if len(infos) == 0 {
 		statOKGet.Inc()
 		lg.Info("no weights found")
-		c.JSON(http.StatusOK, []WeightInfo{})
+		c.JSON(http.StatusOK, []weights.Info{})
 		return
 	}
-	var res []WeightInfo
+	var res []weights.Info
 	for _, val := range infos {
-		res = append(res, WeightInfo{
-			Id:      val.ID(),
-			Name:    val.Name(),
-			Weights: val.Weights(),
-			Offsets: val.Offsets(),
-		})
+		res = append(res, weightFromBL(*val))
 	}
 
 	statOKGet.Inc()
-	lg.WithFields(map[string]interface{}{"res": res}).Info("success")
+	lg.Info("success")
 	c.JSON(http.StatusOK, res)
 }

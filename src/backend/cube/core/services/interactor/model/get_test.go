@@ -25,7 +25,7 @@ func (s *GetSuite) TearDownTest() {
 }
 
 func (s *GetSuite) TestGet() {
-	expected := model.NewInfo("", "", nil)
+	expected := model.NewInfo("", "", "", nil)
 
 	s.mockedModelInfo.On("Get", mock.Anything).Return(expected, nil)
 	info, err := s.interactor.Get(s.ctx, expected.ID())

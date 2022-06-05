@@ -1,15 +1,15 @@
 package weight
 
 func (w *Weight) GetID() string {
-	return w.ID
+	return w.InnerID
 }
 
 func (w *Weight) GetWeightsID() string {
-	return w.WeightsID
+	return w.InnerWeightsID
 }
 
 func (w *Weight) GetLinkID() string {
-	return w.LinkID
+	return w.InnerLinkID
 }
 
 func (w *Weight) GetValue() float64 {

@@ -1,11 +1,11 @@
 package link
 
 type Info struct {
-	id   string
-	from string
-	to   string
+	id   int
+	from int
+	to   int
 }
 
-func NewInfo(id string, from string, to string) *Info {
+func NewInfo(id int, from int, to int) *Info {
 	return &Info{id: id, from: from, to: to}
 }

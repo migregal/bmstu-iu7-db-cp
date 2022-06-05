@@ -1,7 +1,7 @@
 package weights
 
 func (w *Weights) GetID() string {
-	return w.ID
+	return w.InnerID
 }
 
 func (w *Weights) GetStructureID() string {

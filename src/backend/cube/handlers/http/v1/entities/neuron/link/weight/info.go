@@ -1,7 +1,7 @@
 package weight
 
 type Info struct {
-	ID     string  `json:"id"`
-	LinkID string  `json:"link_id"`
+	ID     int     `json:"id"`
+	LinkID int     `json:"link_id"`
 	Weight float64 `json:"weight"`
 }

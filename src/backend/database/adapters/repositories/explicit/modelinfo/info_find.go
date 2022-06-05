@@ -3,6 +3,7 @@ package modelinfo
 import (
 	"fmt"
 	"neural_storage/cube/core/entities/model"
+	"neural_storage/cube/core/entities/structure"
 	"neural_storage/cube/core/ports/repositories"
 	dbmodel "neural_storage/database/core/entities/model"
 )
@@ -32,6 +33,21 @@ func (r *Repository) Find(filter repositories.ModelInfoFilter) ([]*model.Info, e
 	}
 
 	dbInfo := []*model.Info{}
+	if len(filter.Ids) == 0 {
+		for _, v := range modelInfo {
+			st, err := r.getStructInfo(v.ID)
+			if err != nil {
+				return nil, err
+			}
+
+			dbInfo = append(dbInfo, model.NewInfo(
+				v.GetID(), v.GetOwnerID(),
+				v.GetName(),
+				structure.NewInfo(st.GetID(), st.GetName(), nil, nil, nil, nil)))
+		}
+		return dbInfo, nil
+	}
+
 	for _, v := range modelInfo {
 		data, err := r.Get(v.GetID())
 		if err != nil {

@@ -83,7 +83,6 @@ func (r *Repository) Update(info user.Info) error {
 
 func (r *Repository) Delete(info user.Info) error {
 	data := toDBEntity(info)
-	fmt.Println("fuuuuck:", data)
 	return r.db.Delete(&data).Error
 }
 

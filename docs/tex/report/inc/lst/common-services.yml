@@ -1,0 +1,66 @@
+version: '3.9'
+
+services:
+  postgres_db:
+    build:
+      context: ./database
+    container_name: postgresql
+    env_file: ./database/.env
+    restart: always
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - "pg_isready -d $$POSTGRES_DB -U $$POSTGRES_USER"
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  migration:
+    build:
+      context: ./migration
+    container_name: db-migration
+    working_dir: /usr/app
+    entrypoint: ./migrate
+    env_file: ./migration/.env
+    volumes:
+      - ../database/migration:/usr/app
+      - ../database/migration/init/:/docker-entrypoint-initdb.d/
+
+  tarantool-db:
+    image: tarantool/tarantool:2.8
+    container_name: tarantool-db
+    command: tarantool /cache/init.lua
+    env_file:
+      - ./cache/.env
+    volumes:
+      - ./cache:/cache
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    depends_on:
+      - cube
+    restart: always
+
+  grafana:
+    image: grafana/grafana-oss:latest
+    container_name: grafana
+    environment:
+      - GF_SERVER_DOMAIN=localhost
+      - GF_SERVER_ROOT_URL=http://localhost/grafana/
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+    depends_on:
+      - prometheus
+    restart: always
+
+  cube:
+    env_file: ./cube/.env
+    expose:
+      - 8080

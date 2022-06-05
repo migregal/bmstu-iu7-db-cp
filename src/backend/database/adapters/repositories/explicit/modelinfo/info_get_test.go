@@ -42,19 +42,21 @@ func (s *GetSuite) TearDownTest() {
 func (s *GetSuite) TestGet() {
 	name := "test"
 	info := *model.NewInfo(
-		"",
 		name,
+		"",
+		"",
 		structure.NewInfo(
+			"",
 			"awesome struct",
-			[]*neuron.Info{neuron.NewInfo("neuron1", "test")},
-			[]*layer.Info{layer.NewInfo("test", "alpha", "beta")},
-			[]*link.Info{link.NewInfo("link1", "neuron1", "neuron1")},
+			[]*neuron.Info{neuron.NewInfo(0, 0)},
+			[]*layer.Info{layer.NewInfo(0, "alpha", "beta")},
+			[]*link.Info{link.NewInfo(0, 0, 0)},
 			[]*weights.Info{
 				weights.NewInfo(
 					"",
-					"weights1",
-					[]*weight.Info{weight.NewInfo("weights1", "w1", 0.1)},
-					[]*offset.Info{offset.NewInfo("weights1", "o1", 0.5)},
+					"weights 1",
+					[]*weight.Info{weight.NewInfo(0, 0, 0.1)},
+					[]*offset.Info{offset.NewInfo(0, 0, 0.5)},
 				),
 			},
 		))
@@ -68,37 +70,37 @@ func (s *GetSuite) TestGet() {
 			ID:   info.Structure().ID(),
 			Name: info.Structure().Name()}))
 	s.SqlMock.
-		ExpectQuery(`SELECT \* FROM "layers" WHERE structure_id = .* ORDER BY .* LIMIT 1`).
+		ExpectQuery(`SELECT \* FROM "layers" WHERE structure_id = .*`).
 		WillReturnRows(utils.MockRows(dblayer.Layer{
 			ID:             info.Structure().Layers()[0].ID(),
 			StructureID:    info.Structure().ID(),
 			LimitFunc:      info.Structure().Layers()[0].LimitFunc(),
 			ActivationFunc: info.Structure().Layers()[0].ActivationFunc()}))
 	s.SqlMock.
-		ExpectQuery(`^SELECT \* FROM "neurons" WHERE structure_id = .*$`).
+		ExpectQuery(`^SELECT \* FROM "neurons" WHERE layer_id in .*$`).
 		WillReturnRows(utils.MockRows(dbneuron.Neuron{
-			ID:      info.Structure().Neurons()[0].Id(),
+			ID:      info.Structure().Neurons()[0].ID(),
 			LayerID: info.Structure().Neurons()[0].LayerID()}))
 	s.SqlMock.
-		ExpectQuery(`^SELECT \* FROM "neuron_links" WHERE structure_id = .*$`).
+		ExpectQuery(`^SELECT \* FROM "neuron_links" WHERE from_id in .*$`).
 		WillReturnRows(utils.MockRows(dblink.Link{
-			ID:   info.Structure().Links()[0].Id(),
+			ID:   info.Structure().Links()[0].ID(),
 			From: info.Structure().Links()[0].From(),
 			To:   info.Structure().Links()[0].To()}))
 	s.SqlMock.
 		ExpectQuery(`^SELECT \* FROM "weights_info" WHERE structure_id = .*$`).
 		WillReturnRows(utils.MockRows(dbweights.Weights{
-			ID:   info.Structure().Weights()[0].ID(),
+			InnerID:   info.Structure().Weights()[0].ID(),
 			Name: info.Structure().Weights()[0].Name()}))
 	s.SqlMock.
-		ExpectQuery(`^SELECT \* FROM "neuron_offsets" WHERE weights_id = .*$`).
+		ExpectQuery(`^SELECT \* FROM "neuron_offsets" WHERE weights_info_id = .*$`).
 		WillReturnRows(utils.MockRows(dboffset.Offset{
-			Weights: info.Structure().Weights()[0].ID(),
+			InnerWeights: info.Structure().Weights()[0].ID(),
 			ID:      info.Structure().Weights()[0].Offsets()[0].ID(),
 			Neuron:  info.Structure().Weights()[0].Offsets()[0].NeuronID(),
 			Offset:  info.Structure().Weights()[0].Offsets()[0].Offset()}))
 	s.SqlMock.
-		ExpectQuery(`^SELECT \* FROM "link_weights" WHERE weights_id = .*$`).
+		ExpectQuery(`^SELECT \* FROM "link_weights" WHERE weights_info_id = .*$`).
 		WillReturnRows(utils.MockRows(dbweight.Weight{
 			WeightsID: info.Structure().Weights()[0].Weights()[0].LinkID(),
 			ID:        info.Structure().Weights()[0].Weights()[0].ID(),

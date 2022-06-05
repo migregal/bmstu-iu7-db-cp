@@ -6,8 +6,17 @@ services:
       file: common-services.yml
       service: postgres_db
     env_file: ./database/.dev.env
+    volumes:
+      - ../database/data:/data/dbcp/
     ports:
       - 5432:5432
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - "pg_isready -d $$POSTGRES_DB -U $$POSTGRES_USER"
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   migration:
     extends:
@@ -23,6 +32,8 @@ services:
     extends:
       file: common-services.yml
       service: tarantool-db
+    ports:
+      - 3301:3301
     env_file:
       - ./cache/.dev.env
 
@@ -40,7 +51,7 @@ services:
     volumes:
       - ../go.sum:/tmp/project/go.sum
       - ../go.mod:/tmp/project/go.mod
-      - ../vendor:/tmp/project/vendor
+      - ../vendor/:/tmp/project/vendor
       - ../pkg:/tmp/project/pkg
       - ../cache:/tmp/project/cache
       - ../config:/tmp/project/config
@@ -50,3 +61,7 @@ services:
       - ../cube/.air.toml:/tmp/project/cube/.air.toml
       - ../cube/dev.yml:/tmp/config.yml
       - ../out/crypto:/tmp/crypto/
+    depends_on:
+      migration:
+        condition: service_completed_successfully
+    restart: always

@@ -9,7 +9,7 @@ import (
 )
 
 type deleteRequest struct {
-	ID string `json:"id" example:"f6457bdf-4e67-4f05-9108-1cbc0fec9405"`
+	ID string `json:"id" form:"id" example:"f6457bdf-4e67-4f05-9108-1cbc0fec9405"`
 }
 
 // Registration  godoc
@@ -48,6 +48,11 @@ func (h *Handler) Delete(c *gin.Context) {
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
+
+	defer func() {
+		lg.Info("attempt to delete weight from cache")
+		_ = h.cache.Delete(weightStorage, req.ID)
+	}()
 
 	lg.WithFields(map[string]interface{}{"user": usrID, "id": req.ID}).Info("attempt to delete weights")
 	err := h.resolver.DeleteStructureWeights(c, usrID, req.ID)

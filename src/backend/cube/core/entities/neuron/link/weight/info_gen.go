@@ -1,10 +1,10 @@
 package weight
 
-func (i *Info) ID() string {
+func (i *Info) ID() int {
 	return i.id
 }
 
-func (i *Info) LinkID() string {
+func (i *Info) LinkID() int {
 	return i.linkID
 }
 
