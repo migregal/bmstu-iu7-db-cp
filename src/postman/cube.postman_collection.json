@@ -1,0 +1,1593 @@
+{
+	"info": {
+		"_postman_id": "fc2b6a82-284a-4515-9193-f1fcc1f28959",
+		"name": "Cube",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "16256001"
+	},
+	"item": [
+		{
+			"name": "01.v1",
+			"item": [
+				{
+					"name": "01.01.registration",
+					"item": [
+						{
+							"name": "registration",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response must be valid and have a body\", function () {",
+											"    pm.response.to.be.ok;",
+											"    pm.response.to.be.withBody;",
+											"    pm.response.to.be.json;",
+											"});",
+											"",
+											"pm.test(\"User access token\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.token).to.not.null;",
+											"});",
+											"",
+											"pm.environment.set(\"user_access_token\", pm.response.json().token);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"accept-encoding": true
+								}
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"ivanovii\",\n    \"email\": \"user@neural.com\",\n    \"fullname\":\"Ivanov Ivan Ivanovich\",\n    \"password\": \"11111111\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host_url}}/api/v1/registration",
+									"host": [
+										"{{host_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"registration"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "01.02.login",
+					"item": [
+						{
+							"name": "login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response must be valid and have a body\", function () {",
+											"    pm.response.to.be.ok;",
+											"    pm.response.to.be.withBody;",
+											"    pm.response.to.be.json;",
+											"});",
+											"",
+											"pm.test(\"User access token\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.token).to.not.null;",
+											"});",
+											"",
+											"pm.environment.set(\"user_access_token\", pm.response.json().token);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"user@neural.com\",\n    \"password\": \"11111111\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host_url}}/api/v1/login",
+									"host": [
+										"{{host_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"login"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "01.03.refresh",
+					"item": [
+						{
+							"name": "refresh",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response must be valid and have a body\", function () {",
+											"    pm.response.to.be.ok;",
+											"    pm.response.to.be.withBody;",
+											"    pm.response.to.be.json;",
+											"});",
+											"",
+											"pm.test(\"User access token\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.token).to.not.null;",
+											"});",
+											"",
+											"pm.environment.set(\"user_access_token\", pm.response.json().token);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{user_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host_url}}/api/v1/refresh",
+									"host": [
+										"{{host_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"refresh"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "01.04.models",
+					"item": [
+						{
+							"name": "models",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response must be valid and have a body\", function () {",
+											"    pm.response.to.be.ok;",
+											"    pm.response.to.be.withBody;",
+											"    pm.response.to.be.json;",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{user_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "title",
+											"value": "my_awesome_model4",
+											"type": "text"
+										},
+										{
+											"key": "structure",
+											"type": "file",
+											"src": "/Users/g.mironov/projects/bmstu-iu7-db-cp/structure.json.gz"
+										},
+										{
+											"key": "weights",
+											"type": "file",
+											"src": "/Users/g.mironov/projects/bmstu-iu7-db-cp/weights.json.gz"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{host_url}}/api/v1/models",
+									"host": [
+										"{{host_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"models"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "models",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"response is ok\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test('response headers should indicate valid content encoding', function  () {",
+											"    pm.response.to.have.header('content-encoding', 'gzip')",
+											"        .and.have.header('content-type', 'application/json; charset=utf-8');",
+											"});",
+											"",
+											"pm.environment.set(\"model_id\", pm.response.json()[0].id);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{user_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept-Encoding",
+										"value": "gzip",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{host_url}}/api/v1/models?id={{model_id}}",
+									"host": [
+										"{{host_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"models"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "{{model_id}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "models",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response must be valid and have a body\", function () {",
+											"    pm.response.to.be.ok;",
+											"    pm.response.to.be.withBody;",
+											"    pm.response.to.be.json;",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{user_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{host_url}}/api/v1/models?id={{model_id}}",
+									"host": [
+										"{{host_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"models"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "{{model_id}}"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "01.04.weights",
+					"item": [
+						{
+							"name": "weights",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response must be valid and have a body\", function () {",
+											"    pm.response.to.be.ok;",
+											"    pm.response.to.be.withBody;",
+											"    pm.response.to.be.json;",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{user_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "model",
+											"value": "{{model_id}}",
+											"type": "text"
+										},
+										{
+											"key": "weights",
+											"type": "file",
+											"src": "/Users/g.mironov/projects/bmstu-iu7-db-cp/weights.json.gz"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{host_url}}/api/v1/models/weights",
+									"host": [
+										"{{host_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"models",
+										"weights"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "weights",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"response is ok\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test('response headers should indicate valid content encoding', function  () {",
+											"    pm.response.to.have.header('content-encoding', 'gzip')",
+											"        .and.have.header('content-type', 'application/json; charset=utf-8');",
+											"});",
+											"",
+											"pm.environment.set(\"weights_id\", pm.response.json()[0].id);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{user_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept-Encoding",
+										"value": "gzip",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{host_url}}/api/v1/models/weights",
+									"host": [
+										"{{host_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"models",
+										"weights"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "{{weights_id}}",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "weights",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response must be valid and have a body\", function () {",
+											"    pm.response.to.be.ok;",
+											"    pm.response.to.be.withBody;",
+											"    pm.response.to.be.json;",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{user_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{host_url}}/api/v1/models/weights",
+									"host": [
+										"{{host_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"models",
+										"weights"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "{{weights_id}}",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "01.05.users",
+					"item": [
+						{
+							"name": "users",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response must be valid and have a body\", function () {",
+											"    pm.response.to.be.ok;",
+											"    pm.response.to.be.withBody;",
+											"    pm.response.to.be.json;",
+											"});",
+											"",
+											"pm.test(\"UserInfo id format check\", function () {",
+											"    pm.expect(pm.response.json()[0].id.match(/^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$/gi)).to.be.not.null;",
+											"});",
+											"",
+											"pm.environment.set(\"user_id\", pm.response.json()[0].id);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{user_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host_url}}/api/v1/users?email=user@neural.com",
+									"host": [
+										"{{host_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"users"
+									],
+									"query": [
+										{
+											"key": "email",
+											"value": "user@neural.com"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "01.06.logout",
+					"item": [
+						{
+							"name": "logout",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.be.ok;",
+											"    pm.response.to.be.not.withBody;",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{user_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host_url}}/api/v1/logout",
+									"host": [
+										"{{host_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"logout"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "01.07.admin",
+					"item": [
+						{
+							"name": "01.07.01.login",
+							"item": [
+								{
+									"name": "login",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response must be valid and have a body\", function () {",
+													"    pm.response.to.be.ok;",
+													"    pm.response.to.be.withBody;",
+													"    pm.response.to.be.json;",
+													"});",
+													"",
+													"pm.test(\"Admin access token\", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.token).to.not.null;",
+													"});",
+													"",
+													"pm.environment.set(\"admin_access_token\", pm.response.json().token);"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "noauth"
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"email\": \"user@neural.com\",\n    \"password\": \"11111111\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{host_url}}/api/v1/admin/login",
+											"host": [
+												"{{host_url}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"admin",
+												"login"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "01.07.02.refresh",
+							"item": [
+								{
+									"name": "refresh",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response must be valid and have a body\", function () {",
+													"    pm.response.to.be.ok;",
+													"    pm.response.to.be.withBody;",
+													"    pm.response.to.be.json;",
+													"});",
+													"",
+													"pm.test(\"Admin access token\", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.token).to.not.null;",
+													"});",
+													"",
+													"pm.environment.set(\"admin_access_token\", pm.response.json().token);"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{admin_access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{host_url}}/api/v1/admin/refresh_token",
+											"host": [
+												"{{host_url}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"admin",
+												"refresh_token"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "01.07.03.users",
+							"item": [
+								{
+									"name": "blocked",
+									"item": [
+										{
+											"name": "ban",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Response must be valid and don't have a body\", function () {",
+															"    pm.response.to.be.ok;",
+															"    pm.response.to.be.not.withBody;",
+															"});",
+															"",
+															""
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "{{admin_access_token}}",
+															"type": "string"
+														}
+													]
+												},
+												"method": "PATCH",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"id\": \"{{user_id}}\",\n  \"until\": \"{{block_until}}\"\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{host_url}}/api/v1/admin/users/blocked",
+													"host": [
+														"{{host_url}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"admin",
+														"users",
+														"blocked"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "banInfo",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Response must be valid and have a body\", function () {",
+															"    pm.response.to.be.ok;",
+															"    pm.response.to.be.withBody;",
+															"    pm.response.to.be.json;",
+															"});",
+															"",
+															"pm.test(\"UserBan response check\", function () {",
+															"    var jsonData = pm.response.json();",
+															"",
+															"    pm.expect(jsonData).to.have.keys([\"id\", \"until\"]);",
+															"",
+															"    pm.expect(jsonData.id).to.be.eq(pm.environment.get(\"user_id\"), \"get user id\");",
+															"",
+															"    pm.expect(new Date(jsonData.until)).to.be.deep.equal(new Date(pm.environment.get(\"block_until\")), \"get user block date\");",
+															"});",
+															""
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "{{admin_access_token}}",
+															"type": "string"
+														}
+													]
+												},
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{host_url}}/api/v1/admin/users/blocked?id={{user_id}}",
+													"host": [
+														"{{host_url}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"admin",
+														"users",
+														"blocked"
+													],
+													"query": [
+														{
+															"key": "id",
+															"value": "{{user_id}}"
+														}
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "unban",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Response must be valid and don't have a body\", function () {",
+															"    pm.response.to.be.ok;",
+															"    pm.response.to.be.not.withBody;",
+															"});",
+															"",
+															""
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "{{admin_access_token}}",
+															"type": "string"
+														}
+													]
+												},
+												"method": "DELETE",
+												"header": [],
+												"url": {
+													"raw": "{{host_url}}/api/v1/admin/users/blocked?id={{user_id}}",
+													"host": [
+														"{{host_url}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"admin",
+														"users",
+														"blocked"
+													],
+													"query": [
+														{
+															"key": "id",
+															"value": "{{user_id}}"
+														}
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "users",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response must be valid and have a body\", function () {",
+													"    pm.response.to.be.ok;",
+													"    pm.response.to.be.withBody;",
+													"    pm.response.to.be.json;",
+													"});",
+													"",
+													"pm.test(\"UserInfo id format check\", function () {",
+													"    pm.response.to.be.ok;",
+													"    pm.response.to.be.withBody;",
+													"    pm.response.to.be.json;",
+													"    pm.expect(pm.response.json()[0].id.match(/^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$/gi)).to.be.not.null;",
+													"});",
+													"",
+													"",
+													"pm.environment.set(\"user_id\", pm.response.json()[0].id);",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{admin_access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{host_url}}/api/v1/admin/users?email=user@neural.com",
+											"host": [
+												"{{host_url}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"admin",
+												"users"
+											],
+											"query": [
+												{
+													"key": "email",
+													"value": "user@neural.com"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "users",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response must be valid and don't have a body\", function () {",
+													"    pm.response.to.be.ok;",
+													"    pm.response.to.be.not.withBody;",
+													"});",
+													"",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{admin_access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{host_url}}/api/v1/admin/users?id={{user_id}}",
+											"host": [
+												"{{host_url}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"admin",
+												"users"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "{{user_id}}"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "01.07.04.models",
+							"item": [
+								{
+									"name": "models",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"response is ok\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test('response headers should indicate valid content encoding', function  () {",
+													"    pm.response.to.have.header('content-encoding', 'gzip')",
+													"        .and.have.header('content-type', 'application/json; charset=utf-8');",
+													"});",
+													"",
+													"pm.environment.set(\"model_id\", pm.response.json()[0].id);"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{admin_access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{host_url}}/api/v1/admin/models",
+											"host": [
+												"{{host_url}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"admin",
+												"models"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "{{model_id}}",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "models",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response must be valid and have a body\", function () {",
+													"    pm.response.to.be.ok;",
+													"    pm.response.to.be.withBody;",
+													"    pm.response.to.be.json;",
+													"});",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{admin_access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{host_url}}/api/v1/admin/models?id={{model_id}}",
+											"host": [
+												"{{host_url}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"admin",
+												"models"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "{{model_id}}"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "01.07.05.weights",
+							"item": [
+								{
+									"name": "weights",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"response is ok\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"pm.test('response headers should indicate valid content encoding', function  () {",
+													"    pm.response.to.have.header('content-encoding', 'gzip')",
+													"        .and.have.header('content-type', 'application/json; charset=utf-8');",
+													"});",
+													"",
+													"pm.environment.set(\"weights_id\", pm.response.json()[0].id);"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{admin_access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept-Encoding",
+												"value": "gzip",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{host_url}}/api/v1/admin/models/weights",
+											"host": [
+												"{{host_url}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"admin",
+												"models",
+												"weights"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "{{weights_id}}",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "weights",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response must be valid and have a body\", function () {",
+													"    pm.response.to.be.ok;",
+													"    pm.response.to.be.withBody;",
+													"    pm.response.to.be.json;",
+													"});",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{admin_access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{host_url}}/api/v1/admin/models/weights",
+											"host": [
+												"{{host_url}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"admin",
+												"models",
+												"weights"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "{{weights_id}}",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "01.08.stat",
+					"item": [
+						{
+							"name": "01.08. 01.login",
+							"item": [
+								{
+									"name": "login",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response must be valid and have a body\", function () {",
+													"    pm.response.to.be.ok;",
+													"    pm.response.to.be.withBody;",
+													"    pm.response.to.be.json;",
+													"});",
+													"",
+													"pm.test(\"Stat access token\", function () {",
+													"    var jsonData = pm.response.json();",
+													"    pm.expect(jsonData.token).to.not.null;",
+													"});",
+													"",
+													"pm.environment.set(\"stat_access_token\", pm.response.json().token);"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "noauth"
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"email\": \"user@neural.com\",\n    \"password\": \"11111111\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{host_url}}/api/v1/stat/login",
+											"host": [
+												"{{host_url}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"stat",
+												"login"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "01.08.02.users",
+							"item": [
+								{
+									"name": "users",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{stat_access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{host_url}}/api/v1/stat/users?registration=1&update=1",
+											"host": [
+												"{{host_url}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"stat",
+												"users"
+											],
+											"query": [
+												{
+													"key": "registration",
+													"value": "1"
+												},
+												{
+													"key": "update",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "01.08.03.models",
+							"item": [
+								{
+									"name": "models",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{stat_access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{host_url}}/api/v1/stat/models?load=1&update=1",
+											"host": [
+												"{{host_url}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"stat",
+												"models"
+											],
+											"query": [
+												{
+													"key": "load",
+													"value": "1"
+												},
+												{
+													"key": "update",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "01.08.03.weights",
+							"item": [
+								{
+									"name": "weights",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{stat_access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{host_url}}/api/v1/stat/weights?load=1&update=1",
+											"host": [
+												"{{host_url}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"stat",
+												"weights"
+											],
+											"query": [
+												{
+													"key": "load",
+													"value": "1"
+												},
+												{
+													"key": "update",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "host_url",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_access_token",
+			"value": ""
+		},
+		{
+			"key": "admin_access_token",
+			"value": ""
+		},
+		{
+			"key": "user_id",
+			"value": ""
+		},
+		{
+			"key": "block_until",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
