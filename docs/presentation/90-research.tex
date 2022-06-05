@@ -1,11 +1,20 @@
 \frame {
-    \frametitle{\LARGE Эксперимент}
+    \frametitle{\LARGE Исследование}
     \pgfplotsset{tick label style={font=\tiny\bfseries},
         label style={font=\small},
         legend style={font=\tiny}
     }
     \begin{columns}
+        \footnotesize
         \begin{column}{0.6\textwidth}
+            \vskip3.5em
+            Технические характеристики:
+            \begin{itemize}
+                \item процессор: Intel~Core™~i7-1068NG7~CPU~@~2.30ГГц;
+            	\item память: 16~Гб;
+            	\item операционная система: \texttt{macOS~Big~Sur}~11.6.
+            \end{itemize}
+            
             Кэширование данных показало снижение времени отклика системы вплоть до 39 раз, при условии нахождения запрашиваемых данных в кэше
             \begin{itemize}
                 \item 23.6~c --- получение информации из базы данных;
